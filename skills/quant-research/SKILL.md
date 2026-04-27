@@ -201,8 +201,10 @@ adversarial bundle is the mechanism that breaks same-model anchoring — see
 `bug_review.md` for the exact bundle and instruction.
 
 Each returns severity-tagged findings; `high` and `medium` findings block re-running
-the battery and block any verdict change until resolved. Findings are logged under
-`### Bug review for exp_NNN at <timestamp>` in `decisions.md` as the audit trail.
+the battery and block any verdict change until resolved. Findings are aggregated
+**inline in the assistant's reply** — the skill does not write to `decisions.md`
+or create any file. The session transcript is the audit surface; if the user
+wants a durable record they can copy the inline summary themselves.
 
 The notebook also runs the programmatic subset (random-signal benchmark, shuffled-target
 test, PnL reconciliation, cost monotonicity, sign-flip identity, NaN/Inf scan, time-
@@ -242,9 +244,10 @@ single instrument, missed prior work) produces a deployment-ready overstatement 
 What `experiment-review` does: dispatches 7 specialist sub-agents in parallel (question /
 scope / method / validation-sufficiency / claim / literature / narrative) plus 1
 adversarial cold-eye reviewer that reads the `.py` file alone with deliberately minimum
-context. Returns severity-tagged findings aggregated into
-`notebooks/<project>/reviews/exp_NNN_<ISO-date>.md`. See the `experiment-review` skill's
-own SKILL.md and references for the dimension scopes and dispatch protocol.
+context. Returns severity-tagged findings aggregated **inline in the assistant's
+reply** — the skill does not write a review report file or modify any project
+artifact. See the `experiment-review` skill's own SKILL.md and references for
+the dimension scopes and dispatch protocol.
 
 Sequence inside this skill:
 
@@ -305,8 +308,10 @@ must pass — *in this order*:
 3. **`references/research_quality_checklist.md`**: passes as final self-check.
 
 Setting `verdict = "supported"` without all three is a protocol violation that
-downgrades the result to *preliminary screening*. Each gate is logged in `decisions.md`
-with timestamp and the reviewer agent IDs.
+downgrades the result to *preliminary screening*. Each gate's pass/fail must be
+visible in the assistant's reply (trigger, reviewer roster, findings, resolution)
+— the skills do not write to `decisions.md`. If the user wants a durable record
+they can copy the inline summaries themselves.
 
 The two review gates intentionally remain *separate skills* and are *not* merged: they
 answer different questions (correctness vs. claim-warrant) and their adversarial

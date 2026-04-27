@@ -70,9 +70,11 @@ See `references/bug_review.md` and `references/sanity_checks.md`.
 - [ ] Multi-agent review dispatched (5 specialists in parallel, or 5 sequential passes if
       parallel dispatch is unavailable)
 - [ ] Every `high` / `medium` finding resolved or rejected with a recorded reason
-- [ ] `decisions.md` contains the bug-review entry with trigger, reviewer IDs, findings,
-      resolutions
-- [ ] No `verdict = "supported"` was set before the bug-review entry exists
+- [ ] The session transcript contains an inline bug-review summary with trigger,
+      reviewer roles, severity-tagged findings, and resolutions (the skill does
+      not write to `decisions.md`; the transcript is the audit surface)
+- [ ] No `verdict = "supported"` was declared before that inline bug-review
+      summary was actually produced
 
 A pass on this block is required before any pass on Block 9 (Robustness). The robustness
 gates measure overfitting and regime stability — not correctness — so a buggy PnL passes
