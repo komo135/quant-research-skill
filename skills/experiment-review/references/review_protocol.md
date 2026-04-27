@@ -155,30 +155,22 @@ the anchoring this reviewer is supposed to be free of. Let it find what it finds
 
 ## Aggregation
 
-After all eight reviewers return, the assistant produces a single review report at
-`notebooks/<project>/reviews/exp_NNN_<ISO-date>.md` using the template in
-`assets/review_report.md.template`. The aggregation steps:
+After all eight reviewers return, the assistant aggregates the findings into a
+single structured review **delivered inline in the assistant's reply**. The
+skill does not write a review report file to disk and does not append to
+`decisions.md`. The aggregation steps:
 
 1. Concatenate all findings, preserving severity and dimension tags.
 2. Sort: `high` first, then `medium`, then `low`. Within each tier, group by
    dimension in the order question / scope / method / validation / claim / literature /
    narrative / adversarial.
 3. Compute the overall verdict per `severity_rubric.md`.
-4. Write the report.
-5. **Optionally** append a one-line entry to the project's `decisions.md` linking the
-   review report. This is **opt-in**, not automatic — appending modifies the user's
-   research log and should only happen when the user has either explicitly authorized
-   it or invoked this skill from inside a quant-research workflow that already writes
-   to `decisions.md`. When in doubt, ask. If appending, the entry is:
-
-   ```
-   ### Experiment review for exp_NNN at <ISO timestamp>
-   See notebooks/<project>/reviews/exp_NNN_<ISO-date>.md. Verdict: <verdict>.
-   high: <count>, medium: <count>, low: <count>.
-   ```
-
-   The review report itself (in `reviews/`) is the canonical audit trail; the
-   `decisions.md` line is a navigation breadcrumb, not the record.
+4. Return the aggregated review in the assistant's reply, with a clearly
+   visible verdict line, finding counts (high / medium / low), and the
+   per-finding entries grouped as above. The minimum reply must contain:
+   verdict, counts, and every individual finding's full schema entry.
+5. The skill does not modify any project file. If the user wants a durable
+   record they can copy the inline review into `decisions.md` themselves.
 
 ## Single-agent fallback
 
@@ -213,12 +205,11 @@ a follow-up question to the user. Do not silently pick one.
 
 ## Output location and retention
 
-`notebooks/<project>/reviews/` is part of the project — the review is itself a
-research artifact. Reviews are committed alongside experiments. A history of reviews
-across cycles becomes part of the project's audit trail and lets a later researcher see
-how the conclusions evolved.
-
-If `notebooks/<project>/reviews/` does not exist, create it.
+The review is delivered **inline in the assistant's reply**. The skill does not
+create a `reviews/` folder, does not write any file, and does not modify
+`decisions.md`. If the user wants a durable record across cycles they can
+manually copy the inline review into the project — the skill itself stays
+read-only against the project tree.
 
 ## What the assistant does *not* do
 
@@ -233,7 +224,7 @@ If `notebooks/<project>/reviews/` does not exist, create it.
 A "review" that delivers a narrative without:
 - eight dimensions explicitly addressed (seven specialists + one adversarial),
 - severity tags on every finding,
-- an archived report at `notebooks/<project>/reviews/`,
+- a clearly visible verdict line and finding counts in the reply,
 - the adversarial reviewer running with the minimum bundle (not the full bundle),
 
 …has not actually run this skill. Whatever it is, call it something else, do not

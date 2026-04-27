@@ -82,8 +82,10 @@ fix the embargo) rather than relitigating whether the hypothesis is true.
 
 ## Parking findings
 
-A finding can be *parked* instead of fixed if and only if the author records, in
-`decisions.md`:
+A finding can be *parked* instead of fixed if and only if the author records the
+following — either inline in the review reply, or, optionally, in `decisions.md`
+if the author wants a durable record. The skill itself does not write the
+parking note; the author does:
 
 1. Which finding is being parked (severity, dimension, what)
 2. Why the fix is deferred (e.g. "multi-asset extension is the next cycle")

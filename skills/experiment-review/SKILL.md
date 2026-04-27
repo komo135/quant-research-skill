@@ -119,9 +119,11 @@ The eight dimensions:
    compliance actually communicates, orthogonal to dimension 7's *whether*
    spec is met).
 
-Each reviewer returns severity-tagged findings. Findings are aggregated into a
-structured review report at
-`notebooks/<project>/reviews/exp_NNN_<ISO-date>.md`.
+Each reviewer returns severity-tagged findings. The assistant aggregates them
+into a single structured review **delivered inline as part of the assistant's
+reply**. The skill does not write a review report file to disk. If the user
+later wants a durable record they can copy the relevant lines into
+`decisions.md` themselves; the skill itself does not modify any project file.
 
 ## Process
 
@@ -132,9 +134,9 @@ structured review report at
 | 3 | Prepare **two** context bundles: a full bundle for the seven specialists (notebook path, project root, design-cell content, prior cycle log, literature files) and a minimum bundle for the adversarial reviewer (the `.py` file alone — see dimension 8 in `references/review_dimensions.md` for the exact NOT-inputs list) |
 | 4 | Dispatch all eight reviewers *in parallel* via the assistant's sub-agent tool. The seven specialists each get the full bundle plus their dimension scope from `references/review_dimensions.md`. The adversarial reviewer gets only the minimum bundle plus its instruction (also in `references/review_dimensions.md`) |
 | 5 | Each reviewer returns findings in the schema below |
-| 6 | Aggregate into `notebooks/<project>/reviews/exp_NNN_<ISO-date>.md` using `assets/review_report.md.template` |
+| 6 | Aggregate the eight reviewers' findings into a single structured review and return it inline in the assistant's reply (no file is written) |
 | 7 | Compute the overall verdict per `references/severity_rubric.md`: ready / partial / preliminary / not-yet-research |
-| 8 | If running inside a quant-research session, append a one-line entry to the project's `decisions.md` linking to the review report |
+| 8 | The skill does not append to `decisions.md` or write a review report file. If the user wants a durable record they can copy the inline review themselves |
 
 See `references/review_dimensions.md` for what each reviewer specifically
 checks (dimensions 1–7 are specialists; dimension 8 is the adversarial cold-eye
@@ -191,7 +193,6 @@ is preserved sequentially as well as in parallel.
 
 - A delivered review with no severity tags
 - A delivered review covering fewer than eight dimensions explicitly
-- A delivered review with no archived report at `notebooks/<project>/reviews/`
 - A delivered review that concludes "looks fine" without naming what was
   checked under each dimension and what evidence supported that judgment
 - The adversarial reviewer was given the full bundle (literature, decisions,

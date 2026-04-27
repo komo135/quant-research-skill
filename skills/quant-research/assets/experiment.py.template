@@ -472,26 +472,27 @@ def _(mo):
     - Walk-forward mean Sharpe > 2 ; or headline ≥ 2 × walk-forward mean
     - ML AUC on return-sign target > 0.65 ; or per-trade win rate > 65 %
     - Bootstrap 95 % CI excludes the test metric (in either direction)
-    - Any change since the last bug-review entry in `decisions.md` to: data
-      ingestion, target, embargo, fold, feature scaling, signal alignment, fee
-      model
+    - Any change since the last bug-review pass to: data ingestion, target,
+      embargo, fold, feature scaling, signal alignment, fee model
 
     Even if no numeric trigger fires, run the layer once before the FIRST
     `verdict = "supported"` of the experiment.
 
-    Required outputs of this layer:
+    Required outputs of this layer (delivered inline in the assistant's
+    reply — the skill does NOT write to `decisions.md` or any file):
 
-    - [ ] An entry `### Bug review for exp_{{NNN}} at <ISO timestamp>` in
-          `decisions.md` listing trigger, the six reviewer agent IDs (five
-          specialists + one adversarial cold-eye reviewer), the findings, and
-          the resolution per finding
+    - [ ] An inline summary headed `Bug review for exp_{{NNN}}` listing the
+          trigger that fired, the six reviewer roles (five specialists + one
+          adversarial cold-eye reviewer), every finding (severity-tagged),
+          and the resolution per finding
     - [ ] All `high` and `medium` findings either fixed or rejected with a
-          recorded reason
-    - [ ] If the layer was skipped (no trigger), a one-line `decisions.md` note
+          recorded reason in the same inline summary
+    - [ ] If the layer was skipped (no trigger), a one-line note in the reply
           stating which non-trigger conditions held
 
-    A `verdict = "supported"` entry without a preceding bug-review entry
-    downgrades the conclusion to *preliminary screening*.
+    Declaring `verdict = "supported"` without an actually-run bug-review pass
+    in the session transcript downgrades the conclusion to *preliminary
+    screening*.
 
     ## 10b. Multi-agent experiment-review checkpoint (BEFORE the verdict cell, AFTER 10a)
 
@@ -501,18 +502,20 @@ def _(mo):
     claim / literature / narrative) plus 1 adversarial cold-eye reviewer that
     reads this `.py` file alone with deliberately minimum context.
 
-    Required outputs:
+    Required outputs (delivered inline in the assistant's reply — the skill
+    does NOT write a review report file or modify any project artifact):
 
-    - [ ] An entry `### Experiment review for exp_{{NNN}} at <ISO timestamp>` in
-          `decisions.md` linking the review report at
-          `notebooks/{{PROJECT_NAME}}/reviews/exp_{{NNN}}_<ISO-date>.md`
+    - [ ] An inline review headed `Experiment review for exp_{{NNN}}` with a
+          clearly visible verdict line, finding counts (high / medium / low),
+          and every individual finding's full schema entry
     - [ ] All `high` and `medium` findings either fixed or rejected with a
-          recorded reason
+          recorded reason in the same inline review
 
-    A `verdict = "supported"` entry without BOTH 10a (bug-review) AND 10b
-    (experiment-review) preceding entries downgrades the conclusion to
-    *preliminary screening*. The two layers answer different questions
-    (correctness vs. claim-warrant) — both required.
+    Declaring `verdict = "supported"` without BOTH section 10a (bug-review)
+    AND section 10b (experiment-review) actually run in the session
+    transcript downgrades the conclusion to *preliminary screening*. The two
+    layers answer different questions (correctness vs. claim-warrant) — both
+    required.
 
     ## 11. Programmatic verdict
     """

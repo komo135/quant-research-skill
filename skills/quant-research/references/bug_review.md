@@ -206,11 +206,15 @@ but anchoring, sycophancy, and lost-in-middle are removed.
      fix:      <concrete remediation or a follow-up question>
    ```
 
-4. The assistant aggregates findings into `decisions.md` under the heading
-   `### Bug review for exp_NNN at <ISO timestamp>`.
-5. The assistant addresses every `high` and every `medium` finding before re-running the
-   battery or declaring a verdict. `low` findings are logged and may be parked, with a
-   one-line reason in `decisions.md`.
+4. The assistant aggregates findings into a single structured summary
+   **delivered inline in the assistant's reply** — trigger that fired,
+   reviewer roster, every finding grouped by severity and dimension, and the
+   resolution intent. The skill does not write to `decisions.md` and does not
+   create any file.
+5. The assistant addresses every `high` and every `medium` finding before re-running
+   the battery or declaring a verdict. `low` findings are noted in the same inline
+   summary and may be parked. If the user wants a durable record they can copy the
+   summary into `decisions.md` themselves.
 
 ## Single-agent fallback
 
@@ -241,9 +245,9 @@ The most common failure: agent reads the robustness battery output (all green), 
 had a leak, every robustness metric is corrupted in the same direction and the green
 ticks are meaningless.
 
-**Bug review precedes robustness battery, not the other way around.** A
-`verdict = "supported"` entry in `decisions.md` without a preceding bug-review entry is a
-protocol violation that downgrades the result to *preliminary screening*.
+**Bug review precedes robustness battery, not the other way around.** Declaring
+`verdict = "supported"` without having actually run a triggered bug-review pass
+is a protocol violation that downgrades the result to *preliminary screening*.
 
 ## Relationship to `experiment-review` skill
 
@@ -267,12 +271,16 @@ the postcondition. Neither layer alone is sufficient.
 
 ## Audit
 
-`decisions.md` is the audit trail. Every triggered review must end with an entry that
-names:
+The inline summary delivered in the assistant's reply is the audit surface.
+Every triggered review must include in that summary:
 
 - The trigger that fired (numeric or state-change)
-- The six reviewers that were run, with their agent IDs / timestamps
+- The six reviewers that were run (the five specialist scopes plus the
+  adversarial reviewer)
 - The findings produced, severity-tagged
 - What was done about each finding (fixed / parked-with-reason)
 
-If any of these is missing, the layer was not actually run.
+If any of these is missing from the reply, the layer was not actually run.
+The skill itself does not write to `decisions.md` or any other file; the
+session transcript is the trail. If the user wants a durable record they can
+copy the inline summary themselves.
