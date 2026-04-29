@@ -260,13 +260,28 @@ The skill leans on a small number of well-known references:
 
 ## Status
 
-- Version 0.5.0
+- Version 0.6.0
 - Two skills, two review layers, both required as co-gate.
 - Notebook unit is one Purpose (open-ended investigation); per-Hypothesis
   verdict gates and result rows.
 - Adversarial-reviewer mechanism backed by Song (2026); see *References*.
 
 ### Changelog
+
+**0.6.0** — Notebook readability conventions added to
+`notebook_narrative.md`: figures must be self-explanatory at figure-time
+(intuitive at a glance, or with an embedded read-out — title naming the
+quantity + comparison, annotation stating how to read the encoding, or a
+one-line conclusion baked into the figure); when a sweep figure is paired
+with an adopted configuration elsewhere in the notebook, that point is
+marked on the figure. Helper functions defined in the notebook now require
+docstrings stating intent, the responsibility split, args / returns with
+producing / consuming cells, and side effects. Magic numbers concentrate
+in a config cell at the top of each H block; downstream cells reference
+the named constants, not raw literals. The notebook stays expressive
+within the project's existing imports — no new external library
+dependencies. Validated by RED-GREEN via subagent application scenarios
+on a fresh quant-research notebook.
 
 **0.5.0** — Notebook unit reframed from "1 hypothesis" to "1 Purpose"
 (an open-ended investigation). Multiple Hypotheses serving the same
