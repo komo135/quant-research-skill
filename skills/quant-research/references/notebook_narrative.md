@@ -318,6 +318,29 @@ altair / matplotlib). Reaching for a new library to make one figure prettier
 propagates that dependency to every future notebook in the project — a
 wrong trade.
 
+## Body / audit / planning separation
+
+A notebook is the **research artifact**. Two adjacent records exist for the same
+experiment but live elsewhere:
+
+- The **audit trail** (review trigger, reviewer roster, severity-tagged findings,
+  what was fixed) is the inline review summary in the chat transcript, optionally
+  copied to `decisions.md`.
+- The **planning state** (follow-up, parked findings, run-now / next-session,
+  derived H to run later) lives in `decisions.md` / `hypotheses.md` /
+  `hypothesis_cycles.md`.
+
+Body stays clean of the other two. Reviewer vocabulary
+(`leakage-reviewer`, `claim-reviewer`, `(literature dimension)`), severity
+labels (`high` / `medium` / `low`), step / case numbers (`Step 11`, `case A`,
+`medium #1`), and edit-history language ("after bug_review fix",
+"~~2.4~~ → 0.93", `*_pre_fix` audit variables) do not belong in the notebook
+body. Planning labels (`parked`, `follow-up`, `next-session`, `run-now`)
+do not belong in the notebook body.
+
+The mechanism that keeps body clean across review rounds is the post-review
+reconciliation pass — see `references/post_review_reconciliation.md`.
+
 ## Quick checklist
 
 Before declaring an experiment notebook complete:
@@ -347,3 +370,16 @@ Before declaring an experiment notebook complete:
       raw literals
 - [ ] No new external library is required beyond the project's existing
       imports
+- [ ] Notebook body contains no reviewer names (`leakage-reviewer` etc.),
+      reviewer dimension names, severity labels, step / case numbers,
+      planning labels (`parked` / `follow-up` / `next-session`), or
+      edit-history language ("after bug_review fix", "~~2.4~~", etc.)
+- [ ] Chapter numbering is `§1, §2, …, §N`, `## H<id>`, or
+      `## Post-review addenda` only; no lowercase / decimal suffix chapters
+      (`§6a`, `§7b`, `§7.1`); figure numbers stay within the up-front figure
+      plan plus addenda figures `A1, A2, …` (no `Fig 2b` etc.)
+- [ ] After any review-driven edit, every dependent cell has been re-executed
+      and every figure / observation / abstract / interpretation / verdict
+      reflects the post-fix pipeline output (see
+      `references/post_review_reconciliation.md` for the full Definition of
+      Done and verification pass)

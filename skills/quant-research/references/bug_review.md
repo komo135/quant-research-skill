@@ -215,6 +215,20 @@ but anchoring, sycophancy, and lost-in-middle are removed.
    the battery or declaring a verdict. `low` findings are noted in the same inline
    summary and may be parked. If the user wants a durable record they can copy the
    summary into `decisions.md` themselves.
+6. **Post-review reconciliation pass** (mandatory before re-running the robustness
+   battery). After fixing the findings in code, run `references/post_review_reconciliation.md`:
+   assign every reflected change to one of P1 (in-place rewrite), P2 (same-section
+   re-compute / sanity cell at the end of the existing `§N`), P3 (single
+   `## Post-review addenda` block before the verdict cell), or P4 (new `## H<id>`).
+   New chapters with lowercase / decimal suffixes (`§6a`, `§7b`) and figures that
+   violate the up-front figure plan (`Fig 2b`) are forbidden. Re-execute every
+   dependent cell, regenerate every figure, rewrite every observation, align all
+   abstract / per-H abstract / interpretation numbers with the post-fix pipeline,
+   and confirm past-round findings are still reflected. End with a top-to-bottom
+   verification pass that confirms no reviewer vocabulary, edit-history language, or
+   planning notes (`parked` / `follow-up` / `next-session`) has leaked into the
+   notebook body. Without this step, "fixed" in the inline summary is premature —
+   the finding is at most "addressed in code."
 
 ## Single-agent fallback
 

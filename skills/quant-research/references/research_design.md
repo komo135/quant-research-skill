@@ -12,9 +12,19 @@ and rules for writing falsifiable comparison statements.
 ## What to write at the top of each notebook (Purpose header — once)
 
 Each notebook (`experiments/exp_NNN_<purpose-slug>.py`) starts with a Markdown
-cell containing the **Purpose** of the investigation. The Purpose is open-ended
-(it admits multiple H's); individual H's get their own per-H block lower in
-the notebook.
+cell containing the **Purpose** of the investigation plus the four
+cycle-goal items defined in `cycle_purpose_and_goal.md`. The Purpose is
+open-ended (it admits multiple H's); the cycle-goal items make explicit
+*who consumes the cycle's knowledge output and what decision rule they will
+apply to it*. Individual H's get their own per-H block lower in the
+notebook.
+
+The cycle-goal items (Consumer / Decision / Decision rule / Knowledge
+output) are pre-implementation required. They are what H1's design is
+derived from — without them, the H portfolio is improvised per Purpose
+and downstream judgment becomes inconsistent. See
+`cycle_purpose_and_goal.md` for the derivation of why these four items
+exist and how to fill them.
 
 ```markdown
 ## exp_NNN: <one-line purpose-slug>
@@ -28,6 +38,34 @@ notebooks/<project-name>/
 "Can PCA factors predict next-day stock returns?"
 "Does Chronos add value over a frozen-embedding baseline?"
 Multiple Hypotheses serving this Purpose live as `## H<id>` blocks below.]
+
+### Cycle goal (four items — see cycle_purpose_and_goal.md)
+
+#### Consumer
+[Concretely named — the next derived Purpose, the production
+strategy build, the paper section, the portfolio-sizing decision.
+"The research community" / "future researchers" / "myself someday"
+are NOT acceptable; if the only consumer is that vague, return to
+Stage 0. "My own next Purpose, named as <slug>" is a legal
+escape hatch when the next Purpose is *nameable in one phrase*.]
+
+#### Decision the consumer is blocked on
+[One sentence: the yes/no/pivot the consumer cannot make without
+this cycle's output.]
+
+#### Decision rule (committed BEFORE the cycle runs)
+- YES (consumer goes forward): [numeric/structural threshold]
+- NO  (consumer does not go forward, with binding axis): [numeric/
+  structural threshold + which `failure_mode` would be the binding
+  axis]
+- KICK-UP (frame is wrong, return to upstream): [structural
+  condition — e.g., bug_review surfaces unresolvable upstream
+  data issue]
+
+#### Knowledge output (artifact that lets consumer apply the rule)
+[What the cycle produces — typically per-H rows in results.parquet
++ Purpose-level synthesis paragraph + headline figure. State it
+explicitly so the H portfolio below can be checked against it.]
 
 ### Universe (shared across all H's in this notebook)
 - Instruments: [list at least three, or describe the cross-section]
@@ -77,6 +115,19 @@ Each Hypothesis block inside the notebook contains:
 ### Linked hypothesis-portfolio entry
 H<id>: [quote the entry from hypotheses.md; under the same `experiment_id`
 as the notebook's Purpose]
+
+### Sub-claim of the decision rule that this H tests
+[Name the conjunct of the YES / NO / KICK-UP branches in the notebook's
+decision rule that this H produces evidence for. Examples:
+"YES branch's `walk-forward positive-rate ≥ 60%` conjunct"
+"NO branch's `binding axis = fee_model` identification"
+"YES branch's `no Pattern A binding axis` conjunct AND
+NO branch's `regime_mismatch` identification — one well-designed
+test covers both."
+An H with no sub-claim mapping is not in the portfolio under
+cycle_purpose_and_goal.md's frame; either map it to a conjunct of
+the decision rule, expand the decision rule in decisions.md to
+cover it (with justification), or drop the H.]
 
 ### Question for this H
 [Falsifiable comparison statement — see the table below.]

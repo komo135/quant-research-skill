@@ -46,6 +46,67 @@ Default to the within-a-Purpose scale. Crossing into a new notebook is
 reserved for cases where the Purpose itself has shifted (see
 `references/experiment_protocol.md` for the Purpose-change triggers).
 
+## Why the cycle exists — and what stops it (read before the exhaustion section)
+
+The cycle exists to elevate single-experiment evidence into knowledge
+durable enough that a downstream consumer can act on it. The cycle's goal
+is therefore **the knowledge output that closes the consumer's decision
+gap** — not "a `verdict='supported'` on H1", not "a Pattern A-E label",
+not "publication-grade evidence in the abstract". See
+`references/cycle_purpose_and_goal.md` for the four pre-cycle items
+(Consumer / Decision / Decision rule / Knowledge output) that pin this
+frame.
+
+A cycle has two distinct kinds of stop signal:
+
+### Primary stops (cycle finished its job)
+
+The cycle ends when **any** of these fire — these are the *intended*
+closures:
+
+1. **Primary YES** — enough sub-claims have evidence flags that the
+   consumer can apply the YES branch of the decision rule. The
+   YES-supporting H's pass `bug_review`, robustness battery, and
+   `experiment-review`.
+2. **Fallback NO with binding axis identified** — the cluster of H's
+   produces a Pattern A (`failure_mode` shared across rejections), a
+   Pattern C (Pareto frontier), or a Pattern E (special-case scope) that
+   the consumer can apply the NO branch to and inherit the binding axis
+   as documented prior. *This is a full research output, not a degraded
+   YES.*
+3. **KICK-UP** — a structural finding (often via `bug_review`,
+   `experiment-review` `scope` dimension, or unresolvable upstream
+   issue) reveals that the cycle's frame is the wrong layer for the
+   consumer's decision. The cycle closes with the structural finding
+   as its output; the consumer (often the researcher's own next-Purpose
+   decision) inherits "this layer must be solved first".
+
+All three are equivalent research outputs; the equivalence is what
+prevents "produce YES" from quietly becoming the goal (which reintroduces
+selection bias one layer up from the H level).
+
+### Emergency stops (cycle is failing to converge)
+
+When primary stops do not fire and H's keep accumulating without
+landing the decision rule, the protocol provides emergency stops to
+prevent unbounded sunk-cost iteration. The exhaustion-trigger rule
+below (N=5 advisory, N=8 hard cap) is the emergency-stop machinery.
+Its role is to **force cross-H synthesis and re-examine whether the
+Purpose's frame matches the consumer's decision** — not to define when
+the cycle should normally end. A cycle that hits the N=5 advisory
+typically means one of:
+
+- The decision rule's YES branch has thresholds the H portfolio cannot
+  reach (rule too aggressive — re-evaluate)
+- The Purpose is too broad and H's are testing different sub-claims
+  (Pattern B — split into derived Purposes)
+- The consumer's decision actually requires a KICK-UP that has not yet
+  been recognized as such
+
+The fact that a cycle hits the emergency stop at all is a signal worth
+recording in `decisions.md` — it indicates a frame mismatch that the
+project should learn from, not just a stop event.
+
 ## What to write at the end of each H round (inside the current notebook)
 
 ```markdown
@@ -142,16 +203,22 @@ decision. A run-now H whose Purpose is unchanged is the next round inside
 the current notebook *now*. A run-now H whose Purpose has changed opens
 the next notebook *now*.
 
-## Exhaustion criteria — the synthesis-trigger rule
+## Exhaustion criteria — the emergency-stop rule
 
-Patterns A-E in `cross_h_synthesis.md` define the *action* for each
-cluster shape. This section defines the *trigger* — when the
-researcher must stop generating H's and look at the cluster.
+This section defines the **emergency stops** — the triggers that force
+the researcher to stop generating H's and look at the cluster *when the
+primary stops (above) have not fired*. Patterns A-E in
+`cross_h_synthesis.md` define the *action* for each cluster shape; this
+section defines the *trigger* that forces the researcher to invoke them.
 
-Without a trigger, the patterns are advisory documentation that fires
-only when the researcher remembers to consult them. The empirical
-failure mode is that researchers mid-iteration on a Purpose do not
-remember; they keep generating H's. The trigger fixes this.
+Primary stops (Primary YES / Fallback NO with binding axis / KICK-UP, see
+the section above) are the intended way a cycle ends. The emergency
+stops below exist because cycles can fail to land any of those —
+typically when the decision rule was set with thresholds the H portfolio
+cannot reach, when the Purpose is too broad, or when a structural
+KICK-UP has not yet been recognized as one. Without an explicit trigger,
+researchers mid-iteration on a Purpose keep generating H's and the cycle
+runs unbounded.
 
 ### Hard trigger (mandatory)
 
@@ -241,14 +308,20 @@ four-gate machinery that gates real publication-grade verdicts.
 
 A research project counts as complete when all of these hold:
 
-- (a) The seven items in `robustness_battery.md` pass for every H whose
-  verdict is `supported`
-- (b) Every candidate H is classified (executed / next-session / dropped)
-- (c) Every candidate Purpose is classified (executed-as-its-own-notebook /
+- (a) Every Purpose's cycle has landed on a **primary stop** — Primary YES,
+  Fallback NO with binding axis, or KICK-UP (see "Why the cycle exists"
+  above and `cycle_purpose_and_goal.md`). A cycle closed only by emergency
+  stop (N=5 advisory or N=8 hard cap) without an articulated primary-stop
+  outcome is preliminary screening, not completion. The primary-stop
+  outcome is recorded in `decisions.md` per Purpose.
+- (b) The seven items in `robustness_battery.md` pass for every H whose
+  verdict is `supported` (= every H supplying evidence for a Primary YES)
+- (c) Every candidate H is classified (executed / next-session / dropped)
+- (d) Every candidate Purpose is classified (executed-as-its-own-notebook /
   next-session / dropped)
-- (d) `hypotheses.md` has no entries left in an "untriaged" state
-- (e) `decisions.md` provides a traceable history across all cycles, with
-  H sub-bullets under each Purpose
+- (e) `hypotheses.md` has no entries left in an "untriaged" state
+- (f) `decisions.md` provides a traceable history across all cycles, with
+  H sub-bullets under each Purpose and the primary-stop outcome named
 
 If any is missing, the work is preliminary screening.
 
