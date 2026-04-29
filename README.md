@@ -260,7 +260,7 @@ The skill leans on a small number of well-known references:
 
 ## Status
 
-- Version 0.7.0
+- Version 0.8.0
 - Two skills, two review layers, both required as co-gate.
 - Notebook unit is one Purpose (open-ended investigation); per-Hypothesis
   verdict gates and result rows.
@@ -270,6 +270,45 @@ The skill leans on a small number of well-known references:
 - Adversarial-reviewer mechanism backed by Song (2026); see *References*.
 
 ### Changelog
+
+**0.8.0** — Two complementary R-side protocol additions.
+
+- **Cycle goal framed around the downstream consumer.** New
+  `references/cycle_purpose_and_goal.md` defines the four pre-cycle items
+  (Consumer / Decision / Decision rule / Knowledge output) that turn a
+  Purpose into a contract with a named consumer.
+  `references/research_design.md` embeds the four items into the Purpose
+  header template and adds a per-H "sub-claim of the decision rule"
+  mapping so the H portfolio is derived from the cycle's goal rather than
+  improvised per Purpose. `references/hypothesis_cycles.md` separates
+  **primary stops** (Primary YES / Fallback NO with binding axis /
+  KICK-UP — the intended ways a cycle ends) from **emergency stops**
+  (the N=5 / N=8 exhaustion-trigger machinery that fires when primary
+  stops fail to fire), and the completion gate now requires every
+  Purpose to land on a primary stop, not just satisfy the robustness
+  battery on a `verdict='supported'` H.
+- **Post-review reconciliation pass to keep the notebook coherent.** New
+  `references/post_review_reconciliation.md` plus a Step 11b / Step 13b
+  insertion in `quant-research/SKILL.md`, additions to
+  `references/notebook_narrative.md` (body / audit / planning separation
+  + chapter-numbering checklist + DoD pointer) and step 6 of
+  `references/bug_review.md`'s dispatch protocol. Closes the
+  observed-by-RED failure modes where a triggered review left the
+  notebook with intercalary chapters (`§6a`, `§6b`, `§7b`, `Fig 2b`),
+  reviewer vocabulary in the body (`leakage-reviewer`,
+  `(literature dimension)`), edit-history language ("after bug_review
+  fix", `~~2.4~~`), audit variables (`*_pre_fix`), and planning notes
+  (`parked` / `follow-up` / `next-session`) leaking into the research
+  artifact, and where numbers / figures / observation cells fell out of
+  alignment because dependent cells were not re-executed. The pass
+  enforces a 4-pattern placement decision (P1 in-place / P2 same-section
+  re-compute / P3 `## Post-review addenda` / P4 new `## H<id>`),
+  Definition of Done for re-execution and figure / observation
+  alignment, and a top-to-bottom verification pass. Validated by
+  RED-GREEN over 3 review-reflection scenarios (leakage / pnl-accounting
+  / claim-warrant); 7 of 8 RED-observed failure modes eliminated, with
+  F7 (cross-round cumulative consistency) documented as known residual
+  to be exercised by sequential fixtures.
 
 **0.7.0** — R-side R&D protocol added. Five interventions, validated
 together by RED-GREEN-REFACTOR (5 RED + 5 GREEN + 16 loophole pressure
