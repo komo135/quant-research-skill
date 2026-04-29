@@ -21,10 +21,18 @@ Concretely:
   from running an earlier hypothesis stay inside the same notebook as long as
   the Purpose is unchanged. A new Purpose ⇒ a new notebook. (See the next
   section for the operational distinction.)
+- Set the **cycle goal** before any code: name the downstream Consumer, the
+  Decision they are blocked on, the Decision rule (YES / NO with binding axis
+  / KICK-UP, committed before the cycle runs), and the Knowledge output. The
+  H portfolio is *derived from* the decision rule, not improvised. See
+  `references/cycle_purpose_and_goal.md`.
 - Enforce time-series validation
 - Verify robustness before declaring completion (per Hypothesis)
 - Iterate hypothesis cycles instead of stopping after one — usually inside the
-  same notebook
+  same notebook. The cycle ends when the consumer can apply the decision rule
+  (Primary YES / Fallback NO with binding axis / KICK-UP — all three are
+  equivalent research outputs); N=5 / N=8 are emergency stops, not the
+  intended termination.
 - Make differentiation against prior work explicit so the research is not a degraded
   reimplementation
 
@@ -143,20 +151,35 @@ Out of scope: pure implementation tasks (CRUD, bug fix, refactor).
        ↓
 [Open a notebook for one Purpose]
        ↓
-  Create the notebook (experiments/exp_NNN_<purpose-slug>.py) with a
-  Purpose header
+  Set the cycle goal (cycle_purpose_and_goal.md) — name the Consumer,
+  the Decision they are blocked on, the Decision rule (YES / NO with
+  binding axis / KICK-UP, committed BEFORE the cycle runs), and the
+  Knowledge output. The H portfolio below is derived from the
+  decision rule.
        ↓
-  Test H1 → bug_review (if triggered) → robustness → experiment-review →
+  Create the notebook (experiments/exp_NNN_<purpose-slug>.py) with a
+  Purpose header AND the four cycle-goal items
+       ↓
+  Test H1 (= one or more sub-claims of the decision rule) →
+    bug_review (if triggered) → robustness → experiment-review →
     H1 verdict → append one row to results.parquet
        ↓
-  Did a derived H emerge that serves the SAME Purpose?
-       ↓ yes                                 ↓ no (new Purpose)
-  Test H2 inside the same notebook        Close this notebook;
-       ↓                                   open exp_<NNN+1>_*.py
-  Continue until the Purpose is exhausted
+  Can the consumer apply the decision rule yet? (Primary YES /
+    Fallback NO with binding axis / KICK-UP — see hypothesis_cycles.md)
+       ↓ no                                   ↓ yes
+  Did a derived H emerge that serves         Close the cycle on the
+    the SAME Purpose AND a sub-claim of      primary stop that fired.
+    the same decision rule?
+       ↓ yes              ↓ no (new Purpose)
+  Test H2 inside           Close this notebook;
+    the same notebook      open exp_<NNN+1>_*.py
        ↓
-  Purpose-level conclusion (synthesis across H1…HN) +
-    derived Purposes (= candidates for new notebooks)
+  Continue until consumer can decide (primary stop), OR the
+    emergency stop fires (N=5 advisory / N=8 hard cap — emergency
+    stops indicate frame mismatch, force cross-H synthesis)
+       ↓
+  Purpose-level conclusion = primary-stop outcome + synthesis across
+    H1…HN + derived Purposes (= candidates for new notebooks)
        ↓
 [Completion]
        ↓
@@ -269,13 +292,38 @@ Step 2 (research design) tries to formalize the H. Without it, content
 is filled silently from the researcher's background and the protocol's
 review layers cannot tell where the H came from.
 
-### 2. Write the research design first in Markdown — including the figure plan
+### 2. Write the research design first in Markdown — including cycle goal and figure plan
 
-See `references/research_design.md`. At the top of each notebook, write:
+See `references/research_design.md` and `references/cycle_purpose_and_goal.md`.
+At the top of each notebook, write:
 
 - **Purpose** — the open-ended question the notebook investigates
+- **Cycle goal — four items, see `cycle_purpose_and_goal.md`** (mandatory,
+  pre-implementation):
+  - **Consumer** — concretely named (next derived Purpose, production
+    strategy build, paper section, portfolio-sizing decision). "The
+    research community", "future researchers", "myself someday" are not
+    consumers; if the only consumer is that vague, return to Stage 0.
+    "My own next Purpose, named as <slug>" is a legal escape hatch when
+    the next Purpose is *nameable in one phrase*.
+  - **Decision the consumer is blocked on** — the yes/no/pivot the
+    consumer cannot make without this cycle's output, in one sentence.
+  - **Decision rule** — the predicate the consumer applies to the
+    knowledge output to land their decision. Three branches required:
+    YES (numeric / structural threshold for going forward), NO (numeric
+    / structural threshold for not going forward, with the binding axis
+    that would justify it), KICK-UP (structural condition indicating the
+    cycle's frame is the wrong layer). Committed *before* the cycle
+    runs; without pre-commitment the rule becomes post-hoc
+    rationalization.
+  - **Knowledge output** — the artifact (per-H rows in results.parquet
+    + Purpose-level synthesis paragraph + headline figure) onto which
+    the decision rule is applied.
 - **First Hypothesis (H1)** — a specific falsifiable comparison statement
-  serving the Purpose, with numeric acceptance / rejection thresholds
+  serving the Purpose, with numeric acceptance / rejection thresholds.
+  H1 is *derived from* the decision rule above: it tests one or more
+  conjuncts of the YES / NO / KICK-UP branches. An H without a
+  sub-claim mapping is not in the portfolio under this frame.
 - Universe (list at least three instruments, or describe the cross-section)
 - Data range (train / val / test, embargo size)
 - **Headline figure plan** — what the one-and-only figure that conveys the
@@ -287,17 +335,21 @@ See `references/research_design.md`. At the top of each notebook, write:
 
 When a derived H emerges serving the same Purpose, add a new `## H<id>`
 block inside the same notebook with its own falsifiable statement,
-acceptance / rejection thresholds, **per-H headline figure plan**, and per-H
-result row.
+acceptance / rejection thresholds, **sub-claim mapping** to the decision
+rule, **per-H headline figure plan**, and per-H result row.
 
-The figure plan and reader takeaway are required pre-implementation items.
-"I'll figure out the figure when I have the data" is the failure mode that
-produces calculation-log notebooks. Sketch the figure's *shape* (axes,
-overlays, comparison) up front; the data fills in the values, not the
-design.
+The cycle-goal items, the figure plan, and the reader takeaway are
+required pre-implementation items. The cycle-goal items in particular
+are what the H portfolio is *derived from* — without them, H's are
+improvised per Purpose and downstream judgment becomes inconsistent.
+"I'll figure out the figure when I have the data" / "I'll know the
+consumer's decision when I see H1's result" are the failure modes this
+step is built to prevent.
 
-See `references/notebook_narrative.md` for the full communication-artifact
-spec. Read it before writing H1's first code cell, not at the end.
+See `references/cycle_purpose_and_goal.md` for the derivation of why
+the cycle goal exists and how to fill the four items, and
+`references/notebook_narrative.md` for the full communication-artifact
+spec. Read both before writing H1's first code cell.
 
 ### 3. One Purpose = one notebook
 
@@ -446,6 +498,35 @@ If parallel sub-agent dispatch is unavailable, run the six scopes sequentially i
 distinct passes — do not collapse them into one. The adversarial pass is run with the
 minimum bundle only even in the fallback.
 
+#### 11b. Post-review reconciliation pass (mandatory before step 12)
+
+After the inline review summary, before re-running the robustness battery, run the
+reconciliation pass — see `references/post_review_reconciliation.md`. The reconciliation
+pass enforces three things:
+
+1. **A 4-pattern placement decision per finding** — every reflected change is one of
+   P1 (in-place rewrite), P2 (same-section re-compute / sanity cell at the end of the
+   existing `§N`), P3 (a single `## Post-review addenda` block placed immediately before
+   the verdict cell), or P4 (a new `## H<id>` block). New chapters with lowercase /
+   decimal suffixes (`§6a`, `§7b`) and figures that violate the up-front figure plan
+   (`Fig 2b`) are forbidden.
+2. **Definition of Done** — re-execute every dependent cell, align all abstract /
+   per-H abstract / interpretation numbers with the post-fix pipeline output,
+   regenerate every figure, rewrite every observation cell to describe the regenerated
+   figure, and check that *past-round* findings are still reflected in the new numbers.
+3. **A final verification pass** — read the notebook from top to bottom once and
+   confirm that no reviewer vocabulary (`leakage-reviewer`, `claim-reviewer`,
+   `(literature dimension)`), edit-history language ("after bug_review fix",
+   "~~2.4~~ → 0.93"), or planning notes (`parked`, `follow-up`, `next-session`) has
+   leaked into the notebook body. The notebook body is the **research artifact**;
+   the inline review summary (chat transcript) is the **audit trail**;
+   `decisions.md` / `hypotheses.md` is the **planning state**. The three are kept
+   separate.
+
+Without the reconciliation pass, "fixed" in the inline summary is premature — the
+finding is at most "addressed in code." Step 12 (robustness battery) does not start
+until reconciliation is complete.
+
 ### 12. Robustness battery before declaring completion
 
 See `references/robustness_battery.md`. **Run only after step 11 has produced a clean
@@ -488,16 +569,25 @@ the dimension scopes and dispatch protocol.
 
 Sequence inside this skill:
 
-1. Step 11 (`bug_review`) clean — every `high` and `medium` resolved
+1. Step 11 (`bug_review`) clean — every `high` and `medium` resolved **and step 11b
+   reconciliation pass complete**
 2. Step 12 (robustness battery) green
 3. **Invoke `experiment-review` skill via the Skill tool** ← this step
 4. Address every `high` and `medium` finding from `experiment-review`
-5. Step 14 (result aggregation), then completion gate
+5. **Step 13b reconciliation pass** — re-run `references/post_review_reconciliation.md`
+   on the changes from step 4. `experiment-review` findings frequently touch the
+   abstract, per-H abstract, claim wording, and the literature section, so the
+   verification pass is what keeps reviewer dimension names (`validation-sufficiency`,
+   `literature`, `claim`, `narrative`) and edit history out of the notebook body
+6. Step 14 (result aggregation), then completion gate
 
 Do NOT proceed to step 14 (result aggregation) until both `bug_review` and
-`experiment-review` findings are addressed. Setting `verdict = "supported"` before both
-layers pass is a protocol violation that downgrades the result to *preliminary
-screening*.
+`experiment-review` findings are addressed **and both reconciliation passes are
+complete**. Setting `verdict = "supported"` before both layers pass is a protocol
+violation that downgrades the result to *preliminary screening*. Skipping
+reconciliation is the same violation in a quieter form: the inline summary will
+read "fixed" while the notebook body still carries pre-fix figures, edit history,
+and reviewer vocabulary.
 
 Common rationalization to resist: "`bug_review` already ran, that is the review layer."
 Different question (correctness vs. claim-warrant); both required.
