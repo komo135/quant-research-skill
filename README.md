@@ -260,7 +260,7 @@ The skill leans on a small number of well-known references:
 
 ## Status
 
-- Version 0.11.0
+- Version 0.12.0
 - Two skills, two review layers, both required as co-gate.
 - Notebook unit is one Purpose (open-ended investigation); per-Hypothesis
   verdict gates and result rows.
@@ -270,6 +270,93 @@ The skill leans on a small number of well-known references:
 - Adversarial-reviewer mechanism backed by Song (2026); see *References*.
 
 ### Changelog
+
+**0.12.0** — Adds **review dispatch efficiency** to the bug-review and
+experiment-review layers, closing two efficiency-class failure modes
+(F21 / F22) in which 14 sub-agents per H verdict='supported' attempt
+billed dead weight on every dispatch and re-fired in full on every
+re-verify after fix reconciliation. Quality machinery (narrowness /
+bundle asymmetry / parallelism / trigger discipline before
+verdict='supported') is left strictly unchanged; the savings come from
+removing dead-weight reference sections (F21) and from skipping
+re-verifies for dimensions whose surface map didn't intersect the
+applied fixes (F22). Validated by TDD over an audit-type fixture
+(matrix of 14 reviewer × N input file with section-level line counts,
+plus iteration-profile agent-run counting).
+
+- **F21 — Per-reviewer / per-dimension input contract.** New section in
+  both `quant-research/references/bug_review.md` ("Per-reviewer input
+  contract", 6 reviewer rows) and
+  `experiment-review/references/review_protocol.md` ("Per-dimension input
+  contract", 8 dimension rows). Each reviewer receives only its own
+  dimension scope (extracted by section anchor — `### N. <reviewer-name>`
+  for `bug_review.md`, `## N. <dimension>` for `review_dimensions.md`)
+  plus the artifacts named in its required-shared column. Whole-file
+  `bug_review.md` (300 lines) and whole-file `review_dimensions.md` (489
+  lines) are no longer delivered to specialists — the prior "whole file +
+  read §i only" pattern billed 77-96 % dead weight per specialist and
+  diluted attention via lost-in-middle. Section anchors are the
+  source-of-truth for extraction; line ranges are illustrative only and a
+  renamed anchor surfaces a `severity: high, what: missing input section
+  §<N>` graceful-degradation finding rather than silently breaking. The
+  `experiment-review` SKILL.md Process table and the dispatch protocols
+  in both files are updated to mandate pre-extraction. Adversary's
+  extraction tightens, not weakens, the bundle asymmetry (§1-§7
+  specialist scope is now physically excluded rather than relying on the
+  "read only your section" formal rule). Raw input lines across 14
+  reviewers drop from 23115 to 17629 (-24 %).
+- **F22 — Trigger-conditional dispatch on re-verify.** New section in
+  both protocol files ("Trigger-conditional dispatch on re-verify"). A
+  typical H verdict='supported' attempt enters the gate multiple times
+  (Initial → fix → Re-verify → fix → Re-verify → ...). The naive contract
+  re-fired all 14 every round, billing surface-unchanged reviewers as
+  dead reading. F22 splits dispatch into Initial (= all 14 fire) and
+  Re-verify (= the parent identifies which surface map entries the fixes
+  touched, fires only those specialists + adversary). Surface map covers
+  6 + 8 dimensions: leakage on feature/signal/normalization/scaling/
+  cross-section/factor cells; pnl-accounting on PnL/position/fee/
+  turnover/sign cells; validation-correctness on split/embargo/
+  walk-forward/CPCV/test-set cells; statistics on bootstrap/WF-summary/
+  DSR/PSR/headline-metric cells; code-correctness as catch-all on any
+  code change; question on H statement / design / thresholds / cycle
+  hygiene; scope on universe/period/regime/cross-section; method on
+  model/baselines/features/hyperparameters; validation-sufficiency on
+  WF window count / power claims; claim on abstract/verdict/conclusion;
+  literature on `literature/` files; narrative on any markdown / figure
+  plan / observation cell; adversarial as auto-fire on any specialist
+  re-fire. **When in doubt, fire** is the explicit default — surface
+  ambiguity → fire candidates plus adversary, never skip. Cross-session
+  defaults to Initial unless `decisions.md` carries an explicit
+  attestation that named dimensions were verified clean against a named
+  artifact state. Iteration profiles savings: -32 % at depth 2,
+  -43 % at depth 3, -48 % at depth 4 (typical re-verify ≈ 5 reviewers
+  out of 14).
+- **F20 — considered, not adopted.** Prompt caching (= placing a
+  byte-identical prefix at the front of all reviewer prompts so cache
+  read costs replace cache write costs across the parallel batch) was
+  drafted as a third lever and rejected. Claude Code's harness handles
+  the underlying API call; skill text cannot mandate `cache_control`
+  markers, and parallel sub-agent prefix-cache sharing is not a
+  documented harness behavior. F-id taxonomy carries F20 as a gap with
+  the rejection reason recorded in
+  `skill_tests/red_review_dispatch_efficiency/RED_dispatch_efficiency_findings.md`,
+  preserving the dead-end as a TDD breadcrumb for future maintainers.
+- **Anti-rationalizations.** Each protocol file gains a F21/F22 block
+  covering the natural excuses ("whole file is safer", "send adversary
+  more context", "pre-extraction is brittle", "user wanted comprehensive",
+  "narrative refs should also be extracted (counter)", "fix is small so
+  re-fire all", "ambiguous surface so skip", "I remember it was clean so
+  treat cross-session as re-verify", "wording-only fix is skip"). Single-
+  agent fallback explicitly notes that F21 / F22 still apply
+  sequentially — the fallback path inherits the savings.
+
+The change is orthogonal to F1-F19 (all quality-class — body / reviewer-
+vocab leakage, skill-version / migration leakage, 派生 H table leakage,
+research-goal layer absence, carry-forward conjunct gate, research-subject
+drift). F21 / F22 are the first efficiency-class entries in the F-id
+sequence; they describe dead weight in dispatch process rather than
+content drift, and are explicitly framed in the RED findings to avoid
+collapsing them into the quality-class taxonomy.
 
 **0.11.0** — Adds the **research-subject drift counter**, closing two
 silence-licensed inversion paths (F18 / F19) in which the cycle's
