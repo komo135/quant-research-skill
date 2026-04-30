@@ -66,17 +66,15 @@ makes parallel review catch what single-pass review misses. The sixth reviewer
 (`adversarial-reviewer`) intentionally runs with a *different* (minimum) context bundle —
 that asymmetry is what makes it catch what same-context review of the same model misses.
 
-The five specialists each receive:
-
-- The path of the experiment notebook under review
-- Paths of upstream feature notebook(s) listed in the design cell
-- This file (`bug_review.md`)
-- `references/sanity_checks.md`
-- The reviewer-specific scope below
-- The instruction "Return findings only. Do not modify files."
+Each specialist receives only its own dimension scope and the artifacts
+named in the **per-reviewer input contract** below — not whole-file
+`bug_review.md` and not whole-file `sanity_checks.md`. Pre-extraction is
+the parent assistant's pre-dispatch step, not the reviewer's
+attention-budget exercise. The dimension scope is identified by section
+anchor (`### N. <reviewer-name>`) and pulled inline.
 
 The sixth reviewer (`adversarial-reviewer`) receives a *different* bundle — see its
-section below.
+section below and the input contract.
 
 ### 1. leakage-reviewer
 
@@ -186,16 +184,132 @@ The mechanism: a fresh session has no anchor. Same-model perplexity preference i
 not addressed by this — that is an accepted residual risk of single-model review —
 but anchoring, sycophancy, and lost-in-middle are removed.
 
+## Per-reviewer input contract (efficiency-class, F21)
+
+Each specialist receives **only its own dimension scope** plus the shared
+artifacts named below. Whole-file `bug_review.md` and whole-file
+`sanity_checks.md` are NOT delivered to specialists — that was the prior
+"whole file + read §i only" pattern, which billed dead weight (~96 % of
+`bug_review.md` and ~68 % of `sanity_checks.md` per specialist) and
+diluted attention. Pre-extract the dimension scope by **section anchor**
+(the `### N. <reviewer-name>` heading) before dispatch. Anchor missing →
+reviewer flags `severity: high, what: missing input section §<N>` per
+the graceful-degradation pattern; do not abort dispatch.
+
+| # | Reviewer | Required scope (extract) | Required shared | NOT-receive |
+|---|---|---|---|---|
+| 1 | leakage | `bug_review.md` §1 (anchor `### 1. leakage-reviewer`, ~12 lines) | notebook .py, upstream feature notebook .py (only those named in design cell), `sanity_checks.md` §1, §6, §7, §8, §9, §11, §12 | `bug_review.md` outside §1, `sanity_checks.md` outside the named subset, `decisions.md` / `hypotheses.md` / `literature/`, other reviewers' findings |
+| 2 | pnl-accounting | `bug_review.md` §2 (anchor `### 2. pnl-accounting-reviewer`, ~14 lines) | notebook .py, `sanity_checks.md` §3, §4, §5, §6, §11 | `bug_review.md` outside §2, `sanity_checks.md` outside the named subset, `decisions.md` / `hypotheses.md` / `literature/` |
+| 3 | validation (correctness) | `bug_review.md` §3 (anchor `### 3. validation-reviewer`, ~12 lines) | notebook .py, `sanity_checks.md` §12 | `bug_review.md` outside §3, `sanity_checks.md` outside §12, `decisions.md` / `hypotheses.md` / `literature/` |
+| 4 | statistics (metric arithmetic) | `bug_review.md` §4 (anchor `### 4. statistics-reviewer`, ~13 lines) | notebook .py, `sanity_checks.md` §10 | `bug_review.md` outside §4, `sanity_checks.md` outside §10, `decisions.md` / `hypotheses.md` / `literature/` |
+| 5 | code-correctness | `bug_review.md` §5 (anchor `### 5. code-correctness-reviewer`, ~12 lines) | notebook .py | `bug_review.md` outside §5, `sanity_checks.md` (no specific section needed), `decisions.md` / `hypotheses.md` / `literature/` |
+| 6 | adversarial (cold-eye) | `bug_review.md` §6 (anchor `### 6. adversarial-reviewer`, ~39 lines) — verbatim instruction only | notebook .py (the abstract cell within is the "reported headline numbers" — no separate extract), upstream feature notebook .py (only those named in design cell) | `bug_review.md` outside §6, `sanity_checks.md`, the five specialist reviewers' findings, `decisions.md` / `hypotheses.md` / chat context — full minimum-bundle list per §6 |
+
+**Section anchor as source of truth** — extraction reads the section by
+its `### N. <reviewer-name>` heading anchor, not by line range. The
+approximate line counts above are reader hints; line ranges in this
+file shift when other sections are edited, but anchors don't. A renamed
+or removed anchor surfaces a `severity: high, what: missing input
+section §<N>` finding from the affected reviewer (graceful degradation),
+which is the correct signal for an out-of-sync contract — silent
+recovery would mask a real protocol drift.
+
+**Adversary rule**: pre-extraction applies to the adversary as well —
+adversary receives §6 only (= 39 lines vs 300). The asymmetry is preserved:
+**no §1-§5 specialist scope reaches the adversary**, exactly per the
+existing minimum-bundle list. Pre-extraction tightens, not weakens, the
+asymmetry.
+
+The contract is **structured**, not prose advice. Tailoring is no longer a
+reviewer-discretion decision; it is the parent assistant's pre-dispatch
+extraction step (see "Dispatch protocol" step 2 below).
+
+## Trigger-conditional dispatch on re-verify (efficiency-class, F22)
+
+A typical H verdict='supported' attempt enters the gate multiple times:
+once on initial pass, then again on each re-verify after fix
+reconciliation. The naive contract — "fire all 6 every time" — re-pays
+for unchanged surfaces. F22 splits the dispatch into two cases.
+
+### Initial pass
+
+First time this H enters the gate (= no prior clean review on this H in
+the current session). **All 6 reviewers fire** as the full gate — the
+input contract above is what each reviewer receives.
+
+### Re-verify pass
+
+Triggered after the parent has applied fixes from a prior bug-review
+inline summary and completed `references/post_review_reconciliation.md`'s
+Definition of Done for those fixes. The parent then identifies **which
+surface map entries the fixes touched** and fires only the dimensions
+whose surface intersects.
+
+**Adversary auto-fires on re-verify whenever any specialist re-fires** —
+its standalone-readability + claim-warrant check is on the
+*current* artifact and any change can affect either axis. If no
+specialist fires (= no surface change at all), nothing is being
+re-verified and the prior clean state stands.
+
+### Surface map per reviewer
+
+Each reviewer's surface = the union of cell categories / file types
+whose change re-fires the dimension.
+
+| # | Reviewer | Surface (re-fire if any of these changed since last clean review) |
+|---|---|---|
+| 1 | leakage | feature definition cells, signal computation cells, normalization / scaling cells, cross-sectional rank / z-score cells, factor-decomposition cells, leak-check cells, target / horizon definition |
+| 2 | pnl-accounting | PnL formula cells, position weight cells, fee / cost model cells, turnover calculation cells, currency conversion cells, sign-convention cells |
+| 3 | validation (correctness) | split definition (train / val / test boundary), embargo declaration, walk-forward setup, purged k-fold / CPCV setup, test-set evaluation cell |
+| 4 | statistics (metric arithmetic) | bootstrap setup, walk-forward summary cells, DSR / PSR cells, headline metric definition, annualization-factor cells, regime-bucketing cells |
+| 5 | code-correctness | catch-all on any code cell change in the surfaces above + any indexing / sort / NaN / dtype / RNG cell change anywhere |
+| 6 | adversarial (cold-eye) | auto-fires whenever any specialist re-fires (= any change to the artifact); does not have its own surface map because its scope is the entire `.py` standalone |
+
+### When in doubt, fire
+
+Surface classification is the parent assistant's reasoning step. If a
+fix doesn't fit any surface entry cleanly — or fits multiple ambiguously
+— **default to firing the affected dimensions plus adversary**. The
+gate's job is not to skip work but to skip *redundant* work; ambiguity
+is not a redundancy signal.
+
+### Cross-session boundary
+
+The "last clean review" baseline is **session-local**. A researcher
+returning to the same H next session has no in-context record of which
+dimensions were verified clean — the new dispatch is an Initial pass.
+Trigger-conditional savings come from the in-session iteration loop
+(initial → fix → re-verify → fix → re-verify), which is the modal cost
+profile.
+
+If the user explicitly attests in a prior `decisions.md` entry that
+"dimensions {X, Y, Z} were verified clean against state S" and the
+agent can verify the artifact's relevant surfaces are unchanged from S,
+the agent may treat the next dispatch as a re-verify. Without that
+attestation in `decisions.md`, treat as Initial.
+
 ## Dispatch protocol
 
 1. The assistant verifies that at least one trigger has fired. State the trigger
    explicitly to the user.
-2. The assistant prepares **two** context bundles — the full bundle for the five
-   specialists, and the minimum bundle for the adversarial reviewer — and dispatches
-   all six reviewers **in parallel** in a single tool-call batch. Parallelism is
-   required: it forces independent reads, which is the mechanism that makes
-   specialist review work. Bundle asymmetry is required: it is the mechanism that
-   makes the adversarial pass add value over a sixth specialist would add.
+2. The assistant determines whether this is an **Initial pass** or a
+   **Re-verify pass** (per F22 above).
+   - On **Initial**, the assistant **pre-extracts each reviewer's
+     dimension scope** from `bug_review.md` (§1-§6) and
+     `sanity_checks.md` (per the input contract above), assembles two
+     bundles — the full bundle for the five specialists (each with its
+     own §i suffix), and the minimum bundle for the adversarial reviewer
+     (notebook + §6 instruction). All six reviewers dispatch **in
+     parallel** in a single tool-call batch.
+   - On **Re-verify**, the assistant identifies the fixes' locations,
+     intersects each dimension's surface map, dispatches the affected
+     specialists + adversary in parallel. Skipped dimensions are listed
+     by name in the inline summary with "skipped: no surface change
+     since last clean review" and the surfaces checked.
+   Parallelism is required: it forces independent reads, which is the
+   mechanism that makes specialist review work. Bundle asymmetry is
+   required: it is the mechanism that makes the adversarial pass add
+   value over what a sixth specialist would add.
 3. Each reviewer returns findings in this schema:
 
    ```
@@ -230,6 +344,18 @@ but anchoring, sycophancy, and lost-in-middle are removed.
    notebook body. Without this step, "fixed" in the inline summary is premature —
    the finding is at most "addressed in code."
 
+### Anti-rationalizations (efficiency-class, F21 / F22)
+
+| Excuse | Why it is wrong |
+|---|---|
+| "Whole-file `bug_review.md` is safer — what if the reviewer needs context outside §i?" | Cross-dimensional findings are caught by the *parallel ensemble*, not by each reviewer reading every section. The five specialists in parallel are designed to overlap defensively at the dimension *level*, not by sharing prose. The whole-file pattern bills 96 % dead weight per specialist and dilutes attention via lost-in-middle. |
+| "The adversary should also receive `bug_review.md` outside §6, in case there's context it would benefit from." | The asymmetry IS the mechanism. Giving adversary access to specialist scope (§1-§5) makes it a sixth specialist with the same priors, not a cold-eye reader. CCR (arxiv 2603.12123) showed the gain comes from minimum-context, not from richer-context. |
+| "Pre-extraction is brittle — what if the section anchor is renamed?" | Rename a `### N. <reviewer-name>` heading and the dispatch surfaces a graceful-degradation finding (`severity: high, what: missing input section §<N>`). The skill does not silently swallow the rename. The brittleness is *desirable*: a renamed anchor without contract-side update is an actual bug, and the gate catches it. |
+| "User asked for 'all findings the file might generate', so safer to send whole file." | The contract names what the reviewer needs to do its dimension's job. "All findings the file might generate" is a search prompt; this is a structured review. If a section outside §i is genuinely needed, edit the contract, do not bypass it case-by-case. |
+| "The fix is small / cosmetic, just re-fire all 6 to be safe." (F22) | Re-firing all 6 on a fix that touched a single surface is the dead-weight pattern F22 exists to interrupt. The surface map is what determines re-fire — *any* fix lands on at least one surface, so the firing set is non-empty; cosmetic changes that genuinely touch nothing (e.g. a markdown comment edit) re-fire only narrative + adversary, not the full 6. "Just to be safe" is the exact rationalization the surface map replaces. |
+| "I'm unsure which surface this fix touches, default to skipping the dispatch." (F22) | Default is *fire*, not skip. Surface ambiguity → fire the candidates plus adversary. The gate skips only when the parent can confidently classify the fix as not-touching a dimension's surface. Skipping under ambiguity is the failure mode; firing under ambiguity is the safety. |
+| "Cross-session: I remember the prior verdict was clean, treat next dispatch as re-verify." (F22) | Without an attestation in `decisions.md` naming which dimensions were verified clean against which artifact state, cross-session is Initial. In-context memory of "I think it was clean" is anchoring on a prior session, not evidence the current artifact's surfaces match the prior clean state. |
+
 ## Single-agent fallback
 
 If parallel sub-agent dispatch is unavailable (single-process platform, sub-agent quota,
@@ -237,7 +363,10 @@ etc.), the assistant runs the same six scopes sequentially in six distinct passe
 clearing context (or at least re-loading the notebook from scratch) between passes. Six
 focused single-pass reviews still substantially outperform one mixed-scope pass. The
 adversarial pass is run *with the minimum bundle only* even in the fallback — bundle
-asymmetry is preserved.
+asymmetry is preserved. Pre-extraction (F21, per the input contract above) still applies
+in fallback — each pass receives only its dimension scope, not whole-file
+`bug_review.md`. Trigger-conditional dispatch (F22) also still applies on re-verify —
+sequential passes still skip dimensions whose surfaces did not change.
 
 Do not skip scopes. The temptation to merge "leakage" + "validation" into one pass is
 exactly the failure mode this layer prevents. The temptation to give the adversarial
