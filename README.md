@@ -260,7 +260,7 @@ The skill leans on a small number of well-known references:
 
 ## Status
 
-- Version 0.10.0
+- Version 0.11.0
 - Two skills, two review layers, both required as co-gate.
 - Notebook unit is one Purpose (open-ended investigation); per-Hypothesis
   verdict gates and result rows.
@@ -270,6 +270,95 @@ The skill leans on a small number of well-known references:
 - Adversarial-reviewer mechanism backed by Song (2026); see *References*.
 
 ### Changelog
+
+**0.11.0** — Adds the **research-subject drift counter**, closing two
+silence-licensed inversion paths (F18 / F19) in which the cycle's
+de facto deliverable shifts from a market claim to an implementation
+property — what was reported as "主体が研究ではなく実装 / コードに
+なる、コードの正しさを確認するために研究 / 実験をしている". F18
+fires when expected real data is unavailable and an agent silently
+substitutes synthetic data, reframing the Purpose as a "pipeline-
+correctness scaffold"; F19 fires when data IS available and the
+per-H abstract's lead sentence describes the deliverable as
+code / library / numerical correctness rather than the falsifiable
+claim's answer. Validated by TDD over two hand-written fixtures
+(Case L data unavailable + Case M abstract misframed) plus a
+Phase-A artifact-scoring pass on the existing `green_exp_001.py`
+that surfaced the failure mode in flagrant form before the fixture
+was written.
+
+- **Data availability gate.** New section in
+  `references/experiment_protocol.md`. Rule: if the cycle's research
+  subject is real-world behavior AND the expected real data is
+  unavailable in the execution environment, the cycle is **BLOCKED**;
+  synthetic substitution within an instantiated cycle is forbidden.
+  Synthetic-data scaffolding outside the protocol (no Cycle goal, no
+  verdict cell, no `results.parquet` row) is engineering work and
+  remains permitted. The exception — synthetic data IS the research
+  subject — applies only when the Decision rule's threshold is on a
+  property of the estimator / algorithm itself (parameter recovery
+  error, convergence rate, bias relative to a known DGP), not on a
+  numeric metric on real returns (Sharpe / IC / drawdown / win rate /
+  fee-adjusted PnL / turnover / tracking error). The mechanical
+  reinforcement closes the most common rationalization loophole
+  ("synthetic data as a known DGP for pipeline verification" — the
+  metrics are on real-returns shape, not on estimator-recovery shape,
+  so the exception does not apply). Forward path when BLOCKED: file
+  as a structural finding in `decisions.md`, mark the cycle
+  suspended, and pivot to a data-available cycle or return to
+  project-portfolio re-prioritization. The BLOCKED state is itself
+  a research output (the project's data-acquisition layer is
+  surfaced as a binding constraint).
+- **Per-H abstract format rule.** New sub-section in
+  `references/notebook_narrative.md` 1b "Format rule — first sentence
+  is the market claim, not the implementation". The first sentence
+  of each H's abstract names the answer to the falsifiable comparison
+  in the H's own terms (mechanism / market / regime / instrument);
+  implementation / library / numerical correctness statements appear
+  only in a clearly-bounded *Reproducibility note* at the end of the
+  abstract or as a closing sentence — never as the lead. Rationale:
+  the per-H abstract is what a reader scrolling the notebook reads
+  first; if the lead is "the implementation is correct" or "the
+  decomposition matches sklearn's reference", the reader's takeaway
+  is the engineering deliverable, not the world's answer, and the
+  cycle's de facto deliverable inverts. Five anti-rationalization
+  entries cover the natural excuses ("showing implementation
+  correctness increases verdict trust", "robustness battery passing
+  is part of the claim", "library reconciliation is
+  research-community-facing reproducibility", "the market claim is
+  too narrow / tentative to lead with", "user prompt requested
+  implementation details up front").
+- **Template change.** `assets/experiment.py.template` H1 round now
+  carries an explicit `### H1 abstract` slot, placed first in the
+  H1 block (filled after H1 cells run), with the format rule and
+  good / anti-pattern lead examples inline. The agent encounters
+  the rule at template-fill time, not only at writing time.
+- **No new completion gate, no new reference file.** The fix lives
+  in two existing references plus a SKILL.md sub-step 2.5 and a
+  Step 16 paragraph; SKILL.md's four-gate completion contract is
+  unchanged. The format rule bites at three timings — generation
+  via template, writing via reference, verification via the
+  separate `experiment-review` skill's narrative-dimension reviewer
+  reading `notebook_narrative.md`. New gate machinery (a 5th
+  completion gate, a separately-dispatched reviewer) was rejected
+  as unnecessary; the two-layer fix sits cleanly on the existing
+  surface.
+
+The change is orthogonal to F1–F17. F1–F8 (history / reviewer-vocab
+leakage into body), F9–F11 (skill version / migration / cross-skill
+API tutorials in body), F12–F14 (派生 H table leakage into the
+notebook body), F15–F16 (research-goal layer absence), and F17
+(carry-forward conjunct-contribution gate) all operate at different
+layers of the protocol; F18 / F19 surface a previously-uncovered
+inversion path in which the *named deliverable* of the cycle is not
+what the protocol assumed it would be (substitution-on-missing-data
+in F18; abstract framing on implementation property in F19). One
+inversion path remains uncovered (reconciliation focus-pull in
+`references/post_review_reconciliation.md`'s Definition of Done,
+which is heavily weighted toward code-output alignment) and is
+documented as a future RED phase in
+`skill_tests/red_research_subject_drift/RED_research_subject_drift_findings.md`'s
+"Scope 限界" section.
 
 **0.10.0** — Adds the **carry-forward conjunct-contribution gate**
 (sub-step 1.5 of `hypothesis_cycles.md`'s routing rule), closing the
