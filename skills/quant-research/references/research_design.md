@@ -13,20 +13,20 @@ and rules for writing falsifiable comparison statements.
 
 Each notebook (`purposes/pur_NNN_<purpose-slug>.py`) starts with a Markdown
 cell containing the **Purpose** (= the parent claim about the world,
-written as a declarative falsifiable statement) plus the four cycle-goal
-items defined in `cycle_purpose_and_goal.md`. The Purpose is itself
+written as a declarative falsifiable statement) plus the five
+Purpose-header items defined in `purpose_design.md`. The Purpose is itself
 falsifiable at the notebook level (verdicted at notebook closure) and
-admits one or more child H's that decompose it; the cycle-goal items
-make explicit *who consumes the cycle's knowledge output and what
+admits one or more child H's that decompose it; the Purpose-header items
+make explicit *who consumes the Purpose's knowledge output and what
 decision rule they will apply to it*. Individual H's get their own
 per-H block lower in the notebook; each H block is one experiment that
 tests a sub-claim of the parent thesis.
 
-The cycle-goal items (Consumer / Decision / Decision rule / Knowledge
+The Purpose-header items (Consumer / Decision / Decision rule / Knowledge
 output / target_sub_claim_id) are pre-implementation required. They are
 what H1's design is derived from — without them, the H portfolio is
 improvised per Purpose and downstream judgment becomes inconsistent. See
-`cycle_purpose_and_goal.md` for the derivation of why these five items
+`purpose_design.md` for the derivation of why these five items
 exist and how to fill them, and `research_goal_layer.md` for the
 four-layer model that the 5th item (`target_sub_claim_id`) ties this
 notebook into.
@@ -50,10 +50,10 @@ baseline (≥ +0.05 hit rate on direction, test period)."
 Avoid the question form "Does X work on Y?" — it hides the parent
 claim inside an interrogative; the form makes the Purpose-level
 verdict ambiguous. Multiple admissible Hypotheses (per
-`hypothesis_cycles.md` admissibility sub-step 0) decompose this
+`hypothesis_iteration.md` admissibility sub-step 0) decompose this
 Purpose and live as `## H<id>` blocks below.]
 
-### Cycle goal (five items — see cycle_purpose_and_goal.md)
+### Purpose-header items (five mandatory pre-implementation items — see purpose_design.md)
 
 #### Consumer
 [Concretely named — the next derived Purpose, the production
@@ -65,9 +65,9 @@ escape hatch when the next Purpose is *nameable in one phrase*.]
 
 #### Decision the consumer is blocked on
 [One sentence: the yes/no/pivot the consumer cannot make without
-this cycle's output.]
+this Purpose's output.]
 
-#### Decision rule (committed BEFORE the cycle runs)
+#### Decision rule (committed BEFORE the Purpose's investigation runs)
 - YES (consumer goes forward): [numeric/structural threshold]
 - NO  (consumer does not go forward, with binding axis): [numeric/
   structural threshold + which `failure_mode` would be the binding
@@ -77,7 +77,7 @@ this cycle's output.]
   data issue]
 
 #### Knowledge output (artifact that lets consumer apply the rule)
-[What the cycle produces — typically per-H rows in results.parquet
+[What the Purpose produces — typically per-H rows in results.parquet
 + Purpose-level synthesis paragraph + headline figure. State it
 explicitly so the H portfolio below can be checked against it.]
 
@@ -87,7 +87,7 @@ expected to advance. Primary: 1 sub-claim. Secondary: 0-2.
 A Purpose targeting > 3 sub-claims is too broad; split before opening.
 Example: "Primary G1.1 (`quality factor yields net edge in TOPIX500`).
 Secondary: none."
-See `cycle_purpose_and_goal.md` and `research_goal_layer.md`.]
+See `purpose_design.md` and `research_goal_layer.md`.]
 
 ### Universe (shared across all H's in this notebook)
 - Instruments: [list at least three, or describe the cross-section]
@@ -147,9 +147,18 @@ decision rule that this H produces evidence for. Examples:
 NO branch's `regime_mismatch` identification — one well-designed
 test covers both."
 An H with no sub-claim mapping is not in the portfolio under
-cycle_purpose_and_goal.md's frame; either map it to a conjunct of
+purpose_design.md's frame; either map it to a conjunct of
 the decision rule, expand the decision rule in decisions.md to
 cover it (with justification), or drop the H.]
+
+### Why-why chain citation (only for derived H's — see why_why_analysis.md)
+[The specific terminal answer from the parent H's why-why chain that
+this derived H is grounded in (e.g., `H1.chain.terminal-A: "RSI selects
+high-vol participation, not MR specifically"`). Required for every
+derived H regardless of the parent's verdict (supported / rejected /
+partial / parked). A derived H without a citation here is rejected at
+admissibility sub-step 0 of the routing rule (see
+`hypothesis_iteration.md`).]
 
 ### Question for this H
 [Falsifiable comparison statement — see the table below.]

@@ -99,10 +99,10 @@ them silently.
 - [ ] "Cannot conclude" section names dimensions not tested (instruments, regime, sizing)
 - [ ] "Next questions" classified into run-now / next-session / drop
 
-## 11. Hypothesis cycles
+## 11. Hypothesis iteration
 
-- [ ] Cycle count ≥ 3 (minimum) or ≥ 5 (standard)
-- [ ] `hypotheses.md` and `decisions.md` updated each cycle
+- [ ] H-round count ≥ 3 (minimum) or ≥ 5 (standard) across the project
+- [ ] `hypotheses.md` and `decisions.md` updated at every Purpose closure
 - [ ] No untriaged candidate hypotheses remain
 - [ ] All results aggregated into `results.parquet` under the common schema
 
@@ -119,7 +119,7 @@ them silently.
 
 For each failed item, decide and record in `decisions.md`:
 
-- "Will fix in the next cycle" — log the new hypothesis in `hypotheses.md`
+- "Will fix in the next Purpose / next H" — log the new hypothesis in `hypotheses.md`
 - "Will not fix" — state the reason explicitly (e.g. "multi-asset deferred to next session;
   this report covers a single instrument only")
 

@@ -1,11 +1,11 @@
 # Decision log
 
-Time-ordered log of decisions per Purpose / cycle. Used to trace why a hypothesis was
+Time-ordered log of decisions per Purpose. Used to trace why a hypothesis was
 dropped, why a Purpose was opened or split off, or why a particular method was chosen,
 after the fact.
 
-A "cycle" here is one notebook (= one Purpose). A Purpose with multiple H's
-yields a single cycle entry with H sub-bullets, not one entry per H.
+The unit of one entry is one Purpose (= one notebook). A Purpose with
+multiple H's yields a single entry with H sub-bullets, not one entry per H.
 
 The Purpose entry also carries the research-goal layer's bookkeeping: the
 **design hypothesis** at open and at close (the prediction "this Purpose
@@ -16,14 +16,14 @@ applied to the project README's sub-claim list. See
 ## Format
 
 ```markdown
-## YYYY-MM-DD cycle <N> (exp_<NNN>_<purpose-slug>) — Purpose: <one-line>
+## YYYY-MM-DD pur_<NNN>_<purpose-slug> — Purpose: <one-line>
 
-- **Design hypothesis at open**: [the prediction made BEFORE the cycle ran —
-  which research-goal sub-claim(s) this Purpose is expected to advance, and
-  in what direction. Example: "Opening this Purpose will close G1.1 (quality
-  factor yields net edge in TOPIX500) to either confirmed or falsified
-  regardless of per-H verdict pattern. It does NOT touch G1.2 or G1.3
-  directly."]
+- **Design hypothesis at open**: [the prediction made BEFORE the Purpose's
+  investigation ran — which research-goal sub-claim(s) this Purpose is
+  expected to advance, and in what direction. Example: "Opening this Purpose
+  will close G1.1 (quality factor yields net edge in TOPIX500) to either
+  confirmed or falsified regardless of per-H verdict pattern. It does NOT
+  touch G1.2 or G1.3 directly."]
 
 - **Tested H<id>**: [one-line restatement, with target_sub_claim_id]
   - Observation: [observed values, anomalies]
@@ -47,7 +47,7 @@ applied to the project README's sub-claim list. See
   - G1.2: not started → not started (no Purpose has attacked this yet)
   - G1.3: not started → not started
   Sub-claims that were not touched are still listed (= still `not started`)
-  so the project's running state is fully visible at every cycle.]
+  so the project's running state is fully visible at every Purpose closure.]
 
 - **Design hypothesis at close**: [verification of the at-open prediction.
   CONFIRMED / FALSIFIED / PARTIAL, with one-phrase reason. The next Purpose's
@@ -73,7 +73,7 @@ is for Purpose-level (= new-notebook) candidates only.
 ## Example
 
 ```markdown
-## YYYY-MM-DD cycle 5 (pur_005_mean_reversion_eurusd_intraday) — Purpose: Mean-reversion at H1 frequency on EUR/USD generates risk-adjusted edge net of cost
+## YYYY-MM-DD pur_005_mean_reversion_eurusd_intraday — Purpose: Mean-reversion at H1 frequency on EUR/USD generates risk-adjusted edge net of cost
 
 - **Design hypothesis at open**: opening this Purpose will close G1.1 (mean-reversion
   exists on EUR/USD intraday at signal-strength sufficient to produce a verdict)

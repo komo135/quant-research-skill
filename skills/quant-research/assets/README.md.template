@@ -18,7 +18,7 @@ in this project targets one or more of these sub-claims. See
 
 Sub-claim IDs (G1.1, G1.2, ...) are stable within the project and never
 reused after retirement. Each Purpose's notebook references these IDs in
-its Cycle goal (5th item). Each H row in `hypotheses.md` references
+its 5th Purpose-header item. Each H row in `hypotheses.md` references
 these IDs in its `target_sub_claim_id` column.
 
 Sub-claim status legend:
@@ -45,7 +45,7 @@ entry).
 
 ## Status summary
 
-- Current cycle: [N of M planned]
+- Current Purpose: [N of M planned]
 - Purposes opened: [pur_001, pur_002, ...]
 - Sub-claims confirmed: [G1.1, ...]
 - Sub-claims falsified: [G1.2, ...]

@@ -12,7 +12,7 @@ conclusion in the notebook and `decisions.md`.
   are decided (rejected / parked / preliminary).
 - Routine end-of-H check inside an active Purpose with N ≥ 3 H tested:
   is the cluster pattern visible yet?
-- Before declaring a Purpose "exhausted" (see `hypothesis_cycles.md`).
+- Before declaring a Purpose "exhausted" (see `hypothesis_iteration.md`).
 
 ## Goal
 
@@ -46,7 +46,7 @@ same value across them (e.g., `fee_model` on H1, H2, H3).
 
 **Meta-finding**: That axis is the **binding constraint** for this
 Purpose. The parent thesis stated in the Purpose header is **refuted
-under the binding axis** — that is the cycle's durable finding.
+under the binding axis** — that is the Purpose's durable finding.
 
 **Action**:
 - **First, verdict the parent thesis as `refuted` at Purpose-level
@@ -128,11 +128,11 @@ the same axis is sunk-cost iteration.
 metric, all with the same `pathway` (typically Pathway 4 derivations
 of each other). Some `rejected` early, latest `supported`.
 
-**Meta-finding**: The cycle is **working as designed**; the Pathway-4
+**Meta-finding**: The iteration is **working as designed**; the Pathway-4
 derivation chain converged on a viable H. *But*: a monotonically
-improving cycle is also evidence of `selection`, and the verdict
+improving iteration is also evidence of `selection`, and the verdict
 `supported` on the latest H must use a DSR trial count that includes
-*every cycle*, not just the latest.
+*every round*, not just the latest.
 
 **Action**:
 - Keep the supported H, but require the `dsr` field with the honest
@@ -204,7 +204,7 @@ prior. Examples:
 [List with one-sentence justification each, plus the
 `target_sub_claim_id` each derived Purpose will attack (referencing
 the project README's sub-claim list). Classified per
-hypothesis_cycles.md as run-now / next-session / drop.]
+hypothesis_iteration.md as run-now / next-session / drop.]
 ```
 
 ### `decisions.md` entry
@@ -242,14 +242,14 @@ near-paraphrase of an unverdicted prior thesis — the F23 anti-pattern.
    + Derived Purposes section). The new notebook reads as if its Purpose
    were independent — because under the four-layer model it is anchored
    to a research-goal sub-claim, not to the old Purpose's narrative.
-2. **The new notebook's `target_sub_claim_id`** (Cycle goal 5th item) is
+2. **The new notebook's `target_sub_claim_id`** (5th Purpose-header item) is
    chosen from the project README's sub-claim list — not "inherited"
    from the old Purpose. The chosen sub-claim is whichever the synthesis
    identified as the next sub-claim to attack (e.g., Pattern A's binding
    axis often shifts the question to a different sub-claim).
 3. **The new notebook's `## Purpose` statement** is written as a
    declarative falsifiable parent thesis (= research thesis), in the
-   form `cycle_purpose_and_goal.md` requires. The new parent thesis is
+   form `purpose_design.md` requires. The new parent thesis is
    distinct from the closed one — typically scoped to a region of the
    binding axis where the closed thesis did not apply, or to one of
    the sub-claims that Pattern B surfaced. A near-paraphrase of the
@@ -330,7 +330,7 @@ pattern match + paragraph; auditable and reproducible.
 - **"Try H5"**: when Pattern A or B is visible, a fifth H of the same
   shape adds noise, not information. Either redesign around the
   binding axis or split the Purpose. The stop rule in
-  `hypothesis_cycles.md` should fire here.
+  `hypothesis_iteration.md` should fire here.
 - **"The supported H is the result; the rejected H's are noise"**:
   rejected H's are *part* of the meta-finding under Patterns A, B, E.
   Suppressing them in the Purpose-level conclusion is selection bias.

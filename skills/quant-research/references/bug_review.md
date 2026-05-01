@@ -56,7 +56,7 @@ already be world-class. The point is to pause and verify, not to decide.
 
 ### Recommended (not strict)
 
-- At the end of every research cycle, even when no flag has fired
+- At the end of every Purpose's investigation, even when no flag has fired
 
 ## Reviewer roster (5 specialists + 1 adversarial, dispatched in parallel)
 

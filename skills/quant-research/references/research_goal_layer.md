@@ -1,7 +1,7 @@
 # research_goal_layer.md
 
 The four-layer model (Research goal / Design hypothesis / Purpose / Hypothesis)
-that gives every hypothesis — including derived hypotheses generated mid-cycle —
+that gives every hypothesis — including derived hypotheses generated mid-Purpose —
 an explicit anchor in the research goal.
 
 ## When to read
@@ -10,9 +10,9 @@ an explicit anchor in the research goal.
   README's research-goal sub-claim list and the design-hypothesis log in
   `decisions.md` must be set up under this model
 - **Before opening a new Purpose / new notebook** — the Purpose's `target_sub_claim_id`
-  is required, and is a 5th item of the cycle goal (see
-  `cycle_purpose_and_goal.md`)
-- **Whenever a derived H is generated mid-cycle** — to check that the derived
+  is required, and is a 5th item of the Purpose-header items (see
+  `purpose_design.md`)
+- **Whenever a derived H is generated mid-Purpose** — to check that the derived
   H is anchored to a research-goal sub-claim, not just to the previous H's
   numeric observation
 - **At Purpose closure** — when updating the research-goal sub-claim
@@ -31,8 +31,8 @@ an explicit anchor in the research goal.
 ```
 
 The hypothesis at the bottom layer is what `research_design.md` and
-`hypothesis_cycles.md` operate on. The Purpose is what `experiment_protocol.md`
-and `cycle_purpose_and_goal.md` operate on. **The two upper layers (Research
+`hypothesis_iteration.md` operate on. The Purpose is what `experiment_protocol.md`
+and `purpose_design.md` operate on. **The two upper layers (Research
 goal, Design hypothesis) are this file's scope.** Without them, derived
 hypotheses become locally driven by the previous H's numeric observation
 and lose their anchor in why the project is running at all.
@@ -73,8 +73,8 @@ stacking yield a live-tradeable strategy?"]
 
 - IDs are stable within a project (`G1.1`, `G1.2`, …, `G2.1`, …) and never
   reused after retirement
-- IDs are referenced by `target_sub_claim_id` in `hypotheses.md` and by the
-  Cycle goal's 5th item in each notebook
+- IDs are referenced by `target_sub_claim_id` in `hypotheses.md` and by
+  the 5th Purpose-header item in each notebook
 - A research goal with 0 sub-claims is too vague to commit to and is treated
   as "not yet decomposed" — Stage 0 territory; characterize the data /
   consumer first
@@ -93,7 +93,7 @@ upper question — exactly the symptom the four-layer model fixes.
 
 A design hypothesis is the **prediction** that running a particular Purpose
 will close one or more research-goal sub-claims. It is the bridge from the
-upper question to the cycle's `target_sub_claim_id`.
+upper question to the Purpose's `target_sub_claim_id`.
 
 ### Form
 
@@ -157,7 +157,7 @@ A Purpose is the parent research thesis one notebook tests, written
 as a declarative falsifiable statement and verdicted at notebook
 closure. The Purpose's relationship to the research-goal layer is
 via **`target_sub_claim_id`**
-— the cycle goal's 5th item (see `cycle_purpose_and_goal.md`).
+— the 5th Purpose-header item (see `purpose_design.md`).
 
 A Purpose normally targets **1 sub-claim** as primary and may touch 1-2
 others as secondary. A Purpose targeting > 3 sub-claims is too broad
@@ -171,7 +171,7 @@ declare a more specific sub-claim** if the Purpose's primary sub-claim
 decomposes further. The H's row in `hypotheses.md` carries the
 `target_sub_claim_id` column.
 
-A derived H — one generated mid-cycle from H_n's result — inherits its
+A derived H — one generated mid-Purpose from H_n's result — inherits its
 `target_sub_claim_id` from the parent H by default. Overriding is legal
 but must be explicit ("H4 is derived from H3 but targets G1.2 rather than
 G1.1, because the turnover finding shifted the question into the
@@ -185,11 +185,11 @@ column.
 1. Read the project README's research-goal sub-claim list. Pick the
    primary sub-claim this Purpose will close (or attack — close to
    confirmed *or* falsified counts equally)
-2. Write the `target_sub_claim_id` as the 5th item of the Cycle goal
-   in the notebook header (see `cycle_purpose_and_goal.md`)
+2. Write the `target_sub_claim_id` as the 5th item of the Purpose-header
+   items in the notebook header (see `purpose_design.md`)
 3. Write the design hypothesis at open in `decisions.md`
 
-### When generating a derived H mid-cycle
+### When generating a derived H mid-Purpose
 
 1. Inherit `target_sub_claim_id` from the parent H by default
 2. If the derived H reflects a shift in which sub-claim is being tested,
@@ -199,8 +199,8 @@ column.
 
 ### When closing a Purpose
 
-1. Apply the cycle's decision rule (Primary YES / Fallback NO with binding
-   axis / KICK-UP — see `cycle_purpose_and_goal.md`)
+1. Apply the Purpose's decision rule (Primary YES / Fallback NO with binding
+   axis / KICK-UP — see `purpose_design.md`)
 2. Update the research-goal sub-claim status in `decisions.md`'s
    "Research-goal sub-claim progress update" section: each sub-claim
    the Purpose touched moves between {`not started`, `in progress`,
@@ -218,7 +218,7 @@ column.
 | Research goal + sub-claim list | `README.md` | Notebook body, `hypotheses.md`, `decisions.md` |
 | Sub-claim status (not started / in progress / confirmed / falsified) | `decisions.md` Purpose entries | Notebook body, `hypotheses.md` |
 | Design hypothesis (at open / at close) | `decisions.md` Purpose entries | Notebook body, `hypotheses.md` |
-| Purpose's `target_sub_claim_id` | Notebook Cycle goal (5th item) | `decisions.md`'s Design hypothesis line restates it |
+| Purpose's `target_sub_claim_id` | Notebook Purpose-header items (5th) | `decisions.md`'s Design hypothesis line restates it |
 | H's `target_sub_claim_id` | `hypotheses.md` rows | Notebook body |
 | H's `pathway` (1-6 from `hypothesis_generation.md`) | `hypotheses.md` rows | Notebook body |
 | H's `parent_id` (for derived H) | `hypotheses.md` `Statement` column ("derived from H3") | Notebook body |
@@ -227,8 +227,9 @@ column.
 
 The notebook body never carries `target_sub_claim_id` for individual H's,
 classification states, or design-hypothesis prose. It does carry the
-Purpose-level `target_sub_claim_id` (in the Cycle goal block, once) and
-each H's research content (statement, evidence, interpretation, verdict).
+Purpose-level `target_sub_claim_id` (in the Purpose-header items block,
+once) and each H's research content (statement, evidence, interpretation,
+verdict).
 
 ## Failure patterns this model fixes
 
@@ -281,23 +282,23 @@ design hypothesis reads.
 |---|---|
 | "The H's anchor in the research goal is obvious from context." | Then writing `target_sub_claim_id` costs nothing and removes the failure mode. Implicit anchors are the failure mode. |
 | "I'll write the sub-claim status when I have time." | The status update is what justifies the next Purpose. Skipping it makes the next Purpose's design hypothesis vacuous. |
-| "The design hypothesis is just paperwork; the cycle goal already covers it." | Cycle goal answers "what does this cycle output?" Design hypothesis answers "why this cycle, in what order, given the research goal?" — different question. |
+| "The design hypothesis is just paperwork; the Purpose-header items already cover it." | Purpose-header items answer "what does this Purpose output?" Design hypothesis answers "why this Purpose, in what order, given the research goal?" — different question. |
 | "If I write design hypotheses before Purposes, I'll be locked in." | The design hypothesis can be FALSIFIED at close — that is a legitimate research output, not a failure. Pre-commitment is what lets falsification be informative. |
 | "Sub-claim IDs are over-engineering for a small project." | A project too small to need sub-claim IDs is one without 2+ Purposes. As soon as a 2nd Purpose opens, the question "why this one and not that one?" exists; the IDs are how that question gets answered. |
 | "I have only one sub-claim, so the column is redundant." | Then every row's `target_sub_claim_id` says `G1.1` and the redundancy costs nothing. When a 2nd sub-claim is added later, the existing rows are already linked. |
 
 ## Compatibility with existing layers
 
-This file does not invalidate `cycle_purpose_and_goal.md`,
-`hypothesis_cycles.md`, `cross_h_synthesis.md`, or
+This file does not invalidate `purpose_design.md`,
+`hypothesis_iteration.md`, `cross_h_synthesis.md`, or
 `hypothesis_generation.md`. It adds the upper two layers above the
 Purpose layer; the existing layers operate on Purpose and Hypothesis as
 before. Specifically:
 
-- The Cycle goal's 4 items (Consumer / Decision / Decision rule /
+- The Purpose-header items' 4 items (Consumer / Decision / Decision rule /
   Knowledge output) gain a 5th item (`target_sub_claim_id`); the
   semantics of the existing 4 are unchanged
-- `hypothesis_cycles.md` routing (same notebook vs. new) is unchanged;
+- `hypothesis_iteration.md` routing (same notebook vs. new) is unchanged;
   the routing test is "Purpose continuity" and that is determined by
   `target_sub_claim_id` continuity in the same way it was determined by
   Purpose-statement continuity before
