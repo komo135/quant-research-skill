@@ -179,16 +179,26 @@ engineering work and recorded in the parent H's section, not in
      (see `references/why_why_analysis.md`). The parent H's chain
      must already exist (≥ 3 levels, mechanism-level terminal,
      written in the parent's per-H "interpretation" cell or the
-     `decisions.md` H sub-bullet). A derived H that does not cite
-     a chain terminal is **inadmissible** — its existence relies on
-     the bare fact of the parent's verdict / `failure_mode` label
-     rather than on a mechanism-level reading. This admissibility
-     test fires identically on parents with `verdict='supported'`
-     and on parents with `verdict='rejected'`: a "the parent
-     worked, let's try a sibling instrument" derivation that does
-     not cite a chain terminal is the same shallowness pattern as
-     a "the parent failed, let's vary the threshold" derivation,
-     and is rejected for the same reason.
+     `decisions.md` H sub-bullet) AND **every level of the chain
+     must be observation-pinned**: each "why?" answer cites a
+     specific cell / value of a computed analysis (table, figure,
+     distribution, correlation), not a prose mechanism statement
+     unbacked by data. A derived H that cites an unpinned (prose-
+     only / "expected to" / "consistent with") chain level is
+     **inadmissible** even if a citation string exists — the
+     citation must point at observation, not plausibility.
+
+     A derived H that does not cite a chain terminal at all is
+     also inadmissible — its existence relies on the bare fact of
+     the parent's verdict / `failure_mode` label rather than on a
+     mechanism-level reading. Both failure modes (no citation /
+     citation-to-unpinned-level) fire identically on parents with
+     `verdict='supported'` and on parents with `verdict='rejected'`:
+     a "the parent worked, let's try a sibling instrument"
+     derivation grounded in unpinned plausibility is the same
+     shallowness pattern as a "the parent failed, let's vary the
+     threshold" derivation grounded in nothing, and is rejected for
+     the same reason.
    - **Own falsifiable claim** distinct from the parent H (different
      decision axis, not just a tighter / looser threshold on the
      parent's axis). The "different axis" is what the chain

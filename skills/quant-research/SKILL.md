@@ -717,13 +717,27 @@ What this step produces:
   cause** (= what the strategy was actually exposed to / harvested / selected,
   what structural property of the data drove the result), not a metric,
   threshold, parameter, or `failure_mode` label.
+- **Each level pinned to a computed observation.** Every "why?" answer
+  cites a specific cell / value of an analysis output (a table, a
+  distribution, a correlation, a stratified statistic) computed in the
+  notebook before the chain references it. Prose mechanism statements
+  with no number nearby and no table / figure citation are not pinned —
+  the chain is reasoning about what the data would show, not citing what
+  it shows. See `references/why_why_analysis.md` "Observation grounding".
+- **When an analysis cannot be run, the chain stops and surfaces the gap.**
+  A level whose required analysis is unavailable in the current session is
+  written as "level N: cannot be answered without analysis A on artifact X.
+  Chain incomplete." The chain is then **not eligible** to ground a
+  derived H. Writing a plausible chain to compensate for missing
+  computation is the failure mode this step is built to catch.
 - The chain's terminal answer recorded as a one-phrase entry in `decisions.md`'s
   Purpose entry (under the H sub-bullet) — so cross-Purpose derivations can
   cite it as `chain_terminal_cited`.
 - Each derived H proposed for `hypotheses.md` (whether same-Purpose or
   new-Purpose) carries a `chain_terminal_cited` field naming which terminal
-  answer it is grounded in. A derived H without this citation is rejected at
-  routing sub-step 0 of `hypothesis_iteration.md`.
+  answer it is grounded in. A derived H without this citation, **or with a
+  citation pointing to an unpinned (prose-only) chain level**, is rejected
+  at routing sub-step 0 of `hypothesis_iteration.md`.
 
 The rule applies to **both supported and rejected verdicts**. A supported H
 without a chain produces sibling-extension derivations that propagate whatever
@@ -739,6 +753,8 @@ Common rationalizations to resist:
 | "The `failure_mode` label *is* the cause." | A label is a one-word categorization; it is at most level-1 of the chain. Treating it as the cause prevents the chain from reaching mechanism level. |
 | "The H was supported, so there is nothing to dig into." | Sibling extensions of a supported parent inherit whatever the apparatus actually tested. Without a chain, the next H may extend a misspecified mechanism instead of the named one. |
 | "I'll skip the chain on this H and run it later." | "Later" is the audit trail of the skip — by then the next H is on the page, and was generated from the verdict. The chain is what should have grounded that H. |
+| "The chain reads plausibly — that's enough." | Coherent prose is the LLM's default output; the rule requires that each level cite a specific computed cell / value the prose summarizes. "Reads plausibly" is the failure mode the observation-grounding rule is built to catch — see `why_why_analysis.md`. |
+| "The analyses are expensive / not available — let me write the chain from what they would probably show." | "Would probably show" is plausibility, not observation. Stop the chain at the level whose analysis has not been computed; surface the gap explicitly; do not admit a derived H from a partial chain. |
 
 ### 13. Multi-agent experiment review (per Hypothesis, research quality) — invokes the `experiment-review` skill
 

@@ -39,27 +39,38 @@ The chain terminates only when the next "why?" can no longer be
 answered by another metric, threshold, parameter, or failure_mode
 label. At the terminal level, the answer must be a statement about
 **what the strategy was actually doing in the world** — distinct
-from what its name claimed it was doing. Concretely, terminal
-answers describe:
+from what its name claimed it was doing — **and the answer must be
+backed by a specific computed observation**, not by a prose
+hypothesis the data would supposedly support (see "Observation
+grounding" below). Concretely, terminal answers describe:
 
 - What the entry rule **actually selected for** (vs. what it claimed
-  to select for) — e.g., "RSI≤30 selects extremes, but ~75 % of
-  RSI≤30 occurrences in this universe are concentrated in high-vol
-  regimes; what the entry rule selects for is high-vol participation,
-  not mean-reversion specifically".
+  to select for) — backed by a stratification of entries by some
+  feature (vol regime, session, regime indicator) showing the
+  selection bias. Example terminal: "RSI≤30 selects extremes, but
+  the computed gross-PnL distribution by VIX-bucket on this universe
+  is [VIX<12: 6%, 12-18: 18%, 18-25: 28%, 25-35: 38%, ≥35: 10%]
+  (table T2) — the top three buckets are 36% of trades and produce
+  75% of gross PnL, so what the entry rule selects for is high-vol
+  participation, not mean-reversion specifically".
 - What the trades **actually harvested** (vs. the mechanism the H
-  named) — e.g., "the asymmetric signal-flip exit cuts losers fast
-  and lets winners run; the strategy's positive return is sourced
-  from trend-tail asymmetry of the exit, not from reversion of the
-  entry signal".
-- What the strategy was **exposed to** — e.g., "monthly PnL
-  correlates 0.61 with managed-futures indices and 0.06 with
-  EUR/USD's own monthly return; the strategy is a long-vol overlay
+  named) — backed by an intra-trade decomposition or
+  holding-time-by-outcome table. Example: "Per-trade decomposition
+  (table T5) shows the reversion phase is 35% of intra-trade gross
+  return and the trend phase is 65%; combined with mean holding
+  time of winners 11.8h vs losers 2.9h (table T3), the strategy's
+  positive return is sourced from trend-tail asymmetry of the exit".
+- What the strategy was **exposed to** — backed by an external-proxy
+  correlation table. Example: "Monthly PnL correlation
+  (table T4): BarclayHedge CTA = 0.61, SPX 1m straddle = 0.49,
+  EUR/USD monthly = 0.06; the strategy is a long-vol overlay
   with a mean-reversion label".
 - What **structural property of the data or apparatus** drove the
-  result — e.g., "fee-binding behavior is concentrated in the
-  shortest holding-time tercile, which contributes 78 % of the
-  per-trade fee burden; turnover, not signal alpha, is what failed".
+  result — backed by a stratification of the binding metric by
+  trade sub-population. Example: "Fee burden by holding-time
+  tercile (table T6): bottom tercile 78%, middle 15%, top 7%;
+  turnover composition, not signal alpha, is what `fee_model`
+  encodes here".
 
 Terminal answers that **do not** count as mechanism-level (= the
 chain has not bottomed out):
@@ -71,6 +82,68 @@ chain has not bottomed out):
 - "The entry threshold was wrong." → parameter.
 - "The signal was noisy." → vague (no mechanism named).
 - "It didn't work in this universe." → no mechanism named.
+- "RSI≤30 likely selects high-vol participation in this universe." →
+  prose hypothesis without observation. "Likely" is the tell.
+- "Asymmetric exit is consistent with trend-tail harvesting." →
+  "consistent with" = the data has not been computed; the level is
+  reasoning about what the data would show, not citing what it
+  shows.
+
+## Observation grounding (= the rule the chain stands on)
+
+Each "why?" answer in the chain — including the terminal — must
+**cite a specific computed observation** from the parent
+experiment's artifacts: a numeric value, a stratified table cell, a
+distribution shape, a correlation, a regression coefficient, a
+ranked breakdown. The observation is named, computed, and visible
+(as a table or figure) in the notebook before the chain references
+it; the chain's prose is a *summary of* that observation, not a
+*description of* what the observation would supposedly be.
+
+Two layers, both required:
+
+1. **Named analyses performed and their output visible.** Before
+   any chain level past level 1 can be answered, the analysis it
+   draws on has been computed and its output (a table, a
+   distribution, a correlation matrix, a stratified statistic)
+   exists as a cell in the notebook with a referenceable label
+   (e.g., "table T3: holding-time distribution by trade outcome").
+2. **Each level's claim pins to a specific cell / value of that
+   output.** "Gross PnL is concentrated in high-vol regimes" is
+   not yet pinned. "Per table T2 the top three VIX buckets are
+   36% of trades and produce 75% of gross PnL" is pinned. The
+   prose in the chain is a one-line summary; the value lives in
+   the cited table.
+
+A chain level whose answer **does not pin to a cited cell / value**
+is not bottomed out — even if the prose names a mechanism. Common
+tells that the level is unpinned:
+
+- "expected to" / "is expected to" / "should" / "ought to"
+- "consistent with" / "would be consistent with"
+- "likely" / "presumably" / "presumably because"
+- "based on typical patterns" / "in this kind of strategy"
+- prose mechanism statements with no number nearby and no
+  table / figure citation
+
+When the analysis a level depends on **cannot be performed** (e.g.,
+data unavailable, the artifact required does not exist, the
+computation is out of scope for the current session), the
+protocol-correct response is to **stop the chain and surface the
+gap** — not to complete the chain from plausibility. Concretely:
+write the levels that *are* observation-backed, then a final entry
+that says:
+
+> **Level N: cannot be answered without analysis A on artifact X.**
+> Chain incomplete. No derived H may be admitted from this chain
+> until A is computed and table T<n> is present.
+
+The chain is *not eligible* to ground a derived H's
+`chain_terminal_cited` until every level (including the terminal)
+is pinned. This is the discipline that distinguishes "ran the
+post-mortem" from "described the post-mortem the data would
+probably show". The latter is the failure mode this rule exists to
+catch.
 
 ## Required shape of the chain
 
@@ -108,18 +181,33 @@ chain has not bottomed out):
      sub-population.
 
    The choice of which to run is judgment. The minimum is whatever
-   it takes to push the chain past metric / threshold / label level.
+   it takes to push the chain past metric / threshold / label level
+   *with each level pinned to a computed observation* (see
+   "Observation grounding" above). Computing one analysis to support
+   one level is the unit; "I'll run the analyses later, write the
+   chain now" is the failure mode this step exists to interrupt.
 
 2. **Write the chain.** Three or more levels, contiguous, with each
-   answer becoming the subject of the next "why?".
+   answer becoming the subject of the next "why?". **Each level
+   cites a specific cell / value of an analysis output** (table T<n>,
+   figure F<n>, regression coefficient, distribution shape) computed
+   in step 1.
 
 3. **Audit the terminal answer** against the "mechanism-level"
    definition above. If the terminal is still a metric / threshold /
    parameter / label, the chain has not bottomed out — keep digging.
+   **Audit each non-terminal level for observation grounding** — if
+   any level's prose contains "expected to" / "consistent with" /
+   "likely" / "should" without a cited cell, the chain is not yet
+   eligible. Either compute the missing analysis or stop the chain
+   and surface the gap (per the "Observation grounding" rule).
 
 4. **Pass the chain to the derived-H gate.** Each derived H must
    cite a specific terminal answer; if no derived H follows, write
-   the chain anyway (the next session inherits it).
+   the chain anyway (the next session inherits it). A chain whose
+   levels are not all observation-pinned is **not eligible** to
+   ground a derived H — the agent stops and surfaces the gap rather
+   than admitting a derived H from a partial chain.
 
 ## Worked example — rejected verdict
 
@@ -127,46 +215,63 @@ Parent H1: "RSI(14)≤30 entry × signal-flip exit on EUR/USD H1 beats
 B&H test Sharpe by ≥ 0.5 with fee 1 bp/side." Verdict = rejected.
 `failure_mode = fee_model` (break-even fee 0.42 bp/side).
 
-**Mechanism-level analyses run.** Per-trade PnL by VIX bucket;
-holding-time by trade outcome; monthly PnL correlation with
-BarclayHedge CTA Index and SPX 1m straddle PnL; intra-trade
-reversion-vs-trend decomposition.
+**Mechanism-level analyses run** (each produces a referenceable
+output cell in the notebook before the chain is written):
 
-**Chain.**
+- **Table T2** — per-trade gross PnL by entry-time VIX bucket
+  (5-bucket: <12 / 12-18 / 18-25 / 25-35 / ≥35).
+- **Table T3** — holding-time distribution conditional on trade
+  outcome (winners vs. losers).
+- **Table T4** — monthly PnL correlations against BarclayHedge CTA
+  Index, SPX 1m ATM straddle PnL, EUR/USD monthly return.
+- **Table T5** — intra-trade return decomposition (reversion phase
+  before first sign-flip vs. trend phase after).
+
+**Chain.** Each level pins to a cited cell / value.
 
 > **Why was H1 rejected?**
-> Because break-even fee (0.42 bp/side) is well below the deployment
-> fee assumption (1 bp/side). Per-trade unit economics did not survive
-> realistic cost.
+> Because break-even fee (0.42 bp/side, headline table) is below the
+> deployment fee assumption (1 bp/side). Per-trade unit economics
+> did not survive realistic cost.
 >
 > **Why is the per-trade unit economics that thin?**
-> Because the strategy's gross PnL is concentrated in a sub-population
-> of trades (75 % of gross PnL from the top three VIX buckets, which
-> are 36 % of trades) and the remaining 64 % of trades pay fees
-> without contributing edge.
+> Per **table T2**, gross PnL by VIX bucket is
+> [<12: 6%, 12-18: 18%, 18-25: 28%, 25-35: 38%, ≥35: 10%]; the top
+> three buckets are 36% of trades and contribute 75% of gross PnL.
+> The remaining 64% of trades pay round-trip fees on a per-trade
+> gross PnL too small to clear them.
 >
-> **Why is the gross PnL concentrated in high-vol regimes?**
-> Because what RSI(14)≤30 actually selects for in this universe is
-> not "the cross-section of mean-reversion opportunities" but
-> "moments of unusual price displacement" — most of which coincide
-> with high realized volatility. The asymmetric signal-flip exit
-> (winners hold 11.8 h, losers hold 2.9 h) then converts the
-> long-vol exposure into a positive-skew return stream. Monthly PnL
-> correlates 0.61 with the BarclayHedge CTA Index and 0.06 with
-> EUR/USD's own monthly return — the strategy's monthly signature
-> is a long-vol / trend-following overlay, not a directional
-> mean-reversion stream. Intra-trade decomposition: 65 % of PnL
-> comes from the trend phase after first reversion, only 35 % from
-> the reversion phase itself.
+> **Why is the gross PnL concentrated in the high-vol buckets, and
+> what is the apparatus actually testing?**
+> Three observations pin this:
+>
+> - **Table T3** — winners' mean holding time is 11.8h vs. losers'
+>   2.9h; the asymmetric signal-flip exit cuts losers fast and lets
+>   winners run.
+> - **Table T4** — monthly PnL correlation = 0.61 with BarclayHedge
+>   CTA, 0.49 with SPX 1m straddle, 0.06 with EUR/USD's own monthly
+>   return. The monthly signature is long-vol / trend-following, not
+>   directional FX.
+> - **Table T5** — intra-trade decomposition is 35% reversion phase /
+>   65% trend phase; the dominant intra-trade source of return is
+>   the trend phase after the first reversion, not the reversion
+>   phase itself.
+>
+> Read together with table T2's regime concentration: what the
+> RSI(14)≤30 entry actually selects on this universe is high-vol
+> participation, and the asymmetric exit then harvests trend tails
+> within those participations.
 
-**Terminal answer (mechanism-level).** "What H1 actually tested was
-'asymmetric-exit harvesting of long-vol exposure', not 'mean-reversion
-on RSI extremes'. The fee burden is thin because the *non-high-vol*
-trades — which the entry rule should have selected if the mechanism
-were genuine MR — pay fees without contributing edge. The
-`failure_mode = fee_model` label is correct as far as it goes, but the
-deeper cause is mechanism misspecification: the apparatus does not
-test mean-reversion."
+**Terminal answer (mechanism-level, observation-pinned).** "What
+H1 actually tested, per tables T2/T3/T4/T5, was 'asymmetric-exit
+harvesting of trend tails on a high-vol-biased entry population',
+not 'mean-reversion on RSI extremes'. The fee burden is thin
+because the non-high-vol trades — which the entry rule should have
+selected uniformly if the mechanism were genuine MR — pay fees on
+small per-trade gross PnL (T2 buckets <12 and 12-18). The
+`failure_mode = fee_model` label is correct at level 1; the
+mechanism-level cause is misspecification of what the apparatus
+selects and harvests."
 
 **What the chain licenses (= admissible derived H's).**
 
@@ -198,39 +303,55 @@ Parent H7: "Cross-sectional 20-day momentum on TOPIX500 LS-decile
 beats EW baseline by test Sharpe ≥ 0.30." Verdict = supported (test
 Sharpe = 0.51).
 
-**Mechanism-level analyses run.** Per-stock contribution to PnL;
-factor exposure decomposition (size / value / quality / low-vol /
-sector) on the LS portfolio's daily returns; PnL contribution by
-liquidity bucket; turnover and per-stock holding distribution.
+**Mechanism-level analyses run** (each produces a referenceable
+output cell before the chain is written):
 
-**Chain.**
+- **Table U1** — per-stock contribution to PnL, ranked.
+- **Table U2** — Sharpe decomposition by leg (long / short) for
+  the LS portfolio.
+- **Table U3** — short-leg holdings stratified by liquidity quintile
+  (1 = least liquid).
+- **Table U4** — Fama-French / quality / low-vol factor regression
+  on the LS portfolio's daily returns.
+- **Table U5** — turnover and per-stock holding-period distribution.
+
+**Chain.** Each level pins to a cited cell / value.
 
 > **Why was H7 supported?**
-> Because the LS-decile portfolio's test Sharpe (0.51) cleared the
-> +0.30 gate vs. EW.
+> Because the LS-decile portfolio's test Sharpe (0.51, headline
+> table) cleared the +0.30 gate vs. EW.
 >
 > **Why did LS-decile clear the gate?**
-> Because the long-decile generated a +0.21 Sharpe contribution and
-> the short-decile generated a +0.30 Sharpe contribution; the short
-> leg accounted for ~60 % of the spread.
+> Per **table U2**, the long-leg contributed Sharpe = 0.21 and the
+> short-leg contributed Sharpe = 0.30; the short leg accounts for
+> ≈60% of the spread. The result is asymmetric across legs.
 >
 > **Why is the short leg the dominant contributor?**
-> Because the short leg's stocks are concentrated in the bottom three
-> liquidity quintiles (60 % of short-leg names), and that sub-universe
-> exhibits much stronger short-side mean-reversion-of-extremes after a
-> 20-day move than the top quintiles do. Factor decomposition shows
-> 70 % of the short-leg PnL is unexplained by size / value / quality /
-> low-vol exposures — i.e., the short leg's PnL is not a smart-beta
-> proxy. The "20-day momentum" label is technically correct but the
-> mechanism is more specific: short-side reversion-of-overreaction in
-> low-liquidity TOPIX500 names, with average per-stock holding 18
+> Two observations pin this:
+>
+> - **Table U3** — 60% of short-leg names sit in the bottom three
+>   liquidity quintiles (Q1 + Q2 + Q3 of trailing-21d ADV). That
+>   sub-universe's short-side cross-sectional return after a 20-day
+>   push is materially more negative than the top-two-quintile
+>   sub-universe (per-quintile breakdown in U3, with the bottom-3
+>   group at -1.8% mean 21d-forward vs. -0.4% in Q4+Q5).
+> - **Table U4** — factor regression of the LS daily PnL shows R² =
+>   0.30, with size / value / quality / low-vol jointly explaining
+>   only ~30% of variance; ≈70% of the spread is residual to those
+>   four factors. Short-leg-only regression gives the same shape.
+>
+> The "20-day momentum" label correctly names the entry rule (= 20-d
+> return rank), but per U3 + U4, the realized exposure is short-side
+> reversion-of-overreaction concentrated in low-liquidity TOPIX500
+> names, with the per-stock average holding period (table U5) of 18
 > trading days.
 
-**Terminal answer (mechanism-level).** "What H7 actually tested,
-empirically, is 'short-side reversion-of-overreaction in
-low-liquidity TOPIX500 names after a 20-day push'. The 'momentum'
-framing was the H1 design label; the realized exposure is more
-specific."
+**Terminal answer (mechanism-level, observation-pinned).** "What
+H7 actually tested, per tables U2/U3/U4/U5, is 'short-side
+reversion-of-overreaction in low-liquidity TOPIX500 names after a
+20-day push, with ≈70% factor-residual return'. The 'momentum'
+framing was the design label; the realized exposure (per U3's
+liquidity stratification + U4's factor residual) is more specific."
 
 **What the chain licenses.**
 
@@ -286,6 +407,10 @@ failure-mode-analysis entry. The chain replaces the hunch.
 | "I'll skip the chain on this H and run it on the next one." | Skipping is what produces a derived H that "cannot state its own purpose". The next H is the audit trail of the skip; running the chain at that point is too late — the derived H is already on the page. |
 | "I ran the analyses but didn't write the chain — the analyses speak for themselves." | The chain is the artifact the derived-H gate reads. Analyses scattered across cells with no synthesis cannot be cited by a derived H's design header. The chain is the synthesis. |
 | "The chain is just a post-hoc rationalization of the next H I already wanted to run." | If you already know the next H, write the chain *first* and check whether the chain terminal licenses that H. If it does not, the chain is doing its job — the H you wanted to run is surface-derived and the chain reveals what depth was missing. |
+| "I named the mechanism — that's the terminal." | Naming a mechanism in prose ("the strategy harvests trend tails") is a hypothesis, not an observation. Without a cited table cell / distribution / correlation that the prose summarizes, the level is unpinned. Compute the analysis or stop the chain — do not paper over the gap with a plausible sentence. |
+| "The analysis is expensive — let me write the chain from what it would probably show." | "Probably show" is the failure mode this rule is built to catch. A chain whose answers describe what the data *would* show, not what it *does* show, is a plausibility ladder dressed as a post-mortem. Stop the chain at the level whose analysis hasn't run; surface the gap as "level N: cannot be answered without analysis A on artifact X — chain incomplete". |
+| "Each level reads coherently — the chain is fine even without numbers." | Coherent prose is the output an LLM produces by default; that is not evidence the chain reflects the data. The grounding rule exists *because* coherent prose is cheap. A chain with no numbers nearby and no table citations is a coherent piece of writing about the data, not an analysis of the data. |
+| "The analyses can't be run in this context (subagent dispatch / sandboxed environment / data not loaded) — the chain is the best I can do." | Then the chain cannot be completed in this context, and the protocol-correct response is to write the levels that *are* observation-backed (often only level 1, the headline metric) and stop with "level N: requires analysis A — not available in this context. Chain incomplete; no derived H may be admitted." Writing a plausible chain to compensate for missing data inverts the discipline. |
 
 ## What the chain is *not*
 
