@@ -9,7 +9,7 @@ between literature review and the hypothesis-portfolio entry.
 - About to write a new entry in `hypotheses.md`.
 - About to add a `## H<id>` block inside an existing notebook.
 - About to derive a new H from a prior H's verdict (in which case this
-  reference owns *content*; `hypothesis_cycles.md` owns *routing*).
+  reference owns *content*; `hypothesis_iteration.md` owns *routing*).
 
 ## Goal
 
@@ -147,8 +147,8 @@ H_{n+1} survives the axis-A gate; rejection: H_{n+1} fails on the
 axis-A gate or another axis surfaces."
 
 **Routing (cross-reference).** Routing of H_{n+1} (same notebook vs.
-new notebook) is owned by `hypothesis_cycles.md`. Pathway 4 owns the
-*content*; cycles owns the *file placement*.
+new notebook) is owned by `hypothesis_iteration.md`. Pathway 4 owns the
+*content*; the iteration file owns the *file placement*.
 
 ### Pathway 5 — Cross-asset / cross-regime extension
 

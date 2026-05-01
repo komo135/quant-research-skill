@@ -90,7 +90,7 @@ reads *first*. If the first sentence is "the implementation is
 correct", the reader's takeaway is "this notebook delivered a
 correctly-implemented PCA / momentum signal / mean-reversion
 estimator". The reader's takeaway is *the implementation*, not *the
-market answer*. The cycle's de facto deliverable inverts from research
+market answer*. The Purpose's de facto deliverable inverts from research
 to engineering even when the underlying numbers are about the world.
 The format rule pins the lead sentence to the world.
 
@@ -385,7 +385,7 @@ experiment but live elsewhere:
   copied to `decisions.md`.
 - The **planning state** (follow-up, parked findings, run-now / next-session,
   derived H to run later) lives in `decisions.md` / `hypotheses.md` /
-  `hypothesis_cycles.md`.
+  `hypothesis_iteration.md`.
 
 Body stays clean of the other two. Reviewer vocabulary
 (`leakage-reviewer`, `claim-reviewer`, `(literature dimension)`), severity
@@ -441,7 +441,7 @@ Before declaring an experiment notebook complete:
       edit-history language ("after bug_review fix", "~~2.4~~", etc.)
 - [ ] Notebook body contains no skill version numbers or compliance tags
       (`skill v0.X.0`, `(added in v0.Y.0)`, `v0.X.0 規約に準拠`),
-      no `<reference>.md` attributions in prose ("`cycle_purpose_and_goal.md`
+      no `<reference>.md` attributions in prose ("`purpose_design.md`
       に従い…"), no pivot / narrowing history sections
       ("Purpose narrowing — pivot rationale", "当初の Purpose は…",
       "narrowed from X to Y"), no migration / upgrade history

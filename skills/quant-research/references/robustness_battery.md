@@ -19,7 +19,7 @@ file, not a follow-up to it.
 
 ## Required checks
 
-Run all seven. Their results also become triggers for the next hypothesis cycle.
+Run all seven. Their results also become triggers for the next derived hypothesis.
 
 ### 1. Threshold sensitivity (2D grid)
 

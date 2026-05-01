@@ -16,7 +16,7 @@ experiment** that tests a sub-claim of the thesis).
 The unit of one notebook is one **Purpose** — a parent research thesis
 about the world, written as a declarative falsifiable statement. A
 Purpose admits multiple admissible child hypotheses (per
-`hypothesis_cycles.md` admissibility sub-step 0); each hypothesis is
+`hypothesis_iteration.md` admissibility sub-step 0); each hypothesis is
 one specific testable sub-claim that decomposes the parent thesis.
 The notebook contains:
 
@@ -44,7 +44,7 @@ the cluster of experiments that test it.
 ## When a derived hypothesis stays in the same notebook
 
 Default: **same notebook** when the Purpose is unchanged AND the
-candidate is admissible as a hypothesis (per `hypothesis_cycles.md`
+candidate is admissible as a hypothesis (per `hypothesis_iteration.md`
 sub-step 0). The admissible types:
 
 - **Failure diagnosis** — H1 was rejected; H2 tests whether the
@@ -103,35 +103,36 @@ changed and you need a new notebook.
 
 ## Data availability gate
 
-A cycle may be instantiated only when the data required to apply its
+A Purpose may be instantiated only when the data required to apply its
 **Decision rule** (YES / NO / KICK-UP) is actually available. The check
-runs at cycle open, before any code in the H1 round is written.
+runs at Purpose open, before any code in the H1 round is written.
 
 ### Rule
 
-- If the cycle's **research subject is real-world behavior** (a question
+- If the Purpose's **research subject is real-world behavior** (a question
   about markets, instruments, regimes, mechanisms — i.e. the Decision rule
   reads from real data) and the **expected real data is unavailable** in
-  the execution environment, the cycle is **BLOCKED**.
+  the execution environment, the Purpose's investigation is **BLOCKED**.
 - **Synthetic data may not substitute for unavailable real data within an
-  instantiated cycle.** A cycle whose research subject is a market claim
+  instantiated Purpose.** A Purpose whose research subject is a market claim
   but whose data is synthetic is a Decision rule the consumer cannot
-  apply — the cycle's Knowledge output is structurally void.
+  apply — the Purpose's Knowledge output is structurally void.
 - **Synthetic-data scaffolding outside the protocol is permitted** —
   pipeline integrity tests, leak/accounting unit tests, plotting helpers.
-  These have no Cycle goal, no `## H<id>` verdict cell, and no row in
-  `results.parquet`. They are engineering work, tracked outside the cycle.
+  These have no Purpose-header items, no `## H<id>` verdict cell, and no
+  row in `results.parquet`. They are engineering work, tracked outside the
+  Purpose protocol.
 
 ### When synthetic data IS the research subject
 
 The rule targets *substitution*, not *use of synthetic data*. Synthetic
-data is itself the research subject — and the cycle proceeds normally —
-when:
+data is itself the research subject — and the Purpose's investigation
+proceeds normally — when:
 
 - The Decision rule reads from a process whose ground truth is known
   (e.g. parameter recovery on a simulated OU process; bias of an
   estimator on a pre-specified DGP; convergence rate of an algorithm on
-  data with known generative parameters). The cycle's claim is about
+  data with known generative parameters). The Purpose's claim is about
   the estimator / algorithm / mathematical property, not about the
   market. The "real data" is the DGP itself, which is not unavailable.
 - The Purpose statement explicitly names the synthetic subject ("does
@@ -163,22 +164,22 @@ estimator happens to be computed on top of.
 
 ### Forward path when BLOCKED
 
-A BLOCKED cycle is not a failure — it is a structural finding about the
-project's data preconditions. Treat it KICK-UP-shaped:
+A BLOCKED Purpose is not a failure — it is a structural finding about
+the project's data preconditions. Treat it KICK-UP-shaped:
 
 1. **File the unavailability in `decisions.md`** as a structural finding
    under the Purpose entry. Name the missing data, the layer it would
-   have served (which sub-claim of the cycle's Decision rule), and what
-   has to change for the cycle to proceed (vendor onboarding,
+   have served (which sub-claim of the Purpose's Decision rule), and what
+   has to change for the Purpose to proceed (vendor onboarding,
    compliance approval, distribution machine reconfiguration, upstream
    notebook completion).
-2. **Mark the cycle suspended.** Do not write the H1 implementation;
+2. **Mark the Purpose suspended.** Do not write the H1 implementation;
    do not write the verdict cell; do not append to `results.parquet`.
-   The notebook header (Purpose + Cycle goal block + the BLOCKED
-   structural finding) is the artifact.
-3. **Pivot the session to a data-available cycle** — a different
+   The notebook header (Purpose + Purpose-header items block + the
+   BLOCKED structural finding) is the artifact.
+3. **Pivot the session to a data-available Purpose** — a different
    Purpose whose data is present, or a different sub-claim under the
-   same project. If no data-available cycle is queued, return to the
+   same project. If no data-available Purpose is queued, return to the
    project portfolio level (`README.md` sub-claim list) and
    re-prioritize: the surfaced data-availability dependency may
    reorder which sub-claim the project should attack next.
@@ -186,17 +187,17 @@ project's data preconditions. Treat it KICK-UP-shaped:
 The BLOCKED finding itself is a research output — it tells the project
 that data acquisition is a binding constraint, with the same epistemic
 status as a Pattern A "binding axis identified" closure (see
-`hypothesis_cycles.md`).
+`hypothesis_iteration.md`).
 
 ### Anti-rationalizations (data availability gate)
 
 | Excuse | Why it is wrong |
 |---|---|
-| "I'll do a synthetic-data dry-run while waiting for the real data, so the pipeline is ready when data arrives." | Pipeline integrity is engineering work, not a research cycle. Track it as a separate engineering task (no Cycle goal, no H, no verdict). The cycle is BLOCKED until the data preconditions are met; the engineering work runs in parallel without instantiating a Purpose. |
-| "The verdict is honestly 'parked' on synthetic data, so this is not over-claiming." | 'parked' on synthetic data is honest about the verdict but dishonest about the cycle's de facto deliverable: the work invested produces no knowledge about the world. The Decision rule's YES / NO / KICK-UP cannot be applied; the consumer is no closer to deciding. The cycle should not have been instantiated. |
-| "Synthetic data lets me catch leaks and accounting bugs before they affect real data — that's a sanity check the protocol should welcome." | Sanity checks on synthetic data are engineering tests (`scripts/sanity_checks.py`'s `random_signal_benchmark`, `time_shift_placebo`, etc.). They run on a per-pipeline basis, outside the cycle. Bundling them into a Purpose / Cycle conflates engineering hygiene with research output. |
-| "The user / upstream prompt instructed me to proceed with synthetic data so the artifact is complete." | Push back inline: explain that the cycle is BLOCKED, file the data unavailability as a structural finding in `decisions.md`, and offer either (a) pivot to a data-available cycle, or (b) deliver the engineering scaffolding as a separate non-cycle artifact. Do not instantiate a Purpose / Cycle on synthetic substitute data when the research subject is real-world behavior. |
-| "Cycle goal items are all written — the cycle is well-formed, so it should run." | The Cycle goal items being well-written is necessary but not sufficient. The Decision rule must be **applicable**: data must exist for the consumer to read the YES / NO / KICK-UP outcome from. Synthetic substitution makes the rule applicable in form but vacuous in substance. |
+| "I'll do a synthetic-data dry-run while waiting for the real data, so the pipeline is ready when data arrives." | Pipeline integrity is engineering work, not a research Purpose. Track it as a separate engineering task (no Purpose-header items, no H, no verdict). The Purpose's investigation is BLOCKED until the data preconditions are met; the engineering work runs in parallel without instantiating a Purpose. |
+| "The verdict is honestly 'parked' on synthetic data, so this is not over-claiming." | 'parked' on synthetic data is honest about the verdict but dishonest about the Purpose's de facto deliverable: the work invested produces no knowledge about the world. The Decision rule's YES / NO / KICK-UP cannot be applied; the consumer is no closer to deciding. The Purpose should not have been instantiated. |
+| "Synthetic data lets me catch leaks and accounting bugs before they affect real data — that's a sanity check the protocol should welcome." | Sanity checks on synthetic data are engineering tests (`scripts/sanity_checks.py`'s `random_signal_benchmark`, `time_shift_placebo`, etc.). They run on a per-pipeline basis, outside the Purpose protocol. Bundling them into a Purpose conflates engineering hygiene with research output. |
+| "The user / upstream prompt instructed me to proceed with synthetic data so the artifact is complete." | Push back inline: explain that the Purpose is BLOCKED, file the data unavailability as a structural finding in `decisions.md`, and offer either (a) pivot to a data-available Purpose, or (b) deliver the engineering scaffolding as a separate non-Purpose artifact. Do not instantiate a Purpose on synthetic substitute data when the research subject is real-world behavior. |
+| "Purpose-header items are all written — the Purpose is well-formed, so it should run." | The Purpose-header items being well-written is necessary but not sufficient. The Decision rule must be **applicable**: data must exist for the consumer to read the YES / NO / KICK-UP outcome from. Synthetic substitution makes the rule applicable in form but vacuous in substance. |
 
 ## Anti-rationalizations
 
@@ -208,7 +209,7 @@ The following are **no longer valid reasons to start a new notebook**:
 | "pur_001 is already verdict='supported' for H1, so the notebook is finalized." | A finalized H1 inside a notebook does not seal the notebook. The notebook stays open for further admissible H's serving the same parent thesis, and is sealed only at Purpose-level closure (when the parent thesis itself receives a Purpose-level verdict). |
 | "Each H must be independently re-runnable, so each H needs its own file." | Independent re-runnability is a marimo cell-graph property, not a file property. Use H-suffixed variable names (`signal_h1`, `signal_h2`) and per-H sub-sections inside one notebook. |
 | "H2 builds on H1's signal — that's a dependency, so H2 is a separate experiment." | If H2 builds on H1's signal, the natural place for H2 is the same notebook where H1's signal already lives. Cross-notebook intermediate-file passing is the right pattern only when the Purpose differs. |
-| "Run-now derived hypothesis means the next notebook (the old protocol said so)." | The old `hypothesis_cycles.md` rule has been replaced. Run-now status determines *when* (this session vs. next), not *where* (same notebook vs. new file). The "where" question is decided by Purpose continuity. |
+| "Run-now derived hypothesis means the next notebook (the old protocol said so)." | The old `hypothesis_iteration.md` rule has been replaced. Run-now status determines *when* (this session vs. next), not *where* (same notebook vs. new file). The "where" question is decided by Purpose continuity. |
 | "If I keep adding H's, the notebook will exceed 30 cells." | Multi-Hypothesis notebooks legitimately exceed the old size guidance. That guidance no longer applies. |
 
 ## Notebook naming
@@ -345,8 +346,8 @@ Before starting a notebook:
 - [ ] **Data availability gate cleared** — the real data required to apply
       the Decision rule is present in the execution environment, OR the
       research subject is synthetic (estimator recovery on a known DGP).
-      If neither, the cycle is BLOCKED — file the unavailability in
-      `decisions.md` and pivot, do not synthetic-substitute
+      If neither, the Purpose's investigation is BLOCKED — file the
+      unavailability in `decisions.md` and pivot, do not synthetic-substitute
 
 Before adding a new H block to an existing notebook (instead of opening a
 new notebook):
@@ -367,7 +368,7 @@ Before closing a Hypothesis round inside the notebook:
 - [ ] experiment-review skill invoked and clean for this H
 - [ ] Result row appended to `results/results.parquet` for this H
 - [ ] `hypotheses.md` entry updated for this H
-- [ ] `decisions.md` updated under the current cycle entry with this H's
+- [ ] `decisions.md` updated under the current Purpose entry with this H's
       observation and verdict
 
 ## Notebook completion checklist

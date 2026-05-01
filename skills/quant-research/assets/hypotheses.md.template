@@ -6,7 +6,7 @@ end of every Hypothesis round.
 A hypothesis is one falsifiable child claim that decomposes a Purpose
 (= the parent research thesis the notebook tests). The Purpose lives at
 the notebook level (each `pur_NNN_*.py` is one Purpose); multiple
-admissible hypotheses (per `hypothesis_cycles.md` admissibility
+admissible hypotheses (per `hypothesis_iteration.md` admissibility
 sub-step 0) can
 share the same `purpose_id` because they investigate the same Purpose
 inside one notebook.
@@ -42,18 +42,18 @@ or a *planning state* (before the H has run):
 The planning states are the single source of truth for run-now /
 next-session / drop classification of derived H's. The notebook body
 does NOT carry these states (see `references/post_review_reconciliation.md`
-F5 counter and `references/hypothesis_cycles.md`); the row here is where
+F5 counter and `references/hypothesis_iteration.md`); the row here is where
 they live.
 
 ## Entries
 
-| ID | Statement | Status | purpose_id (= notebook = Purpose) | target_sub_claim_id | pathway | Acceptance condition | Last update |
-|---|---|---|---|---|---|---|---|
-| H1 | [Falsifiable comparison statement.] | planned | pur_001 (Purpose: …) | G1.1 | 2 | [numeric threshold] | YYYY-MM-DD |
-| H2 | [Derived from H1, same Purpose: …] | planned-runnow | pur_001 (same Purpose) | G1.1 | 4 | [numeric threshold] | YYYY-MM-DD |
-| H3 | [Derived from H2, same Purpose; targets G1.2 instead because turnover-cap is in the live-tradeability layer] | planned-nextsession | pur_001 (same Purpose) | G1.2 | 4 | [numeric threshold] | YYYY-MM-DD |
-| H4 | [Derived from H1, NEW Purpose: …] | planned | pur_002 (Purpose: …) | G1.3 | 4 | [numeric threshold] | YYYY-MM-DD |
-| ... | ... | ... | ... | ... | ... | ... | ... |
+| ID | Statement | Status | purpose_id (= notebook = Purpose) | target_sub_claim_id | pathway | chain_terminal_cited | Acceptance condition | Last update |
+|---|---|---|---|---|---|---|---|---|
+| H1 | [Falsifiable comparison statement.] | planned | pur_001 (Purpose: …) | G1.1 | 2 | n/a (initial H, no parent chain) | [numeric threshold] | YYYY-MM-DD |
+| H2 | [Derived from H1, same Purpose: …] | planned-runnow | pur_001 (same Purpose) | G1.1 | 4 | H1.chain.terminal-A: "[one-phrase mechanism-level cause from H1's why-why chain]" | [numeric threshold] | YYYY-MM-DD |
+| H3 | [Derived from H2, same Purpose; targets G1.2 instead because turnover-cap is in the live-tradeability layer] | planned-nextsession | pur_001 (same Purpose) | G1.2 | 4 | H2.chain.terminal-B: "[…]" | [numeric threshold] | YYYY-MM-DD |
+| H4 | [Derived from H1, NEW Purpose: …] | planned | pur_002 (Purpose: …) | G1.3 | 4 | H1.chain.terminal-C: "[…]" | [numeric threshold] | YYYY-MM-DD |
+| ... | ... | ... | ... | ... | ... | ... | ... | ... |
 
 Multiple H's that share an `purpose_id` live in the same notebook because
 they serve the same Purpose. An H whose `purpose_id` differs lives in a
@@ -71,6 +71,14 @@ different notebook because the Purpose differs.
   (= derived from a previous H's failure axis), 5 = cross-asset / cross-regime
   extension, 6 = mechanism-driven. An ad-hoc H records `ad-hoc` here and
   must clear at least Medium tier in differentiation.
+- **`chain_terminal_cited`** (depth-gate provenance): the specific
+  terminal answer from the parent H's why-why chain (per
+  `references/why_why_analysis.md`) that this derived H is grounded in.
+  Use `n/a` for initial H's that have no parent chain. Required for
+  every derived H regardless of the parent's verdict (supported /
+  rejected / partial / parked); a derived H without a citation is
+  rejected at admissibility sub-step 0 of the routing rule (see
+  `references/hypothesis_iteration.md`).
 - **`Acceptance condition`**: numeric / structural threshold the H is
   tested against.
 
@@ -83,6 +91,8 @@ different notebook because the Purpose differs.
 - The `target_sub_claim_id` column ties the H to one research-goal sub-claim;
   inheritance from parent is the default for derived H's
 - The `pathway` column records the H's generation provenance (1-6 or ad-hoc)
+- The `chain_terminal_cited` column records which terminal answer of the
+  parent's why-why chain the derived H is grounded in (`n/a` for initial H's)
 - Derived hypotheses keep a reference to their parent in the Statement column
   (e.g. `H10 [Derived from H3, same Purpose: …]` or `H10 [Derived from H3, NEW Purpose: …]`)
 

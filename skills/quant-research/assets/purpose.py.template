@@ -56,9 +56,9 @@ def _(mo):
 
     Do NOT write the first H here. The first H goes in the H1 block below.]
 
-    ## Cycle goal — 5 items (mandatory, pre-implementation)
+    ## Purpose-header items — 5 mandatory pre-implementation items
 
-    See `references/cycle_purpose_and_goal.md` and
+    See `references/purpose_design.md` and
     `references/research_goal_layer.md`.
 
     ### Consumer
@@ -71,9 +71,9 @@ def _(mo):
 
     ### Decision the consumer is blocked on
     [One sentence: the yes/no/pivot the consumer cannot make without this
-    cycle's output.]
+    Purpose's output.]
 
-    ### Decision rule (committed BEFORE the cycle runs)
+    ### Decision rule (committed BEFORE the Purpose's investigation runs)
     - YES (consumer goes forward): [numeric / structural threshold]
     - NO (consumer does not go forward, with binding axis): [numeric /
       structural threshold + which `failure_mode` would be the binding axis]
@@ -81,7 +81,7 @@ def _(mo):
       e.g., bug_review surfaces unresolvable upstream data issue]
 
     ### Knowledge output (artifact that lets consumer apply the rule)
-    [What the cycle produces — typically per-H rows in results.parquet +
+    [What the Purpose produces — typically per-H rows in results.parquet +
     Purpose-level synthesis paragraph + headline figure. State it explicitly
     so the H portfolio below can be checked against it.]
 
@@ -302,7 +302,7 @@ def _(mo):
     H{{HYP_ID}}: [quote the entry from hypotheses.md; same `purpose_id` =
     `pur_{{NNN}}` as the notebook's Purpose; cite the row's `target_sub_claim_id`
     (= the research-goal sub-claim this H produces evidence for; inherited
-    from Purpose-level Cycle goal 5th item by default) and `pathway`
+    from the 5th Purpose-header item by default) and `pathway`
     (= 1-data-driven / 2-literature-extension / 3-literature-refutation /
     4-failure-derived / 5-cross-asset-extension / 6-mechanism-driven / ad-hoc)]
 
@@ -615,14 +615,32 @@ def _(mo):
     ## 9. Interpretation for H1 (prose conclusion — fill before the verdict cell)
 
     1. **What did the numbers say (for H1)?** [Headline metrics, CI, PSR.]
-    2. **Why is this the answer mechanistically?** [What is the model picking
-       up? Why might it generalize, or not?]
+    2. **Why-why chain (mandatory, ≥ 3 levels, mechanism-level terminal).**
+       Per `references/why_why_analysis.md`. Required regardless of the
+       eventual verdict (supported / rejected / partial / parked). Each
+       "why?" takes the previous answer as its subject and asks "why is
+       *that*?" until the terminal level is reached.
+
+       > **Why did H1 produce these numbers?** [level-1 answer]
+       >
+       > **Why is *that*?** [level-2 answer]
+       >
+       > **Why is *that*?** [level-3 answer — at this depth the answer must
+       > be mechanism-level: what the strategy was actually exposed to /
+       > harvested / selected / what structural property of the data drove
+       > the result. NOT a metric / threshold / parameter / `failure_mode`
+       > label.]
+
+       Terminal answer (one phrase, will be cited as `chain_terminal_cited`
+       by any derived H): [...]
     3. **What is the next falsifiable question this raises?**
-       [Concrete, testable, with the data we have or specifying what new data
-       is needed. If the next H still serves the same Purpose, it becomes
-       the H2 block in this same notebook (see the "## H2 round" stub at the
-       bottom). If it reflects a new Purpose, it becomes a candidate for a
-       new notebook in section 14 below.]
+       [Concrete, testable, *grounded in the chain terminal above* — the
+       next H falsifies or isolates the mechanism-level reading the chain
+       produced, not the metric layer of the result. If the next H still
+       serves the same Purpose, it becomes the H2 block in this same
+       notebook (see the "## H2 round" stub at the bottom). If it reflects
+       a new Purpose, it becomes a candidate for a new notebook in
+       section 14 below.]
     """
     )
     return
@@ -762,7 +780,7 @@ def _(mo):
     variable names (`signal_h2`, `pnl_h2`, …) so cells from H1 and H2 coexist
     in marimo's dataflow graph.
 
-    Routing reminder (see references/hypothesis_cycles.md and SKILL.md "Purpose
+    Routing reminder (see references/hypothesis_iteration.md and SKILL.md "Purpose
     vs. Hypothesis"):
 
     - Same Purpose → next H block in THIS notebook (default case)
@@ -792,7 +810,7 @@ def _(mo):
     (= inherited from the parent H by default), and `pathway` (= typically 4
     for failure-derived).
 
-    See `references/hypothesis_cycles.md` "Outside the notebook — hypotheses.md
+    See `references/hypothesis_iteration.md` "Outside the notebook — hypotheses.md
     and decisions.md" and `references/research_goal_layer.md` for the four-layer
     model. The notebook body's role is research record (what this H said and
     what it did not say); the planning record (what comes next) lives in
@@ -824,16 +842,16 @@ def _(mo):
     - [ ] For every H tested in this notebook, update its status in
           `hypotheses.md` (planning state → in-progress → supported / rejected /
           parked) and confirm each H's `purpose_id` matches `pur_{{NNN}}`
-          and `target_sub_claim_id` is set (inherited from Purpose-level Cycle
-          goal unless overridden with reason in the row's Statement column)
+          and `target_sub_claim_id` is set (inherited from Purpose-header
+          item 5 unless overridden with reason in the row's Statement column)
     - [ ] Append a time-ordered entry to `decisions.md` for this Purpose
-          (one entry per cycle), with H sub-bullets per H tested AND the three
+          (one entry per Purpose), with H sub-bullets per H tested AND the three
           mandatory sections from `references/research_goal_layer.md`:
           (a) Design hypothesis at open (= the prediction made before the
-          cycle ran), (b) Research-goal sub-claim progress update (= transition
-          per sub-claim this Purpose touched, with sub-claims not touched
-          listed unchanged), (c) Design hypothesis at close (= CONFIRMED /
-          FALSIFIED / PARTIAL with one-phrase reason)
+          Purpose's investigation ran), (b) Research-goal sub-claim progress
+          update (= transition per sub-claim this Purpose touched, with
+          sub-claims not touched listed unchanged), (c) Design hypothesis at
+          close (= CONFIRMED / FALSIFIED / PARTIAL with one-phrase reason)
     - [ ] Update the project README's sub-claim status table to reflect the
           transitions recorded in `decisions.md`'s sub-claim progress update
     - [ ] For every H whose verdict is "supported", confirm BOTH the
