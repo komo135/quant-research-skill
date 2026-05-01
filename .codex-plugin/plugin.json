@@ -1,0 +1,43 @@
+{
+  "name": "quant-research",
+  "version": "0.15.0",
+  "description": "Protocol skills for algorithmic trading and quantitative finance research.",
+  "author": {
+    "name": "komoootv",
+    "email": "komoootv@gmail.com"
+  },
+  "homepage": "https://github.com/komo135/quant-research-skill",
+  "repository": "https://github.com/komo135/quant-research-skill",
+  "license": "MIT",
+  "keywords": [
+    "quant",
+    "finance",
+    "research",
+    "algorithmic-trading",
+    "backtest",
+    "marimo",
+    "time-series"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Quant Research",
+    "shortDescription": "Quant finance research protocols for Codex",
+    "longDescription": "Protocol skills for agent-driven quantitative finance research. Bundles quant-research for falsifiable hypothesis design, time-series validation, robustness checks, and bug-review gates, plus experiment-review for independent claim-warrant review before supported conclusions.",
+    "developerName": "komoootv",
+    "category": "Research",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/komo135/quant-research-skill",
+    "privacyPolicyURL": "https://github.com/komo135/quant-research-skill",
+    "termsOfServiceURL": "https://github.com/komo135/quant-research-skill/blob/main/LICENSE",
+    "defaultPrompt": [
+      "Design a quant research notebook",
+      "Review this experiment verdict",
+      "Check my backtest protocol"
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
+}

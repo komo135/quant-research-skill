@@ -1,7 +1,7 @@
 # quant-research-skill
 
-A Claude Code plugin that bundles two protocol skills for **agent-driven quantitative
-finance research**:
+A Claude Code and Codex plugin that bundles two protocol skills for
+**agent-driven quantitative finance research**:
 
 - `quant-research` — research lifecycle organised around one **Purpose** per
   notebook (an open-ended investigation), with one or more falsifiable
@@ -148,6 +148,8 @@ quant-research-skill/
 ├── .claude-plugin/
 │   ├── plugin.json
 │   └── marketplace.json
+├── .codex-plugin/
+│   └── plugin.json
 ├── skills/
 │   ├── quant-research/
 │   │   ├── SKILL.md           # entry point — research lifecycle
@@ -164,7 +166,7 @@ quant-research-skill/
 
 ## Installation
 
-### From a Git repository (recommended)
+### Claude Code: from a Git repository
 
 ```text
 /plugin marketplace add https://github.com/komo135/quant-research-skill
@@ -174,11 +176,21 @@ quant-research-skill/
 After installation the skills are referenced as
 `/quant-research:quant-research` and `/quant-research:experiment-review`.
 
-### Local development
+### Claude Code: local development
 
 ```bash
 claude --plugin-dir /path/to/quant-research-skill
 ```
+
+### Codex: local plugin
+
+This repository includes a Codex manifest at `.codex-plugin/plugin.json`.
+For local Codex installation, place the checkout at `~/plugins/quant-research`,
+add a local marketplace root to `~/.codex/config.toml`, and enable
+`quant-research@local`.
+
+The installed Codex skills are exposed as `quant-research` and
+`experiment-review`.
 
 ## Usage flow
 
