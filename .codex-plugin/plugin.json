@@ -1,7 +1,7 @@
 {
   "name": "quant-research",
-  "version": "0.15.0",
-  "description": "Protocol skills for algorithmic trading and quantitative finance research.",
+  "version": "0.17.0",
+  "description": "Research-state protocols for algorithmic trading and quantitative finance research.",
   "author": {
     "name": "komoootv",
     "email": "komoootv@gmail.com"
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "Quant Research",
     "shortDescription": "Quant finance research protocols for Codex",
-    "longDescription": "Protocol skills for agent-driven quantitative finance research. Bundles quant-research for falsifiable hypothesis design, time-series validation, robustness checks, and bug-review gates, plus experiment-review for independent claim-warrant review before supported conclusions.",
+    "longDescription": "Protocol skills for agent-driven quantitative finance research. Bundles quant-research for R&D technology decomposition, Pure Research state management, failure analysis, lightweight hypothesis quality gates, time-series validation, and promotion-only heavy review, plus experiment-review for independent claim-warrant review before supported conclusions.",
     "developerName": "komoootv",
     "category": "Research",
     "capabilities": [

@@ -1,41 +1,19 @@
 # {{PROJECT_NAME}}
 
+## Research mode
+
+[R&D / Pure Research. State the reason in one sentence.]
+
 ## Research goal
 
-[One-sentence high-level question this project exists to answer.
-Example: "Does JP equity quality-factor stacking yield a live-tradeable
-strategy?" The goal is decomposed into sub-claims below; each Purpose
-in this project targets one or more of these sub-claims. See
-`references/research_goal_layer.md` for the four-layer model.]
+[One-sentence goal. In R&D mode, name the target technology. In Pure Research
+mode, name the phenomenon or research question.]
 
-### Sub-claims
+## Current state
 
-| ID | Sub-claim | Status |
-|---|---|---|
-| G1.1 | [Concrete sub-claim — falsifiable as `confirmed` or `falsified` by one or more Purposes] | not started |
-| G1.2 | [Next sub-claim] | not started |
-| G1.3 | [...] | not started |
-
-Sub-claim IDs (G1.1, G1.2, ...) are stable within the project and never
-reused after retirement. Each Purpose's notebook references these IDs in
-its 5th Purpose-header item. Each H row in `hypotheses.md` references
-these IDs in its `target_sub_claim_id` column.
-
-Sub-claim status legend:
-
-- `not started`: no Purpose has attacked this sub-claim yet
-- `in progress`: a Purpose is currently testing this sub-claim, or has
-  produced partial evidence
-- `confirmed`: at least one Purpose has produced a Primary YES on H's
-  whose evidence settles the sub-claim
-- `falsified`: at least one Purpose has produced a Fallback NO whose
-  binding axis settles the sub-claim negatively
-- `retired`: the sub-claim has been deliberately removed from the
-  project's scope (the reason is logged in `decisions.md`)
-
-Status updates are recorded in `decisions.md` at Purpose closure (in
-the "Research-goal sub-claim progress update" section of each Purpose
-entry).
+- Current question / capability: [Q1 / C1]
+- Current status: [active / blocked / ready-for-promotion-review / ...]
+- Next discriminating step: [...]
 
 ## Universe
 
@@ -43,37 +21,24 @@ entry).
 - Period: {{START}} to {{END}}
 - Frequency: [primary timeframe + auxiliary]
 
-## Status summary
-
-- Current Purpose: [N of M planned]
-- Purposes opened: [pur_001, pur_002, ...]
-- Sub-claims confirmed: [G1.1, ...]
-- Sub-claims falsified: [G1.2, ...]
-- Sub-claims in progress: [G1.3]
-
 ## Navigation
 
+- [research_state.md](research_state.md) — compact state map; update before adding work
 - [literature/](literature/papers.md) — prior papers and differentiation
-- [hypotheses.md](hypotheses.md) — hypothesis portfolio (with `target_sub_claim_id` per row)
-- [purposes/INDEX.md](purposes/INDEX.md) — list of Purpose notebooks (one parent thesis per file)
-- [decisions.md](decisions.md) — time-ordered decision log (with sub-claim progress updates per Purpose)
-- [results/](results/) — aggregated `results.parquet` and figures
+- [hypotheses.md](hypotheses.md) — hypotheses that passed the entry gate
+- [purposes/INDEX.md](purposes/INDEX.md) — notebooks / trials
+- [decisions.md](decisions.md) — durable state transitions and commitments
+- [results/](results/) — aggregated results and figures
 - [reproducibility/](reproducibility/) — env lock, data hashes, seed
 
-## Lifecycle
+## Workflow
 
-```
-0. Decompose research goal into sub-claims (this README) — before any Purpose opens
-1. Literature review → hypothesis portfolio (first H per Purpose, with target_sub_claim_id)
-2. Per Purpose: write design hypothesis at open in decisions.md (which sub-claim does this Purpose attack?)
-3. One notebook per Purpose; one or more H rounds tested inside it
-4. At each H round: bug_review → robustness battery → experiment-review → per-H verdict → append per-H row to results.parquet
-5. If a derived H serves the same Purpose: continue with the next H round inside the SAME notebook (the H inherits target_sub_claim_id from its parent unless explicitly overridden in hypotheses.md)
-6. If the next investigation reflects a new Purpose: open the next notebook (the new Purpose's target_sub_claim_id is chosen from sub-claims still `not started` or `in progress`)
-7. At Purpose close: update sub-claim status in decisions.md, write design hypothesis at close (CONFIRMED / FALSIFIED / PARTIAL)
-8. Project complete when all sub-claims are `confirmed`, `falsified`, or `retired`
-```
-
-Detailed protocols live in the `quant-research` plugin's `references/` directory.
-The four-layer model (Research goal / Design hypothesis / Purpose / Hypothesis)
-that ties this README to per-H rows is in `references/research_goal_layer.md`.
+1. Choose mode: R&D or Pure Research.
+2. Fill `research_state.md`.
+3. Review prior work, including the user's own earlier notebooks.
+4. Add a hypothesis only if success and failure both update state.
+5. Run the smallest discriminating trial.
+6. Analyze misses and ambiguous results before proposing more work.
+7. Update `research_state.md`, `hypotheses.md`, and `decisions.md`.
+8. Run heavy review only for promotion, external sharing, deployment decisions,
+   research-line closure, or major direction changes.
