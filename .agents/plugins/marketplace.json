@@ -1,0 +1,20 @@
+{
+  "name": "quant-research-skill",
+  "interface": {
+    "displayName": "Quant Research"
+  },
+  "plugins": [
+    {
+      "name": "quant-research",
+      "source": {
+        "source": "local",
+        "path": "./plugins/quant-research"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Research"
+    }
+  ]
+}
