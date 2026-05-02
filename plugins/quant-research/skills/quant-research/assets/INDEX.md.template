@@ -1,31 +1,26 @@
-# Purpose INDEX
+# Trial INDEX
 
-List of Purpose notebooks (one parent research thesis per file), with their
-per-H verdicts and the Purpose-level verdict. `scripts/new_purpose.py` adds
+List of numbered research notebooks / trials. `scripts/new_purpose.py` adds
 new entries automatically.
 
 ## Entries
 
-| purpose_id | target_sub_claim_id | Purpose (parent thesis, one line) | Hypotheses (H<id>: verdict) | Notebook status | Purpose-level verdict (one line) |
+| trial_id | mode | linked hypothesis | state row updated | notebook status | state update / result summary |
 |---|---|---|---|---|---|
-| pur_001 | G1.0 (foundation) | (example) Data universe is defined | H1: foundation | done | supported — universe of N instruments × T period defined; data hashes recorded |
-| pur_002 | G1.1 | (example) Top-3 PCA factors carry IC ≥ 0.03 on test | H2: supported · H3: rejected · H4: parked | done | partial — IC ≥ 0.03 holds on val, fails on test (binding axis: regime composition change) |
-| pur_003 | G1.2 | ... | ... | in-progress | (pending) |
 
 ## Notebook-status legend (per notebook)
 
-- `planned`: Purpose stated, notebook not created
-- `in-progress`: notebook created, at least one H not yet at a final per-H verdict
-- `done`: every H inside the notebook is at a final per-H verdict (supported / rejected / partial / parked) AND the Purpose-level verdict on the parent thesis is recorded (supported / refuted / partial / refuted-as-stated)
+- `planned`: accepted through the entry gate, notebook not created
+- `in-progress`: notebook created, trial not yet interpreted
+- `done`: observation, interpretation, and research-state update are recorded
 - `parked`: blocked on upstream dependency
 - `dropped`: judged not worth pursuing; reason recorded in decisions.md
 
-A notebook is `done` only when the parent thesis itself has received a
-Purpose-level verdict — not when one specific H is final, and not when
-the per-H verdicts are all in but the Purpose-level verdict is missing.
+A notebook is `done` only when it changes the project state. A metric without
+an update to `research_state.md`, `hypotheses.md`, or `decisions.md` is still
+unfinished.
 
 ## Order
 
-Sequential numbering, but dependencies (upstream Purposes first) take precedence.
-Each notebook states its upstream dependencies in its "Upstream dependencies"
-section.
+Sequential numbering is for auditability. Dependencies and blocking state rows
+take precedence over chronology when deciding what to run next.

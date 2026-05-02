@@ -1,332 +1,193 @@
 # results_db_schema.md
 
-Common schema for appending each Hypothesis result to
+Common schema for appending interpreted trial results to
 `results/results.parquet`.
 
 ## When to read
 
-- Closing a Hypothesis round inside a Purpose notebook (each `## H<id>` block is one experiment within the Purpose)
-- Aggregating or comparing results across Hypotheses or across notebooks
+- A trial result should be queryable across notebooks.
+- A claim is being considered for promotion and needs an audit trail.
+- Prior results are being compared by state row, mode, method, market, or
+  failure mode.
+
+Do not append rows just because a notebook ran. Append when the result has an
+interpretation and updates a named research-state row.
 
 ## Principle
 
-**One row per Hypothesis tested** (not one row per notebook). A notebook
-conducts one Purpose containing one or more H's; each H produces its own row
-in `results/results.parquet`. The append happens at the end of each H's
-round inside the notebook, not once at the bottom of the file.
+One row is one interpreted trial outcome. The row does not replace
+`research_state.md`; it is a queryable index of evidence that points back to
+the notebook and the state row it changed.
 
-The schema below carries `purpose_id` (= the notebook = the Purpose;
-the prior name `experiment_id` was a vocabulary inversion that conflated
-the notebook with an experiment, retired here) and `hypothesis_id`
-(= the individual H within the Purpose; each H block is one experiment
-that tests that hypothesis) as separate columns; a notebook with three
-H's emits three rows that share `purpose_id` and differ in
-`hypothesis_id`. Cross-H aggregation queries group by `hypothesis_id`;
-cross-Purpose aggregation queries group by `purpose_id`.
+The `purpose_id` field is kept for compatibility with the existing generated
+notebook names (`pur_001_*`). Treat it as the trial / notebook identifier, not
+as a large parent-thesis verdict.
 
-Without per-H rows, no cross-H comparison or per-H verdict tracking is
-possible.
-
-## Common schema
+## Required Fields
 
 ```python
 {
-    # Identification ----------
-    "project":          str,    # project folder name
-    "purpose_id":       str,    # pur_001, pur_002, ...
-    "hypothesis_id":    str,    # H1, H2, ...
-    "run_timestamp":    datetime,  # UTC
+    # Identification
+    "project": str,
+    "purpose_id": str,      # trial / notebook id, e.g. pur_005_signal_flip
+    "hypothesis_id": str,   # H1, H2, ...
+    "run_timestamp": datetime,  # UTC
 
-    # Universe / data ----------
-    "instrument":       str,    # instrument identifier
-    "timeframe":        str,    # M5, H1, D1, ...
-    "data_start":       date,
-    "data_end":         date,
-    "split":            str,    # train / val / test / full
+    # Research state
+    "mode": str,            # r_and_d | pure_research
+    "state_row_id": str,    # Q1 / E2 / C3 / CL4 from research_state.md
+    "state_transition": str | None,  # e.g. active->resolved, active->split
 
-    # Method ----------
-    "method":           str,    # free-text identifier
-    "model_type":       str,    # math / classical_ml / dl / rl / foundation / hybrid
-    "entry_rule":       str,
-    "exit_rule":        str,
-    "sizing":           str,    # equal / vol_target / kelly / ...
+    # Universe / data
+    "instrument": str,
+    "timeframe": str,
+    "data_start": date | None,
+    "data_end": date | None,
+    "split": str | None,    # train / val / test / full / walk_forward
 
-    # Cost ----------
-    "fee_bp_per_side":  float,
-    "slippage_model":   str,    # none / scalar / realistic
+    # Method
+    "method": str,
+    "model_type": str,      # math / classical_ml / dl / rl / foundation / hybrid
+    "entry_rule": str | None,
+    "exit_rule": str | None,
+    "sizing": str | None,
 
-    # Primary metrics ----------
-    "n_trades":         int,
-    "win_rate":         float,
-    "total_return":     float,
-    "sharpe":           float,  # annualized
-    "max_drawdown":     float,
-    "ret_per_trade_bp": float,
+    # Cost
+    "fee_bp_per_side": float,
+    "slippage_model": str | None,
 
-    # Prediction-model metrics (ML research) ----------
-    "auc":              float | None,
-    "ic_spearman":      float | None,
-    "ir":               float | None,
-    "calibration_ece":  float | None,
+    # Primary metrics
+    "n_trades": int,
+    "win_rate": float | None,
+    "total_return": float | None,
+    "sharpe": float,
+    "max_drawdown": float | None,
+    "ret_per_trade_bp": float | None,
 
-    # Robustness ----------
-    "wf_mean_sharpe":   float | None,
-    "wf_pct_positive":  float | None,
+    # Optional prediction-model metrics
+    "auc": float | None,
+    "ic_spearman": float | None,
+    "ir": float | None,
+    "calibration_ece": float | None,
+
+    # Optional robustness metrics
+    "wf_mean_sharpe": float | None,
+    "wf_pct_positive": float | None,
     "bootstrap_ci_low": float | None,
-    "bootstrap_ci_high":float | None,
-    "bootstrap_p":      float | None,
-    "psr":              float | None,
-    "dsr":              float | None,
+    "bootstrap_ci_high": float | None,
+    "bootstrap_p": float | None,
+    "psr": float | None,
+    "dsr": float | None,
 
-    # Generation pathway (from `hypothesis_generation.md`, Step 1.5) ----------
-    "pathway":          str,    # 1-data-driven / 2-literature-extension /
-                                # 3-literature-refutation / 4-failure-derived /
-                                # 5-cross-asset-extension / 6-mechanism-driven /
-                                # ad-hoc
-    "parent_hypothesis_id": str | None,  # required when pathway=4 (the H_n
-                                         # whose named failure axis sourced
-                                         # this H_{n+1}); otherwise None
+    # Interpretation
+    "verdict": str,         # supported_candidate / supported / rejected / partial / parked
+    "failure_mode": str | None,
+    "competing_explanations_changed": str | None,
+    "scope_condition": str | None,
 
-    # Research-goal anchor (from `research_goal_layer.md` four-layer model) -----
-    "target_sub_claim_id": str,  # required — the project README sub-claim
-                                 # ID this H produces evidence for (e.g.
-                                 # "G1.1"). Inherited from parent H when
-                                 # the H is derived (pathway=4) unless the
-                                 # row's `notes` records an override reason.
-                                 # See `research_goal_layer.md`.
-
-    # Verdict and tier (verdict and achieved_tier are filled post-review) ----
-    "verdict":          str,    # supported / rejected / parked / preliminary
-                                # provisional at append-time, finalized after
-                                # bug_review + experiment-review pass
-    "failure_mode":     str | None,  # required when verdict=rejected;
-                                     # controlled vocabulary (see below);
-                                     # None for verdict in {supported, parked}
-    "forecasted_tier":  str,    # strong / medium / weak / variable — from
-                                # the H's pathway forecast (B's table). Known
-                                # at append-time.
-    "achieved_tier":    str | None,  # strong / medium / weak — filled by
-                                     # the experiment-review literature
-                                     # dimension's novelty check (E). Null at
-                                     # append-time, updated after Step 13.
-
-    # Meta ----------
-    "n_hyperparams_tried": int,    # used for DSR
-    "notebook_path":    str,
-    "notes":            str,
+    # Meta
+    "n_hyperparams_tried": int | None,
+    "notebook_path": str,
+    "notes": str,
 }
 ```
 
-### `failure_mode` controlled vocabulary
+`scripts/aggregate_results.py` validates only the minimal required subset so
+projects can add optional metrics without editing the helper.
 
-Required when `verdict == "rejected"`. One value per row; the *primary*
-failure axis (the one that, if fixed, would most plausibly change the
-verdict). Free-text elaboration goes in `notes`.
+## Failure Mode Vocabulary
 
-| Value | Meaning | Typical fix |
-|---|---|---|
-| `leakage` | Look-ahead, target leak, or feature-scaling leak detected by `bug_review` or sanity checks | Fix the data flow; re-run |
-| `regime_mismatch` | Held only in one regime; failed under regime-conditional sweep | Either narrow the H's claim to that regime or redesign |
-| `fee_model` | Gross alpha exists but realistic fees consume it; break-even fee below realistic | Either change horizon / sizing to reduce trading frequency or close the H |
-| `wrong_horizon` | Position held too long / too short for the signal's information half-life | Re-derive H4 (Pathway 4) targeting horizon as the named axis |
-| `wrong_universe` | Signal exists in a narrow subset; failed on the declared universe | Either narrow the H or test universe-specific |
-| `wrong_baseline` | Beat lower-bound but failed against hand-crafted upper-bound | Strengthen method beyond linear / GBT baseline |
-| `threshold_brittleness` | Single peak in 2D sensitivity surface; failed outside the optimum | Likely overfit; reject or redesign with plateau-finding |
-| `capacity_constraint` | Sharpe degrades sharply with notional | Either shrink the deployment claim or close |
-| `signal_weakness` | No bug, no leak, just no alpha | Close the H; meta-knowledge that this direction does not work |
-| `mechanism_misspecification` | Pathway 6 H: the declared cause-mechanism-observable chain did not predict the data | Re-examine the mechanism; do not silently switch pathways |
-| `power_insufficient` | Test sample too small to distinguish from noise; not a true rejection | Re-collect data or close as inconclusive (verdict=parked rather than rejected) |
-| `other` | None of the above | **Requires** a free-text paragraph in `notes` naming the axis explicitly. `other` without a `notes` paragraph is a schema-protocol violation. |
+Use one primary value when `verdict` is `rejected`, `partial`, or `parked`:
 
-The vocabulary is extensible per the existing `extra_*` rule for
-project-specific axes; the listed values are the protocol's defaults
-and should be preferred when they fit.
+| Value | Meaning |
+|---|---|
+| `leakage` | Look-ahead, target leak, scaling leak, or timestamp error |
+| `regime_mismatch` | Works only in a regime narrower than the claim |
+| `fee_model` | Gross edge exists but realistic costs consume it |
+| `wrong_horizon` | Holding period does not match the signal information horizon |
+| `wrong_universe` | Result is specific to a narrower universe than claimed |
+| `wrong_baseline` | Beats a weak baseline but not the relevant baseline |
+| `threshold_brittleness` | Result depends on a narrow parameter optimum |
+| `capacity_constraint` | Degrades materially with plausible notional / turnover |
+| `signal_weakness` | No interpretable edge after checks |
+| `mechanism_misspecification` | Proposed mechanism does not explain the observation |
+| `power_insufficient` | Test cannot distinguish the explanations yet |
+| `implementation_bug` | Correctness review invalidated the result |
+| `other` | Requires a concrete explanation in `notes` |
 
-### Post-review update pattern for `verdict` and `achieved_tier`
+Generic labels such as `noise`, `bad data`, or `market regime` are not valid
+terminal explanations unless decomposed in `notes`.
 
-`verdict` and `achieved_tier` carry provisional values at append-time
-(end of H round in the notebook) and are **updated** after both review
-layers pass:
+## Append Example
 
 ```python
-import polars as pl
-
-db_path = "results/results.parquet"
-db = pl.read_parquet(db_path)
-
-# After bug_review + experiment-review for H3 in pur_007 complete and
-# the literature dimension reports achieved_tier=medium (forecast was
-# strong for a Pathway-6 H — tier downgrade)
-mask = (pl.col("purpose_id") == "pur_007") & (pl.col("hypothesis_id") == "H3")
-db = db.with_columns([
-    pl.when(mask).then(pl.lit("rejected")).otherwise(pl.col("verdict")).alias("verdict"),
-    pl.when(mask).then(pl.lit("medium")).otherwise(pl.col("achieved_tier")).alias("achieved_tier"),
-    pl.when(mask).then(pl.lit("mechanism_misspecification")).otherwise(pl.col("failure_mode")).alias("failure_mode"),
-])
-db.write_parquet(db_path)
-```
-
-A row whose `verdict` was set to `supported` at append-time but whose
-final review verdict is `partial` or `preliminary` (per the
-experiment-review verdict tiers) has the schema field `verdict`
-*updated to match the review's final verdict*. The append-time value
-is provisional precisely because the protocol's verdict gates fire
-after the H's primary metrics are computed.
-
-## Append pattern at the end of each H round (NOT at the end of the notebook)
-
-```python
-import polars as pl
 from datetime import datetime, timezone
+from aggregate_results import append_result
 
-result_row = {
-    "project": "<project-name>",
-    "purpose_id": "pur_005_signal_flip",
-    "hypothesis_id": "H3",
-    "run_timestamp": datetime.now(timezone.utc),
-    "instrument": "<instrument>",
-    "timeframe": "M5",
-    "data_start": ...,
-    "data_end": ...,
-    "split": "test",
-    "method": "h8_filter+signal_flip",
-    "model_type": "math",
-    "entry_rule": "rsi_14<=-13 AND atr_p>=median",
-    "exit_rule": "rsi_14>=0",
-    "sizing": "equal",
-    "fee_bp_per_side": 1.0,
-    "slippage_model": "none",
-    "n_trades": 223,
-    "win_rate": 0.623,
-    "total_return": -0.0241,
-    "sharpe": -1.74,
-    "max_drawdown": -0.031,
-    "ret_per_trade_bp": -1.08,
-    "auc": None,
-    "ic_spearman": None,
-    "ir": None,
-    "calibration_ece": None,
-    "wf_mean_sharpe": -0.10,
-    "wf_pct_positive": 0.474,
-    "bootstrap_ci_low": 0.009,
-    "bootstrap_ci_high": 0.202,
-    "bootstrap_p": 0.014,
-    "psr": None,
-    "dsr": None,
-    "n_hyperparams_tried": 20,
-    "notebook_path": "purposes/pur_005_signal_flip.py",
-    "notes": "...",
-}
-
-import os
-db_path = "results/results.parquet"
-if os.path.exists(db_path):
-    existing = pl.read_parquet(db_path)
-    new = pl.concat([existing, pl.DataFrame([result_row])], how="diagonal_relaxed")
-else:
-    new = pl.DataFrame([result_row])
-new.write_parquet(db_path)
+append_result(
+    "results/results.parquet",
+    {
+        "project": "pca_factor_screening",
+        "purpose_id": "pur_005_signal_flip",
+        "hypothesis_id": "H3",
+        "run_timestamp": datetime.now(timezone.utc),
+        "mode": "pure_research",
+        "state_row_id": "Q1",
+        "state_transition": "active->split",
+        "instrument": "SPY",
+        "timeframe": "D1",
+        "data_start": None,
+        "data_end": None,
+        "split": "test",
+        "method": "pca_factor_screening",
+        "model_type": "math",
+        "entry_rule": None,
+        "exit_rule": None,
+        "sizing": None,
+        "fee_bp_per_side": 1.0,
+        "slippage_model": "scalar",
+        "n_trades": 223,
+        "win_rate": None,
+        "total_return": None,
+        "sharpe": -1.74,
+        "max_drawdown": None,
+        "ret_per_trade_bp": None,
+        "verdict": "rejected",
+        "failure_mode": "regime_mismatch",
+        "competing_explanations_changed": "E1 weakened; E2 still active",
+        "scope_condition": "fails outside low-volatility regime",
+        "n_hyperparams_tried": 20,
+        "notebook_path": "purposes/pur_005_signal_flip.py",
+        "notes": "Failure split Q1 into regime-conditioned subquestions.",
+    },
+)
 ```
 
-`scripts/aggregate_results.py` wraps this into a function with required-field validation.
-
-## Aggregation queries
-
-Comparing across the full project:
+## Query Examples
 
 ```python
 import polars as pl
+
 db = pl.read_parquet("results/results.parquet")
 
-# Conclusions per hypothesis
-db.group_by("hypothesis_id").agg(
-    pl.col("sharpe").mean().alias("avg_sharpe"),
-    pl.col("split").n_unique().alias("n_splits"),
-    pl.col("purpose_id").unique().alias("purposes"),
+# What evidence changed Q1?
+db.filter(pl.col("state_row_id") == "Q1").select(
+    ["purpose_id", "hypothesis_id", "verdict", "failure_mode", "notes"]
 )
 
-# Fee sensitivity for a specific hypothesis
-(
-    db
-    .filter(pl.col("hypothesis_id") == "H3")
-    .sort("fee_bp_per_side")
-    .select(["fee_bp_per_side", "split", "sharpe"])
+# Failure modes by research mode
+db.group_by(["mode", "failure_mode"]).len().sort(["mode", "len"])
+
+# Supported candidates that still need promotion review
+db.filter(pl.col("verdict") == "supported_candidate").select(
+    ["purpose_id", "hypothesis_id", "state_row_id", "sharpe", "notebook_path"]
 )
 ```
 
-### Cross-H meta-knowledge queries (using the new fields)
+## Extension Rules
 
-These queries are the queryable surface that the cross-H synthesis
-(see `cross_h_synthesis.md`) consumes:
-
-```python
-# Distribution of failure modes within one Purpose
-(
-    db
-    .filter(pl.col("purpose_id") == "pur_007")
-    .filter(pl.col("verdict") == "rejected")
-    .group_by("failure_mode")
-    .agg(pl.col("hypothesis_id").alias("rejected_H_ids"))
-)
-
-# All H's that lost on fee_model across the whole project — candidates
-# for "lower-frequency" pivot
-(
-    db
-    .filter(pl.col("failure_mode") == "fee_model")
-    .select(["purpose_id", "hypothesis_id", "fee_bp_per_side", "sharpe"])
-)
-
-# H's that achieved Weak tier despite forecasting Medium or Strong —
-# tier-downgrade audit
-(
-    db
-    .filter(pl.col("achieved_tier") == "weak")
-    .filter(pl.col("forecasted_tier").is_in(["medium", "strong"]))
-    .select(["purpose_id", "hypothesis_id", "pathway",
-             "forecasted_tier", "achieved_tier"])
-)
-
-# Derivation chain for a Pathway-4 H — what failure axis was the
-# parent's, and did the derived H actually address it
-(
-    db
-    .filter(pl.col("pathway") == "4-failure-derived")
-    .join(
-        db.select([
-            pl.col("hypothesis_id").alias("parent_hypothesis_id"),
-            pl.col("failure_mode").alias("parent_failure_mode"),
-            pl.col("verdict").alias("parent_verdict"),
-        ]),
-        on="parent_hypothesis_id",
-        how="left",
-    )
-    .select(["purpose_id", "hypothesis_id", "parent_hypothesis_id",
-             "parent_failure_mode", "verdict", "failure_mode"])
-)
-```
-
-The first three queries are the primary cross-H meta-learning surface;
-the fourth verifies the Pathway-4 derivation chain is well-formed
-(every Pathway-4 H names a parent that exists and has a recorded
-failure mode).
-
-## Extension
-
-Topic-specific metrics may be added, with rules:
-
-- Use the prefix `extra_<name>` for added columns
-- Do not change the type of common-schema columns
-- Older rows fill new columns with null
-
-## Warning signs
-
-- Forgot to append a row for some H → that H is invisible to aggregation; force
-  the append at the end of every H round
-- Same `(purpose_id, hypothesis_id)` pair appended multiple times → decide
-  whether overwriting or duplicating is intended, and document
-- A notebook emits only one row when its hypothesis log clearly shows multiple
-  H's tested → likely a stale "one row per notebook" mental model; emit one
-  row per H
-- Schema changes per H → cross-H queries break; keep the common part fixed
-  (extra metrics use the `extra_<name>` prefix per the Extension section)
+- Add project-specific metrics with the prefix `extra_<name>`.
+- Do not change the type or meaning of common-schema columns.
+- Older rows may leave new optional columns null.
+- Keep the state transition in `research_state.md`; this table only indexes
+  the evidence.

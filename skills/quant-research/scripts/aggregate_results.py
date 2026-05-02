@@ -1,9 +1,8 @@
 """aggregate_results.py — Append result rows to results/results.parquet.
 
-Called from the final cell of a Purpose notebook (one row per H). The
-schema is documented in references/results_db_schema.md. Each `## H<id>`
-block in the Purpose notebook is one experiment that tests a sub-claim
-of the parent thesis; that experiment emits one row here.
+Called from an interpreted research trial when the result is worth querying
+across notebooks. The schema is documented in references/results_db_schema.md.
+Each row must name the research-state row the trial updates.
 
 Usage in Python:
     from aggregate_results import append_result
@@ -12,6 +11,7 @@ Usage in Python:
         row={
             "project": "...",
             "purpose_id": "pur_005_signal_flip",
+            "state_row_id": "Q1",
             ...
         },
     )
@@ -29,17 +29,14 @@ from typing import Any
 import polars as pl
 
 # Required keys per the common schema (keep aligned with results_db_schema.md).
-# target_sub_claim_id and pathway are required per research_goal_layer.md
-# (the four-layer model that anchors every H to a project research-goal
-# sub-claim) and hypothesis_generation.md (the H's generation provenance).
-# parent_hypothesis_id is conditionally required (only when pathway == "4-...")
-# and therefore is NOT in REQUIRED_FIELDS — append_result accepts it as an
-# optional column.
+# Extra project-specific metrics are accepted as optional columns.
 REQUIRED_FIELDS = {
     "project",
     "purpose_id",
     "hypothesis_id",
     "run_timestamp",
+    "mode",
+    "state_row_id",
     "instrument",
     "timeframe",
     "method",
@@ -47,9 +44,8 @@ REQUIRED_FIELDS = {
     "fee_bp_per_side",
     "n_trades",
     "sharpe",
+    "verdict",
     "notebook_path",
-    "pathway",
-    "target_sub_claim_id",
 }
 
 

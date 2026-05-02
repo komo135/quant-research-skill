@@ -56,7 +56,7 @@ already be world-class. The point is to pause and verify, not to decide.
 
 ### Recommended (not strict)
 
-- At the end of every Purpose's investigation, even when no flag has fired
+- At the end of a trial or research line, even when no flag has fired
 
 ## Reviewer roster (5 specialists + 1 adversarial, dispatched in parallel)
 
@@ -239,11 +239,10 @@ input contract above is what each reviewer receives.
 
 ### Re-verify pass
 
-Triggered after the parent has applied fixes from a prior bug-review
-inline summary and completed `references/post_review_reconciliation.md`'s
-Definition of Done for those fixes. The parent then identifies **which
-surface map entries the fixes touched** and fires only the dimensions
-whose surface intersects.
+Triggered after the parent has applied fixes from a prior bug-review inline
+summary and completed the post-fix reconciliation checklist in this file. The
+parent then identifies **which surface map entries the fixes touched** and
+fires only the dimensions whose surface intersects.
 
 **Adversary auto-fires on re-verify whenever any specialist re-fires** —
 its standalone-readability + claim-warrant check is on the
@@ -329,19 +328,13 @@ attestation in `decisions.md`, treat as Initial.
    the battery or declaring a verdict. `low` findings are noted in the same inline
    summary and may be parked. If the user wants a durable record they can copy the
    summary into `decisions.md` themselves.
-6. **Post-review reconciliation pass** (mandatory before re-running the robustness
-   battery). After fixing the findings in code, run `references/post_review_reconciliation.md`:
-   assign every reflected change to one of P1 (in-place rewrite), P2 (same-section
-   re-compute / sanity cell at the end of the existing `§N`), P3 (single
-   `## Post-review addenda` block before the verdict cell), or P4 (new `## H<id>`).
-   New chapters with lowercase / decimal suffixes (`§6a`, `§7b`) and figures that
-   violate the up-front figure plan (`Fig 2b`) are forbidden. Re-execute every
-   dependent cell, regenerate every figure, rewrite every observation, align all
-   abstract / per-H abstract / interpretation numbers with the post-fix pipeline,
-   and confirm past-round findings are still reflected. End with a top-to-bottom
-   verification pass that confirms no reviewer vocabulary, edit-history language, or
-   planning notes (`parked` / `follow-up` / `next-session`) has leaked into the
-   notebook body. Without this step, "fixed" in the inline summary is premature —
+6. **Post-fix reconciliation pass** (mandatory before re-running the robustness
+   battery). After fixing findings in code, re-execute every dependent cell,
+   regenerate every figure, rewrite observations that changed, align the abstract
+   and interpretation with the post-fix pipeline, and confirm earlier findings are
+   still reflected. End with a top-to-bottom verification pass that confirms no
+   reviewer vocabulary, edit-history language, or planning notes leaked into the
+   notebook body. Without this step, "fixed" in the inline summary is premature;
    the finding is at most "addressed in code."
 
 ### Anti-rationalizations (efficiency-class, F21 / F22)
