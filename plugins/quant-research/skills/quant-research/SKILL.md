@@ -29,8 +29,8 @@ verdict or another decision log entry is not progress.
 
 ## First Decision: Research Mode
 
-Before designing any Purpose, notebook, hypothesis, model, or backtest, choose
-one mode and follow its reference:
+Before designing any notebook, hypothesis, model, or backtest, choose one mode
+and follow its reference:
 
 | Mode | Use when | Required reference |
 |---|---|---|
@@ -169,14 +169,20 @@ Read only what applies:
 - `references/robustness_battery.md` — robustness checks for promotion gates
 - `references/bug_review.md` — correctness review for promotion gates
 - `references/modeling_approach.md` — model selection guidance
+- `references/results_db_schema.md` — queryable result ledger schema
+- `references/sanity_checks.md` — pre-promotion sanity check patterns
+- `references/psr_dsr_formulas.md` — PSR / DSR formulas used by helper scripts
+- Domain method references when needed: `feature_construction.md`,
+  `model_diagnostics.md`, `prediction_to_decision.md`,
+  `portfolio_construction.md`, `exit_strategy_design.md`
 
 ## Bundled Helper Scripts
 
 | script | purpose |
 |---|---|
 | `new_project.py` | Initialize a research project folder with the standard layout |
-| `new_purpose.py` | Generate a numbered Purpose notebook from the template |
-| `aggregate_results.py` | Append rows to `results/results.parquet` and query them |
+| `new_purpose.py` | Generate a numbered trial notebook from the template |
+| `aggregate_results.py` | Append interpreted trial rows to `results/results.parquet` and query them |
 | `walk_forward.py` | Compute Sharpe distribution over rolling windows |
 | `bootstrap_sharpe.py` | Block-bootstrap CI for per-trade Sharpe |
 | `psr_dsr.py` | Probabilistic / Deflated Sharpe Ratio |
