@@ -239,738 +239,109 @@ The skill leans on a small number of well-known references:
 
 ### Changelog
 
-**0.17.0** — Major research-state redesign.
+**0.17.0** — Major research-state redesign. This is a structural rewrite of
+`quant-research`, not a small protocol patch.
 
-- Adds explicit R&D and Pure Research modes. R&D now starts from technology
-  decomposition, maturity, and capability exit criteria; Pure Research now
-  starts from prior work, competing explanations, failed-trial analysis, and
-  state updates rather than fast conclusions.
-- Replaces routine heavy hypothesis review with four lightweight gates:
-  entry, design, interpretation, and state update. Heavy bug-review /
-  robustness / experiment-review is reserved for promotion, external sharing,
-  deployment decisions, research-line closure, and major direction changes.
-- Adds `research_state.md` as the compact current map of active questions,
-  explanations, R&D capabilities, claims, and retired / merged / stale rows.
-  Hypotheses must update a named state row under both success and failure.
+- **Two research modes.** The skill now starts by choosing either R&D / technology
+  establishment or Pure Research. R&D decomposes a target technology into small
+  capabilities with maturity levels, dependencies, and exit criteria. Pure
+  Research treats the deliverable as a research-state update: prior work,
+  competing explanations, failed-trial analysis, and the next discriminating
+  question.
+- **Research state as the central artifact.** New projects now include
+  `research_state.md`, a compact map of active questions, explanations, R&D
+  capabilities, claims, and retired / merged / stale rows. A trial is not
+  complete until it changes this state.
+- **Hypothesis quality rebuilt around pruning.** Routine hypothesis management
+  now uses four lightweight gates: entry, design, interpretation, and state
+  update. Hypotheses must name what state row changes under both success and
+  failure. Parameter tweaks, threshold variants, lower-fee reruns, and
+  same-family signal variants default to `merged` / robustness work, not new H
+  rows.
+- **Pure Research conclusion discipline.** First-session Pure Research cannot
+  end with `supported` unless it is a bounded replication / verification task
+  with all evidence already present and promotion gates run. Same-day conclusion
+  pressure is explicitly reframed as a research-state update, not weaker evidence
+  standards.
+- **Failure analysis strengthened.** `failure_analysis.md` now requires generic
+  labels such as noise, regime, cost, sample size, overfitting, or data quality
+  to be decomposed into observable sub-claims. Cost-sensitive alpha failures get
+  explicit gross-edge, turnover, holding-period, break-even fee, slippage, and
+  regime-dependence checks before any lower-fee or narrower-regime follow-up.
+- **Heavy review moved to promotion moments.** Full bug-review, robustness, and
+  `experiment-review` are no longer the default for every exploratory trial.
+  They are mandatory for supported-claim promotion, external sharing, deployment
+  decisions, research-line closure, or major direction changes. Good headline
+  metrics make a claim eligible for review; they do not establish `supported`.
+- **R&D shortcuts blocked.** A whole technology cannot be marked `supported`
+  because one integrated backtest looks good. For financial ML / return
+  prediction, the capability map must separate task definition, point-in-time
+  data, feature / embedding generation, leakage controls, baselines, validation,
+  economic integration, and promotion gates.
+- **Templates rebuilt.** `README.md.template`, `research_state.md.template`,
+  `hypotheses.md.template`, `decisions.md.template`, and `purpose.py.template`
+  now reflect the state-led workflow. `new_project.py` creates
+  `research_state.md` and points the user to fill it before adding hypotheses.
+- **Pressure-tested with five adversarial scenarios.** Multi-agent read-only
+  pressure tests covered R&D big-backtest pressure, Pure Research same-day
+  conclusion pressure, fee/regime failure analysis, RSI threshold hypothesis
+  proliferation, and premature `supported` promotion from good metrics. The
+  resulting hardening patches are included in this release.
 
-**0.16.0** — Reframes the why-why chain as **pre-verdict result
-analysis** (F29), not a post-verdict explanation. F28 made chain levels
-stand on computed observations, but still allowed the chain root to be
-"why was this supported/rejected?", which lets an agent write a
-data-backed story after the label is chosen. F29 moves the chain before
-final `verdict` / `failure_mode` writing, forbids verdict-rooted chain
-questions, and requires each cited observation to state its diagnostic
-role: which question it answers and which superficial reading it rules
-in, rules out, or leaves unresolved. The chain may downgrade, qualify,
-or block an apparent `supported` result, or move a superficial rejection
-to `partial` / `parked` when the data shows underpower or design limits
-rather than falsification.
+**0.16.0** — Made the why-why chain a pre-verdict result-analysis gate rather
+than a post-verdict explanation. The chain had to start from the observed result
+pattern, state the diagnostic role of each observation, and be able to downgrade,
+qualify, or block an apparent verdict before final wording.
 
-**0.15.0** — Adds the **why-why observation-grounding rule** (F28),
-patching a gap left by 0.14.0's F27. F27 added the chain requirement
-(≥ 3 levels, mechanism-level terminal) but accepted prose mechanism
-statements as terminals and intermediate levels — which an LLM agent
-can satisfy by stacking plausible "why?"s in coherent prose without
-actually computing the post-mortem the chain summarizes. F28 closes
-that gap by requiring **observation grounding at every chain level**:
-each "why?" answer cites a specific computed cell / value (table
-T<n> / distribution / correlation / regression coefficient), not a
-prose mechanism statement unbacked by data. When an analysis a level
-depends on cannot be performed, the protocol-correct response is to
-stop the chain at that level and surface the gap explicitly — write
-the levels that *are* observation-backed, then "level N: cannot be
-answered without analysis A on artifact X. Chain incomplete; no
-derived H may be admitted." Validated by re-running 0.14.0's GREEN
-fixture against the F28-revised skill: the agent now writes only
-level 1 (pinned to the headline result), stops at level 2 with a
-five-analysis gap statement naming the missing computation + the
-artifact each would consume, refuses to admit any derived H, and
-records the natural inadmissible derivations as `planned-drop`
-rejected at admissibility 0. F28 owns a gap left by F27, not a
-failure mode the user invented.
+**0.15.0** — Added observation grounding to why-why analysis. Each chain level
+had to cite a computed cell / value / distribution / correlation instead of
+stacking plausible prose. If the required analysis was unavailable, the protocol
+had to stop and surface the gap rather than admit a derived hypothesis.
 
-- **Observation grounding rule.** New "Observation grounding" section
-  in `references/why_why_analysis.md` formalizing the two-layer
-  requirement: (a) named analyses performed and output visible as
-  notebook cells with referenceable labels; (b) each chain level's
-  prose pins to a specific cell / value of that output. Plausibility
-  tells ("expected to" / "consistent with" / "likely" / "presumably"
-  / "should" / "based on typical patterns") indicate an unpinned
-  level — keep computing or stop. Worked examples rewritten to show
-  table-citation-per-level (T2/T3/T4/T5 for the rejected case;
-  U1-U5 for the supported case) instead of prose-mechanism-per-level.
+**0.14.0** — Removed the duplicate "cycle" abstraction and attached decision
+rules, stop conditions, and Purpose closure directly to the Purpose layer. Also
+introduced the depth gate for derived hypotheses: a derived H needed a
+mechanism-level why-why terminal, not just a parent verdict or `failure_mode`
+label.
 
-- **Stop-and-surface-gap rule.** When the analysis a level depends
-  on cannot be performed (data unavailable, sandboxed dispatch,
-  computation out of scope), the chain explicitly stops at that
-  level: "level N: cannot be answered without analysis A on artifact
-  X. Chain incomplete." A chain whose levels are not all
-  observation-pinned is **not eligible** to ground a derived H; the
-  agent stops and surfaces the gap rather than admitting a derived H
-  from a partial chain.
+**0.13.0** — Repaired the Purpose / Hypothesis / Experiment vocabulary. A
+Purpose became the notebook-level parent thesis; each `## H<id>` block became
+one experiment testing one child claim. Parameter sweeps and threshold variants
+were moved out of the hypothesis log and into robustness / implementation
+analysis.
 
-- **Routing admissibility extension.** `references/hypothesis_iteration.md`
-  routing sub-step 0 now rejects derived H's whose
-  `chain_terminal_cited` points at an unpinned (prose-only) chain
-  level — the citation must point at observation, not plausibility.
-  The two failure modes (no citation / citation-to-unpinned-level)
-  are treated identically and fire on supported and rejected
-  parents alike.
+**0.12.0** — Added the research-goal layer so Purpose selection had to be tied
+back to project-level sub-claims and close with explicit progress updates rather
+than drifting from notebook to notebook.
 
-- **Anti-rationalizations.** Five new entries in
-  `why_why_analysis.md` ("I named the mechanism — that's the
-  terminal" / "the analysis is expensive — write from what it would
-  probably show" / "each level reads coherently — chain is fine
-  without numbers" / "the chain reads plausibly — that's enough" /
-  "computation unavailable in this context — chain is the best I
-  can do"). SKILL.md Step 12.5 rationalization table extended with
-  the corresponding entries.
+**0.11.0** — Added review-dispatch efficiency rules so expensive multi-agent
+reviews run only from clear triggers and with bounded context.
 
-The change is a refinement of F27, not an independent failure mode:
-F27 alone is sufficient for "the chain must exist"; F28 is what
-makes the chain stand on data rather than on prose. The two
-compose — F27 is the chain-must-exist gate, F28 is the chain-must-
-be-observation-pinned gate. Each is necessary; neither alone is
-sufficient.
+**0.10.0** — Added subject-drift protection: notebooks must keep the research
+claim about the market / mechanism / technique, not silently turn into library,
+implementation, or process documentation.
 
-**0.14.0** — Two structural changes that compose: (a) abolishes the
-**"cycle" concept layer** (F26) — a duplicate unit-of-investigation
-abstraction above the Hypothesis that empirically was always the
-Purpose / notebook lifetime; (b) adds the **why-why analysis depth
-gate** (F27) on derived hypothesis admissibility — the bare verdict /
-`failure_mode` label is no longer a legitimate root for derivation,
-and the rule fires identically on supported and rejected parents.
-Validated by RED-GREEN over a fixture that withholds the
-mechanism-level post-mortem the user would normally not have at the
-moment of derivation; the RED run produced derivations without an
-explicit chain (F-RED-1 fired), the GREEN run produced derivations
-each citing a distinct chain terminal in the parent's mechanism-level
-reading.
+**0.9.0** — Added notebook narrative and post-review reconciliation rules so
+review fixes do not leave stale figures, contradictory prose, edit-history
+language, or reviewer vocabulary inside the research artifact.
 
-- **F26 — Cycle vocabulary inversion.** The "cycle" framing implied a
-  separate unit of investigation above the Hypothesis but below the
-  Purpose. Empirically there is no such unit: "the cycle" was always
-  the lifetime of one notebook (= one Purpose), the "cycle goal" was
-  always the Purpose-header pre-implementation items, and "the cycle
-  ends" was always "the notebook closes". Counter renames
-  `references/cycle_purpose_and_goal.md` → `references/purpose_design.md`
-  and `references/hypothesis_cycles.md` →
-  `references/hypothesis_iteration.md`, restructures framing to attach
-  Decision-rule pre-commit, Primary YES / Fallback NO with binding
-  axis / KICK-UP, and N=5 / N=8 emergency stops directly to the
-  Purpose layer without an intermediate "cycle" abstraction. SKILL.md,
-  decisions.md.template, purpose.py.template, README.md.template,
-  hypotheses.md.template, and all in-protocol references
-  (research_design.md / research_goal_layer.md / experiment_protocol.md
-  / cross_h_synthesis.md / bug_review.md / notebook_narrative.md /
-  post_review_reconciliation.md / hypothesis_generation.md /
-  research_quality_checklist.md / robustness_battery.md) are swept of
-  cycle vocabulary. `decisions.md.template` Purpose entry header
-  changes from `## YYYY-MM-DD cycle <N> (exp_<NNN>...)` to
-  `## YYYY-MM-DD pur_<NNN>_...`. Existing `skill_tests/` RED/GREEN
-  findings retain the old vocabulary as historical audit trail and
-  are deliberately not edited.
+**0.8.0** — Introduced downstream-consumer framing: Purpose headers name the
+consumer, blocked decision, decision rule, and knowledge output before H design.
 
-- **F27 — Derived hypothesis depth gate.** Before this change, derived
-  H's could be generated directly from the parent's verdict or
-  `failure_mode` label — the protocol mandated own falsifiable claim,
-  own purpose, and meaningful research unit at admissibility, but
-  these checks could be satisfied syntactically with no real
-  mechanism-level reading of the parent experiment. Result: derived
-  H's that "could not state their own purpose" beyond "the parent
-  failed, let's vary X" or "the parent worked, let's try sibling Y" —
-  the same shallowness pattern on rejected and supported parents.
-  Counter introduces a new reference
-  `references/why_why_analysis.md` defining the chain (≥ 3
-  consecutive levels, each "why?" taking the previous answer as
-  subject, terminating only at a mechanism-level cause — what the
-  strategy was actually exposed to / harvested / selected — not at a
-  metric / threshold / parameter / `failure_mode` label). The chain
-  is mandatory at every per-H verdict regardless of value (supported
-  / rejected / partial / parked), as a new Step 12.5 in `SKILL.md`
-  and as a 4th admissibility property in `hypothesis_iteration.md`
-  routing rule sub-step 0. Each derived H carries a
-  `chain_terminal_cited` field naming which terminal answer it is
-  grounded in; without the citation the H is rejected at routing as
-  "surface-derived". The `hypotheses.md.template` schema gains the
-  `chain_terminal_cited` column. SKILL.md anti-rationalization table
-  gains a "supported parent → sibling extension without chain" entry
-  symmetrical to the rejected-parent case. The completion gate
-  becomes 5 gates (bug_review / robustness battery / why-why chain /
-  experiment-review / research-quality checklist) where the chain is
-  a per-H prerequisite for any derivation rather than only a
-  precondition for `verdict='supported'`.
+**0.7.0** — Added the original R-side research protocol: pre-hypothesis
+exploration, hypothesis-generation pathways, novelty / differentiation checks,
+cross-H synthesis, and exhaustion triggers.
 
-The two changes compose: F26 makes the Purpose layer the only unit of
-investigation, and F27 makes the why-why chain the depth gate that
-prevents derived H's from being shallow within that layer. Each
-change is independent — F26 alone would leave the depth gap; F27
-alone would leave the duplicate-layer abstraction. Together they
-move the protocol from "structurally permits surface derivation"
-(RED) to "structurally enforces mechanism-level grounding" (GREEN)
-on the same fixture.
+**0.6.0** — Added notebook readability conventions: self-explanatory figures,
+per-figure observations, helper-function docstrings, and centralized config
+cells.
 
-**0.13.0** — Adds the **hypothesis ↔ experiment inversion counter**,
-closing three structural failure modes (F23 / F24 / F25) in which the
-skill's vocabulary and structure made the standard "the experiment
-exists to test the hypothesis" direction look reversed: the Purpose
-acted as an implicit parent hypothesis with no verdict gate, the
-schema's `experiment_id` reassigned `experiment` to the Purpose
-container (breaking the 1 hypothesis ↔ 1 experiment correspondence),
-and the derived-hypothesis examples licensed 1-axis parameter sweeps
-to occupy the hypothesis log. Validated by TDD over two RED fixtures
-(notebook_N for the F23 + F25 chain pathology on EUR/USD H1
-mean-reversion; notebook_O for the F24 vocabulary inversion on SP500
-exit-rule design) and two GREEN counterparts.
-
-- **F23 — Purpose-as-meta-hypothesis pretense.** SKILL.md L48 defined
-  Purpose as "an open-ended question about the world" while L49 / L52
-  gave Form / Examples that were Y/N propositions ("Does mean-reversion
-  work on EUR/USD intraday?"); L96 explicitly excluded a Purpose-level
-  verdict ("the notebook itself does not have a single verdict");
-  cross_h_synthesis.md Pattern A / B's Action menu licensed
-  carry-forward of the parent claim into a derived Purpose
-  ("lower-frequency variants of the same signal") without first
-  verdicting it. Counter rewrites the Purpose vs. Hypothesis table to
-  declarative falsifiable form ("Mean-reversion at H1 frequency on
-  EUR/USD generates risk-adjusted edge net of cost (≥ 0.5 test Sharpe
-  with 1 bp/side fees)" instead of the question form), removes the
-  L96 / L783-786 verdict-gate denial, adds a "Purpose-level closure
-  gate (per Notebook)" section requiring supported / refuted / partial
-  / refuted-as-stated at notebook close, and rewrites Pattern A / B
-  Action menus + Handoff section to require parent-thesis verdict as
-  precondition 0 before any derived Purpose may open. Anti-rationalization
-  table gains entries on Purpose-verdict denial and threshold-variation
-  rerun. The parent claim now has a place to die in writing; F23 was
-  the load-bearing reason a 4 / 5-level hypothesis chain
-  (Purpose-as-parent → H1 → derived H2 → derived H3 → derived Purpose
-  with the same parent claim) could persist with no claim ever being
-  rejected.
-
-- **F24 — Experiment vocabulary inversion.** SKILL.md L653-655 defined
-  `experiment_id (= the notebook = the Purpose)` with `hypothesis_id`
-  as the H within it; folder `experiments/` and file
-  `exp_NNN_<purpose-slug>.py` reinforced "experiment = container".
-  Asked "what is H2's experiment?", the protocol-correct answer was
-  "the apparatus shared with H1/H3 with exit_rule replaced", i.e.
-  H2 had no experiment of its own. Counter renames the schema field to
-  `purpose_id` (with prose explaining the prior name was a vocabulary
-  inversion that conflated the notebook with an experiment, retired
-  here), reattributes "experiment" to "the apparatus that tests one
-  hypothesis" — each `## H<id>` block IS one experiment — and renames
-  folder `experiments/` → `purposes/`, file prefix `exp_NNN_*.py` →
-  `pur_NNN_*.py`, helper script `scripts/new_experiment.py` →
-  `scripts/new_purpose.py`, asset
-  `assets/experiment.py.template` → `assets/purpose.py.template`. The
-  rename propagates through results_db_schema.md, hypothesis_cycles.md,
-  cross_h_synthesis.md, experiment_protocol.md, research_design.md,
-  marimo_cell_granularity.md, model_diagnostics.md,
-  feature_construction.md, prediction_to_decision.md,
-  cycle_purpose_and_goal.md, project layout templates
-  (hypotheses.md.template, INDEX.md.template, decisions.md.template,
-  README.md.template), and the experiment-review skill's
-  references/review_protocol.md / review_dimensions.md. The
-  1 hypothesis ↔ 1 experiment correspondence is restored; in a Purpose
-  with N admissible H's, the notebook is a cluster of N experiments
-  sharing an apparatus (apparatus = universe + split + baseline + fee
-  model + entry rule), each H block replacing the apparatus slot the H
-  is testing.
-
-- **F25 — Derived hypothesis granularity licensing.** SKILL.md L63-71
-  gave 5 derived-H types (sensitivity / parameter-sweep / failure-diagnosis
-  / specialization / alternative formulation / follow-on layer) with no
-  requirement that each derived H declare an own falsifiable claim
-  distinct from the parent or an own stated purpose. The result: a
-  rejected H1 spawned an H2 sensitivity variant whose claim was
-  identical in shape and threshold to H1, then an H3 regime-conditioning
-  variant on top of H2 — three rows in results.parquet for one research
-  finding. Counter introduces a "Derived hypothesis admissibility"
-  section in SKILL.md and an admissibility sub-step 0 in
-  hypothesis_cycles.md routing rule, requiring all three of: (a) own
-  falsifiable claim distinct from parent (different decision axis, not
-  just tighter / looser threshold on the parent's axis), (b) own
-  stated purpose written before the H runs (one sentence answering
-  "what new question does this H answer that the parent did not?"),
-  (c) meaningful research unit (not a 1-axis sweep over sizing /
-  threshold / regime / lookback / cost / fee). Inadmissible patterns —
-  sensitivity / parameter-sweep variant, follow-on layer that doesn't
-  change the underlying claim, threshold-variation rerun, and
-  diagnosis without an independent claim — are reclassified as Step 12
-  robustness battery / Step 10 portfolio construction inside the
-  parent H's section, not as new H<id>s in the hypothesis log. The
-  hypothesis log now carries one row per meaningful research unit;
-  parameter sweeps live in robustness as 2D / 3D grids inside the
-  parent H, where they belong.
-
-The change is independent of F1-F22. F23 cannot be reduced to F24
-(renaming the schema field does not introduce a Purpose-level verdict
-gate) and F25 cannot be reduced to F23 (adding Purpose-level verdict
-does not require derived H to declare own claim / purpose / unit).
-F24 remains independent of F23 / F25 — even with a Purpose-level
-verdict and admissibility constraints in place, a schema field named
-`experiment_id` would continue to signal "experiment = container" to
-both agents and human readers.
-
-Out of scope (recorded as future RED breadcrumbs in the GREEN
-results): the design-hypothesis layer (decisions.md at-open prediction)
-that may also act as an unverdicted parent claim is not addressed here
-— it is structurally similar to F23 but lives at a different layer
-and requires independent treatment. The research-goal sub-claim's
-explicit `refuted` transition condition (when a Purpose-level
-`refuted` verdict mechanically transitions a sub-claim to `falsified`)
-is also not added here.
-
-**0.12.0** — Adds **review dispatch efficiency** to the bug-review and
-experiment-review layers, closing two efficiency-class failure modes
-(F21 / F22) in which 14 sub-agents per H verdict='supported' attempt
-billed dead weight on every dispatch and re-fired in full on every
-re-verify after fix reconciliation. Quality machinery (narrowness /
-bundle asymmetry / parallelism / trigger discipline before
-verdict='supported') is left strictly unchanged; the savings come from
-removing dead-weight reference sections (F21) and from skipping
-re-verifies for dimensions whose surface map didn't intersect the
-applied fixes (F22). Validated by TDD over an audit-type fixture
-(matrix of 14 reviewer × N input file with section-level line counts,
-plus iteration-profile agent-run counting).
-
-- **F21 — Per-reviewer / per-dimension input contract.** New section in
-  both `quant-research/references/bug_review.md` ("Per-reviewer input
-  contract", 6 reviewer rows) and
-  `experiment-review/references/review_protocol.md` ("Per-dimension input
-  contract", 8 dimension rows). Each reviewer receives only its own
-  dimension scope (extracted by section anchor — `### N. <reviewer-name>`
-  for `bug_review.md`, `## N. <dimension>` for `review_dimensions.md`)
-  plus the artifacts named in its required-shared column. Whole-file
-  `bug_review.md` (300 lines) and whole-file `review_dimensions.md` (489
-  lines) are no longer delivered to specialists — the prior "whole file +
-  read §i only" pattern billed 77-96 % dead weight per specialist and
-  diluted attention via lost-in-middle. Section anchors are the
-  source-of-truth for extraction; line ranges are illustrative only and a
-  renamed anchor surfaces a `severity: high, what: missing input section
-  §<N>` graceful-degradation finding rather than silently breaking. The
-  `experiment-review` SKILL.md Process table and the dispatch protocols
-  in both files are updated to mandate pre-extraction. Adversary's
-  extraction tightens, not weakens, the bundle asymmetry (§1-§7
-  specialist scope is now physically excluded rather than relying on the
-  "read only your section" formal rule). Raw input lines across 14
-  reviewers drop from 23115 to 17629 (-24 %).
-- **F22 — Trigger-conditional dispatch on re-verify.** New section in
-  both protocol files ("Trigger-conditional dispatch on re-verify"). A
-  typical H verdict='supported' attempt enters the gate multiple times
-  (Initial → fix → Re-verify → fix → Re-verify → ...). The naive contract
-  re-fired all 14 every round, billing surface-unchanged reviewers as
-  dead reading. F22 splits dispatch into Initial (= all 14 fire) and
-  Re-verify (= the parent identifies which surface map entries the fixes
-  touched, fires only those specialists + adversary). Surface map covers
-  6 + 8 dimensions: leakage on feature/signal/normalization/scaling/
-  cross-section/factor cells; pnl-accounting on PnL/position/fee/
-  turnover/sign cells; validation-correctness on split/embargo/
-  walk-forward/CPCV/test-set cells; statistics on bootstrap/WF-summary/
-  DSR/PSR/headline-metric cells; code-correctness as catch-all on any
-  code change; question on H statement / design / thresholds / cycle
-  hygiene; scope on universe/period/regime/cross-section; method on
-  model/baselines/features/hyperparameters; validation-sufficiency on
-  WF window count / power claims; claim on abstract/verdict/conclusion;
-  literature on `literature/` files; narrative on any markdown / figure
-  plan / observation cell; adversarial as auto-fire on any specialist
-  re-fire. **When in doubt, fire** is the explicit default — surface
-  ambiguity → fire candidates plus adversary, never skip. Cross-session
-  defaults to Initial unless `decisions.md` carries an explicit
-  attestation that named dimensions were verified clean against a named
-  artifact state. Iteration profiles savings: -32 % at depth 2,
-  -43 % at depth 3, -48 % at depth 4 (typical re-verify ≈ 5 reviewers
-  out of 14).
-- **F20 — considered, not adopted.** Prompt caching (= placing a
-  byte-identical prefix at the front of all reviewer prompts so cache
-  read costs replace cache write costs across the parallel batch) was
-  drafted as a third lever and rejected. Claude Code's harness handles
-  the underlying API call; skill text cannot mandate `cache_control`
-  markers, and parallel sub-agent prefix-cache sharing is not a
-  documented harness behavior. F-id taxonomy carries F20 as a gap with
-  the rejection reason recorded in
-  `skill_tests/red_review_dispatch_efficiency/RED_dispatch_efficiency_findings.md`,
-  preserving the dead-end as a TDD breadcrumb for future maintainers.
-- **Anti-rationalizations.** Each protocol file gains a F21/F22 block
-  covering the natural excuses ("whole file is safer", "send adversary
-  more context", "pre-extraction is brittle", "user wanted comprehensive",
-  "narrative refs should also be extracted (counter)", "fix is small so
-  re-fire all", "ambiguous surface so skip", "I remember it was clean so
-  treat cross-session as re-verify", "wording-only fix is skip"). Single-
-  agent fallback explicitly notes that F21 / F22 still apply
-  sequentially — the fallback path inherits the savings.
-
-The change is orthogonal to F1-F19 (all quality-class — body / reviewer-
-vocab leakage, skill-version / migration leakage, 派生 H table leakage,
-research-goal layer absence, carry-forward conjunct gate, research-subject
-drift). F21 / F22 are the first efficiency-class entries in the F-id
-sequence; they describe dead weight in dispatch process rather than
-content drift, and are explicitly framed in the RED findings to avoid
-collapsing them into the quality-class taxonomy.
-
-**0.11.0** — Adds the **research-subject drift counter**, closing two
-silence-licensed inversion paths (F18 / F19) in which the cycle's
-de facto deliverable shifts from a market claim to an implementation
-property — what was reported as "主体が研究ではなく実装 / コードに
-なる、コードの正しさを確認するために研究 / 実験をしている". F18
-fires when expected real data is unavailable and an agent silently
-substitutes synthetic data, reframing the Purpose as a "pipeline-
-correctness scaffold"; F19 fires when data IS available and the
-per-H abstract's lead sentence describes the deliverable as
-code / library / numerical correctness rather than the falsifiable
-claim's answer. Validated by TDD over two hand-written fixtures
-(Case L data unavailable + Case M abstract misframed) plus a
-Phase-A artifact-scoring pass on the existing `green_exp_001.py`
-that surfaced the failure mode in flagrant form before the fixture
-was written.
-
-- **Data availability gate.** New section in
-  `references/experiment_protocol.md`. Rule: if the cycle's research
-  subject is real-world behavior AND the expected real data is
-  unavailable in the execution environment, the cycle is **BLOCKED**;
-  synthetic substitution within an instantiated cycle is forbidden.
-  Synthetic-data scaffolding outside the protocol (no Cycle goal, no
-  verdict cell, no `results.parquet` row) is engineering work and
-  remains permitted. The exception — synthetic data IS the research
-  subject — applies only when the Decision rule's threshold is on a
-  property of the estimator / algorithm itself (parameter recovery
-  error, convergence rate, bias relative to a known DGP), not on a
-  numeric metric on real returns (Sharpe / IC / drawdown / win rate /
-  fee-adjusted PnL / turnover / tracking error). The mechanical
-  reinforcement closes the most common rationalization loophole
-  ("synthetic data as a known DGP for pipeline verification" — the
-  metrics are on real-returns shape, not on estimator-recovery shape,
-  so the exception does not apply). Forward path when BLOCKED: file
-  as a structural finding in `decisions.md`, mark the cycle
-  suspended, and pivot to a data-available cycle or return to
-  project-portfolio re-prioritization. The BLOCKED state is itself
-  a research output (the project's data-acquisition layer is
-  surfaced as a binding constraint).
-- **Per-H abstract format rule.** New sub-section in
-  `references/notebook_narrative.md` 1b "Format rule — first sentence
-  is the market claim, not the implementation". The first sentence
-  of each H's abstract names the answer to the falsifiable comparison
-  in the H's own terms (mechanism / market / regime / instrument);
-  implementation / library / numerical correctness statements appear
-  only in a clearly-bounded *Reproducibility note* at the end of the
-  abstract or as a closing sentence — never as the lead. Rationale:
-  the per-H abstract is what a reader scrolling the notebook reads
-  first; if the lead is "the implementation is correct" or "the
-  decomposition matches sklearn's reference", the reader's takeaway
-  is the engineering deliverable, not the world's answer, and the
-  cycle's de facto deliverable inverts. Five anti-rationalization
-  entries cover the natural excuses ("showing implementation
-  correctness increases verdict trust", "robustness battery passing
-  is part of the claim", "library reconciliation is
-  research-community-facing reproducibility", "the market claim is
-  too narrow / tentative to lead with", "user prompt requested
-  implementation details up front").
-- **Template change.** `assets/experiment.py.template` H1 round now
-  carries an explicit `### H1 abstract` slot, placed first in the
-  H1 block (filled after H1 cells run), with the format rule and
-  good / anti-pattern lead examples inline. The agent encounters
-  the rule at template-fill time, not only at writing time.
-- **No new completion gate, no new reference file.** The fix lives
-  in two existing references plus a SKILL.md sub-step 2.5 and a
-  Step 16 paragraph; SKILL.md's four-gate completion contract is
-  unchanged. The format rule bites at three timings — generation
-  via template, writing via reference, verification via the
-  separate `experiment-review` skill's narrative-dimension reviewer
-  reading `notebook_narrative.md`. New gate machinery (a 5th
-  completion gate, a separately-dispatched reviewer) was rejected
-  as unnecessary; the two-layer fix sits cleanly on the existing
-  surface.
-
-The change is orthogonal to F1–F17. F1–F8 (history / reviewer-vocab
-leakage into body), F9–F11 (skill version / migration / cross-skill
-API tutorials in body), F12–F14 (派生 H table leakage into the
-notebook body), F15–F16 (research-goal layer absence), and F17
-(carry-forward conjunct-contribution gate) all operate at different
-layers of the protocol; F18 / F19 surface a previously-uncovered
-inversion path in which the *named deliverable* of the cycle is not
-what the protocol assumed it would be (substitution-on-missing-data
-in F18; abstract framing on implementation property in F19). One
-inversion path remains uncovered (reconciliation focus-pull in
-`references/post_review_reconciliation.md`'s Definition of Done,
-which is heavily weighted toward code-output alignment) and is
-documented as a future RED phase in
-`skill_tests/red_research_subject_drift/RED_research_subject_drift_findings.md`'s
-"Scope 限界" section.
-
-**0.10.0** — Adds the **carry-forward conjunct-contribution gate**
-(sub-step 1.5 of `hypothesis_cycles.md`'s routing rule), closing the
-F17 failure mode in which derived hypotheses were enumerated
-bookkeeping-style without being asked how they advance the cycle goal's
-decision rule. The previous routing rule decided where a derived H goes
-by (1) Purpose continuity and (2) run-now / next-session / drop only —
-nothing forced the question "which conjunct of the YES / NO / KICK-UP
-branches does this carry-forward H close, and is that conjunct already
-addressed by the parent H?" Result: a Pathway-4 sensitivity variant on
-the same instrument as the parent could route through cleanly while a
-multi-instrument YES-conjunct of the cycle goal remained untouched.
-Validated by TDD over scenario L (mid-range parent on EUR/USD only +
-RSI parameter-sweep H on the same EUR/USD + YES (b) ≥3-pair conjunct
-unaddressed): the RED subagent flagged the binding gap as a side-note
-but did not block the H ("not blocking H2: a tighter-threshold
-sensitivity probe ... is a legitimate Pathway-4 step"); the GREEN
-subagent rejects the candidate at the new gate and proposes a
-replacement targeting the binding gap.
-
-- **Sub-step 1.5 (conjunct contribution gate).** New section in
-  `references/hypothesis_cycles.md`'s routing rule, fired on the
-  same-notebook branch only (new-Purpose H's are gated against their
-  own new cycle goal at the new notebook's open). Classifies the new
-  H as **eligible** (unaddressed conjunct, or middle-range conjunct
-  via a structurally different test — different exit, different
-  feature, different fee model), **redundant** (parent already landed
-  the conjunct per `cycle_purpose_and_goal.md`'s "Stop the cycle as
-  soon as the rule fires" definition), or **freelance** (closes no
-  conjunct of the decision rule). The verdict is reported inline in
-  the assistant's reply; rejected-at-routing H's persist as a
-  `planned-drop` row with the reject reason in the Statement column.
-- **`closes_conjuncts` schema column.** New column in `hypotheses.md`
-  rows. Enumerates the YES / NO / KICK-UP conjuncts the H tests,
-  optionally annotated with structural progress (e.g. `YES_b (3/3
-  instruments)`). It is the **cycle-goal-layer** counterpart to the
-  **research-goal-layer** `target_sub_claim_id` column added in 0.9.0;
-  the two layers are orthogonal and both anchor a derived H — one to
-  the project's running research question, the other to the current
-  cycle's decision rule.
-- **Anti-rationalization table** of five excuses the gate is built to
-  interrupt: "Pathway 4 makes it legitimate" (gate is goal-contribution,
-  not generation provenance — Pathway is necessary but not sufficient),
-  "I'll flag the binding gap as a design-hypothesis-at-open concern in
-  `decisions.md` and proceed" (gate is a gate, not a flag — logging the
-  gap is parallel work, not a substitute), "sub-step 1.5 will rarely
-  fire" (true for the eligible majority; the gate exists to catch the
-  minority of natural-looking Pathway-4 derivations that actually
-  re-test landed conjuncts), "I'll write `closes_conjuncts = TBD`"
-  (legal only for new-Purpose H's; for same-Purpose derived H's the
-  cycle goal is already on the page), "if 1.5 keeps rejecting my H's,
-  the cycle is stuck — I'll skip 1.5 once" (a series of rejects is the
-  cross-H synthesis trigger, not an obstruction).
-- **`planned-drop` sub-categorization.** The status keyword now covers
-  three sub-categories (out-of-scope drop / rejected-at-routing /
-  superseded). The Statement column's leading clause identifies which
-  fired, so cross-H synthesis at Purpose closure can distinguish the
-  three at the row level instead of collapsing them into one bucket.
-- **Notebook-body H-id numbering rule.** H-ids are global and
-  sequential across `hypotheses.md`, permanent at moment of
-  consideration. H's that ran get one `## H<id>` block with the row id
-  verbatim; H's that did not run (rejected-at-routing, out-of-scope
-  drop, superseded) get no notebook block. Notebook H-id sequence may
-  have gaps — those gaps are the audit trail of considered-but-not-run
-  candidates and may not be renumbered away. Closes the previously
-  open question of whether a routing-rejected H consumes an id, gets
-  prime-suffixed, or is renumbered into the next available `## H<id>`
-  slot — different agents had been answering this differently.
-- **Back-references.** `cycle_purpose_and_goal.md`'s "How to plan the
-  H portfolio" (initial-portfolio decomposition) now points forward to
-  sub-step 1.5 as the carry-forward equivalent. `SKILL.md` step 2's
-  existing per-H "sub-claim mapping" line now points forward to
-  sub-step 1.5 as the carry-forward enforcement point — previously the
-  mapping was a recording requirement only and did not flow into a
-  routing decision.
-
-The change is orthogonal to the F12–F16 family of failure modes that
-0.9.0 closed: F12–F14 (派生 H table leakage into notebook body) is a
-record-location problem; F15–F16 (research-goal layer absence) is a
-project-level layer problem; F17 closed here is a cycle-internal
-conjunct-mapping problem on the routing path. Each layer needs its
-own counter; this release supplies the third.
-
-**0.9.0** — Introduces a **four-layer model** (Research goal / Design
-hypothesis / Purpose / Hypothesis) that anchors every derived hypothesis
-to a project-level research-goal sub-claim, closes the F12–F16 family
-of failure modes in derived-hypothesis routing and Purpose handoff.
-Validated by TDD over five scenarios (run-now promotion / multi-round
-table accumulation / new-Purpose handoff / derivation root-cause
-absence / Purpose-close research-goal-distance absence).
-
-- **Layered model.** New `references/research_goal_layer.md` adds the
-  upper two layers above the existing Purpose / Hypothesis pair. The
-  project README now carries a research-goal sub-claim list with stable
-  IDs (`G1.1`, `G1.2`, …); each Purpose declares its
-  `target_sub_claim_id` as the **5th item** of the cycle goal in
-  `references/cycle_purpose_and_goal.md`; each H row in `hypotheses.md`
-  carries its own `target_sub_claim_id` (inherited from the parent H by
-  default, override recorded in the Statement column with reason).
-- **Derived-hypothesis table template removed** from
-  `references/hypothesis_cycles.md` (closes F12–F14). Per-H planning
-  state (`planned-runnow` / `planned-nextsession` / `planned-drop`) is
-  now recorded as a single source of truth in the `Status` column of
-  `hypotheses.md` rather than as a `### Derived hypotheses` table in the
-  notebook body. The cross-notebook handoff rule for derived Purposes
-  is moved into a new section of `references/cross_h_synthesis.md`
-  ("Handoff to the next notebook"): old-Purpose synthesis, Pattern
-  labels, binding-axis prose, and `## Origin` sections are forbidden in
-  the new notebook's body. Minimal cross-references conveying research
-  content (e.g. comparison-series names in a Figure plan) remain
-  permitted.
-- **Design-hypothesis bookkeeping at Purpose closure** (closes F15–F16).
-  `assets/decisions.md.template`'s Purpose entry gains three mandatory
-  sections: **Design hypothesis at open** (the prediction "this Purpose
-  closes such-and-such sub-claims"), **Research-goal sub-claim progress
-  update** (the transition for every sub-claim this Purpose touched —
-  unchanged sub-claims listed too, so the project's running state is
-  fully visible), and **Design hypothesis at close** (CONFIRMED /
-  FALSIFIED / PARTIAL). The next Purpose's selection is justified from
-  the sub-claim status table in the project README, not from per-H
-  numeric observations alone.
-- **Schema extensions kept aligned across templates and helpers.**
-  `assets/hypotheses.md.template` adds `target_sub_claim_id` and
-  `pathway` columns; `assets/INDEX.md.template` adds
-  `target_sub_claim_id` per notebook; `assets/experiment.py.template`'s
-  Purpose header gains the Cycle goal 5-item block, the per-H result
-  row gains `target_sub_claim_id` / `pathway` / `parent_hypothesis_id`,
-  and the closing checklist is updated to drive the new bookkeeping;
-  `references/results_db_schema.md` adds the `target_sub_claim_id`
-  column to the per-H row schema; `scripts/aggregate_results.py`'s
-  `REQUIRED_FIELDS` is extended accordingly. `SKILL.md` step 2 declares
-  the Cycle goal as 5 items; step 14 documents the sub-claim progress
-  update + design hypothesis at close as part of result aggregation.
-
-**0.8.1** — Patch: closes meta-leak (F9–F11) loophole in the post-review
-reconciliation pass. Reviewer vocabulary was already banned in 0.8.0 but
-the reconciliation rules did not cover skill versioning, pivot history,
-migration changelogs, reference-file attributions, or cross-skill API
-tutorials leaking into the notebook body. Augments
-`references/post_review_reconciliation.md`'s "本文に書かない語彙" table
-with seven new categories (skill version numbers / compliance tags;
-skill or process internal terms in body prose; reference-file
-attributions; pivot / narrowing rationale sections; migration / upgrade
-history; cross-skill / library API tutorials), adds four rationalization
-counters covering the case where a user prompt directly asks for
-migration / pivot / API-diff to be readable in the body (resolution:
-preserve body cleanliness, route the requested information to git log /
-README changelog / `decisions.md` / inline summary instead), extends the
-why-quality self-test from three to four questions (4: skill / library /
-process の固有名詞を全部マスクしたら、何が研究 claim として残るか), and
-adds matching checklist items in `notebook_narrative.md`. Validated by
-RED-GREEN-REFACTOR over three scenarios (skill upgrade migration /
-mid-cycle pivot / cross-skill API change); F10 (pivot history) and F11
-(cross-skill API tutorials) closed on the initial GREEN, F9 (skill
-versioning) closed in REFACTOR after the user-instruction-override
-loophole was patched.
-
-**0.8.0** — Two complementary R-side protocol additions.
-
-- **Cycle goal framed around the downstream consumer.** New
-  `references/cycle_purpose_and_goal.md` defines the four pre-cycle items
-  (Consumer / Decision / Decision rule / Knowledge output) that turn a
-  Purpose into a contract with a named consumer.
-  `references/research_design.md` embeds the four items into the Purpose
-  header template and adds a per-H "sub-claim of the decision rule"
-  mapping so the H portfolio is derived from the cycle's goal rather than
-  improvised per Purpose. `references/hypothesis_cycles.md` separates
-  **primary stops** (Primary YES / Fallback NO with binding axis /
-  KICK-UP — the intended ways a cycle ends) from **emergency stops**
-  (the N=5 / N=8 exhaustion-trigger machinery that fires when primary
-  stops fail to fire), and the completion gate now requires every
-  Purpose to land on a primary stop, not just satisfy the robustness
-  battery on a `verdict='supported'` H.
-- **Post-review reconciliation pass to keep the notebook coherent.** New
-  `references/post_review_reconciliation.md` plus a Step 11b / Step 13b
-  insertion in `quant-research/SKILL.md`, additions to
-  `references/notebook_narrative.md` (body / audit / planning separation
-  + chapter-numbering checklist + DoD pointer) and step 6 of
-  `references/bug_review.md`'s dispatch protocol. Closes the
-  observed-by-RED failure modes where a triggered review left the
-  notebook with intercalary chapters (`§6a`, `§6b`, `§7b`, `Fig 2b`),
-  reviewer vocabulary in the body (`leakage-reviewer`,
-  `(literature dimension)`), edit-history language ("after bug_review
-  fix", `~~2.4~~`), audit variables (`*_pre_fix`), and planning notes
-  (`parked` / `follow-up` / `next-session`) leaking into the research
-  artifact, and where numbers / figures / observation cells fell out of
-  alignment because dependent cells were not re-executed. The pass
-  enforces a 4-pattern placement decision (P1 in-place / P2 same-section
-  re-compute / P3 `## Post-review addenda` / P4 new `## H<id>`),
-  Definition of Done for re-execution and figure / observation
-  alignment, and a top-to-bottom verification pass. Validated by
-  RED-GREEN over 3 review-reflection scenarios (leakage / pnl-accounting
-  / claim-warrant); 7 of 8 RED-observed failure modes eliminated, with
-  F7 (cross-round cumulative consistency) documented as known residual
-  to be exercised by sequential fixtures.
-
-**0.7.0** — R-side R&D protocol added. Five interventions, validated
-together by RED-GREEN-REFACTOR (5 RED + 5 GREEN + 16 loophole pressure
-tests, all passing):
-
-- **Stage 0 — pre-hypothesis exploration** (new
-  `references/pre_hypothesis_exploration.md`, conditional on the
-  data-without-candidate-phenomenon start state). Four mandatory
-  protocol inventions: an exploration set (held-out 20 % default,
-  never used in train / val / test), structural-only observations
-  (existence, not parameter values), EDA → H provenance, and a
-  stop rule.
-- **Step 1.5 — hypothesis generation** (new
-  `references/hypothesis_generation.md`). Six legal generation
-  pathways — data-driven, literature-extension, literature-refutation,
-  failure-derived, cross-asset extension, mechanism-driven — each
-  with required citations, tier expectation, and a common-failure-mode
-  table. Ad-hoc generation is a legal escape hatch with a higher
-  differentiation hurdle.
-- **Novelty / knowledge-advance gate** (edits to
-  `experiment-review/references/review_dimensions.md`'s `literature`
-  and `claim` dimensions, plus a 4th completion-gate condition in
-  `quant-research/SKILL.md`). The literature dimension is split into
-  coverage and novelty; novelty checks compare achieved differentiation
-  tier against the H's pathway-forecasted tier. The claim dimension
-  gains a symmetric "does not rebrand local replication as novel
-  finding" check, addressing the prior asymmetry where only the
-  underclaim direction was caught.
-- **Cross-H learning** (new `references/cross_h_synthesis.md` plus
-  6 schema fields in `results_db_schema.md`). Schema additions
-  (`pathway`, `parent_hypothesis_id`, `verdict`, `failure_mode` with
-  controlled vocabulary, `forecasted_tier`, `achieved_tier`) turn
-  `results.parquet` into a queryable surface for cross-H meta-knowledge.
-  The synthesis reference defines five recurring patterns (A: same
-  axis fails everything; B: different axes, no convergence; C: Pareto
-  re-allocation, not progress; D: monotonic improvement with
-  selection caveat; E: one supported, others rejected on same axis)
-  and prescribes the action for each.
-- **Exhaustion trigger** (Exhaustion-criteria section in
-  `references/hypothesis_cycles.md`). Hard trigger: 5 H tested under
-  one Purpose without a four-gate-clean `verdict='supported'` →
-  cross-H synthesis is mandatory before any H6 can be appended. Hard
-  cap at N=8: the Purpose closes mechanically, further work opens a
-  new Purpose with the previous synthesis as documented prior. Reset
-  rule is gated on the same four-gate machinery as real verdicts so
-  it cannot be escaped by a provisional `supported` label.
-
-The five interventions compose end-to-end: Stage 0 produces a
-candidate phenomenon; Step 1.5 declares its pathway and provenance;
-the experiment runs; the novelty gate verifies achieved tier matches
-forecast; multiple H's accumulate as queryable rows; cross-H synthesis
-extracts the cluster's meta-finding; the exhaustion trigger forces
-synthesis at the right moment and prevents sunk-cost iteration.
-
-**0.6.0** — Notebook readability conventions added to
-`notebook_narrative.md`: figures must be self-explanatory at figure-time
-(intuitive at a glance, or with an embedded read-out — title naming the
-quantity + comparison, annotation stating how to read the encoding, or a
-one-line conclusion baked into the figure); when a sweep figure is paired
-with an adopted configuration elsewhere in the notebook, that point is
-marked on the figure. Helper functions defined in the notebook now require
-docstrings stating intent, the responsibility split, args / returns with
-producing / consuming cells, and side effects. Magic numbers concentrate
-in a config cell at the top of each H block; downstream cells reference
-the named constants, not raw literals. The notebook stays expressive
-within the project's existing imports — no new external library
-dependencies. Validated by RED-GREEN via subagent application scenarios
-on a fresh quant-research notebook.
-
-**0.5.0** — Notebook unit reframed from "1 hypothesis" to "1 Purpose"
-(an open-ended investigation). Multiple Hypotheses serving the same
-Purpose now live as successive `## H<id>` rounds inside one notebook;
-verdicts and `results.parquet` rows are per-Hypothesis. Headline-figure
-plan and reader takeaway promoted to required pre-implementation items
-(no longer end-of-pipeline decoration). Both changes validated by
-RED-GREEN-REFACTOR via subagent pressure scenarios.
+**0.5.0** — Reframed the notebook unit from one hypothesis to one Purpose with
+multiple H rounds inside it.
 
 **0.4.0** — Initial public release with `quant-research` and
-`experiment-review` skills, multi-agent bug-review and claim-warrant
-review layers, adversarial cold-eye reviewer with deliberately minimum
-context bundle.
+`experiment-review`: falsifiable design, time-series validation, robustness,
+bug-review, and claim-warrant review.
 
 ## License
 
