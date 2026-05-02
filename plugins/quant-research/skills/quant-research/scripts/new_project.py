@@ -116,7 +116,7 @@ def main() -> None:
     )
     print(f"  5. Add only entry-gate-passing hypotheses to {project_dir}/hypotheses.md.")
     print(
-        f"  6. python new_purpose.py --project {args.name} --slug <purpose> --hyp H1"
+        f"  6. python new_purpose.py --project {args.name} --slug <trial> --hyp H1"
     )
 
 

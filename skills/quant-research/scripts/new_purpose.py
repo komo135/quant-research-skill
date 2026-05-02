@@ -1,12 +1,11 @@
-"""new_purpose.py — Create a new Purpose notebook (one parent thesis per file) with a sequential number.
+"""new_purpose.py — Create a numbered research trial notebook.
 
-A "Purpose notebook" carries the parent research thesis as a declarative
-falsifiable statement; each `## H<id>` block inside it is one experiment
-that tests a sub-claim of the thesis. The notebook receives a
-Purpose-level verdict at closure (in addition to per-H verdicts).
+The generated notebook is a small state-updating trial. It may be used for
+R&D capability work or Pure Research, but it is only valid when success and
+failure both update a named row in research_state.md.
 
 Usage:
-    python new_purpose.py --project <project-name> --slug <purpose> --hyp H1
+    python new_purpose.py --project <project-name> --slug <trial> --hyp H1
     python new_purpose.py --project <project-name> --slug pca_factor_screening --hyp H1
 
 What it does:
@@ -74,8 +73,12 @@ def create_purpose(
     index_path = purposes_dir / "INDEX.md"
     if index_path.exists():
         index = index_path.read_text(encoding="utf-8")
-        new_row = f"| pur_{nnn} | {title or slug} | {hyp} | planned | (pending) | (pending) |\n"
-        index += new_row
+        new_row = f"| pur_{nnn} | TBD | {hyp} | TBD | planned | pending |\n"
+        marker = "\n## Notebook-status legend"
+        if marker in index:
+            index = index.replace(marker, new_row + marker, 1)
+        else:
+            index += "\n" + new_row
         index_path.write_text(index, encoding="utf-8")
 
     return out_path
@@ -83,10 +86,10 @@ def create_purpose(
 
 def main() -> None:
     p = argparse.ArgumentParser(
-        description="Create a new Purpose notebook (one parent thesis per file) with sequential numbering.",
+        description="Create a numbered quant-research trial notebook.",
     )
     p.add_argument("--project", required=True, help="project name (notebooks/<name>/)")
-    p.add_argument("--slug", required=True, help="Purpose slug (alphanumeric and _)")
+    p.add_argument("--slug", required=True, help="trial slug (alphanumeric and _)")
     p.add_argument("--hyp", required=True, help="linked hypothesis ID (e.g. H3)")
     p.add_argument("--title", default=None, help="title (defaults to slug humanized)")
     p.add_argument("--root", default="notebooks")
@@ -97,7 +100,7 @@ def main() -> None:
     )
     print(f"created: {out}")
     print("next steps:")
-    print(f"  1. Edit the Markdown cells in {out} (parent thesis, hypothesis, acceptance).")
+    print(f"  1. Edit the Markdown cells in {out} (mode, state row, hypothesis, acceptance).")
     print(f"  2. Update hypotheses.md: mark {args.hyp} as in-progress.")
     print(f"  3. Open the notebook with marimo edit {out}.")
 
