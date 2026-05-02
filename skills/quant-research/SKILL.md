@@ -1,1049 +1,167 @@
 ---
 name: quant-research
-description: Use for quantitative-finance or algorithmic-trading research, including alpha factors, backtests, return prediction, regime detection, execution, and financial time-series ML. Enforces falsifiable hypotheses, one Purpose per notebook, time-series validation, robustness checks, bug-review gates, and experiment-review before supported conclusions.
+description: Use for quantitative-finance, algorithmic-trading, or financial time-series research. Supports two modes: R&D for establishing a technology by decomposing it into small technical capabilities with explicit maturity/exit criteria, and Pure Research for slow, literature-grounded research that prioritizes research-state updates, failure analysis, competing explanations, and reproducibility over fast conclusions. Use for alpha factors, backtests, return prediction, regime detection, execution, portfolio construction, and financial ML.
 ---
 
 # Quant Research
 
-A protocol skill for quantitative-finance and algorithmic-trading research that uses either
-mathematical models or machine learning.
+A protocol skill for agent-driven technical research in quantitative finance.
+The primary job is not to produce quick answers. The job is to keep the
+research state clean, make uncertainty explicit, and move the investigation
+forward by the smallest defensible step.
 
-## Purpose
+## Prime Directive
 
-Keep the research at publication-grade quality. Writing a paper is not the goal, but the
-research itself should reach a level at which a paper could be written.
+Prefer a precise unresolved state over a shallow conclusion.
 
-Concretely:
+No experiment is complete until it changes the research state. A result may
+change the state by confirming, weakening, splitting, merging, parking, or
+deleting a question / hypothesis / explanation. Merely appending another
+verdict or another decision log entry is not progress.
 
-- Fix a falsifiable hypothesis before writing any implementation
-- One **Purpose** (a research thesis: the parent claim about the world that
-  the notebook is built to test) per notebook; one or more **Hypotheses**
-  tested inside it as the falsifiable child claims that decompose the parent.
-  Each H block is **one experiment** (= the apparatus that tests one
-  hypothesis); the notebook is the cluster of experiments under one Purpose.
-  Derived hypotheses that emerge from running an earlier hypothesis stay
-  inside the same notebook as long as the Purpose is unchanged AND each
-  derived H declares own falsifiable claim, own stated purpose distinct
-  from parent, a meaningful research unit, AND cites a specific terminal
-  answer from the parent H's why-why chain (see "Derived hypothesis
-  admissibility" below). A new Purpose ⇒ a new notebook. (See the next
-  section for the operational distinction.)
-- The notebook closes with a **Purpose-level verdict** declaring the
-  parent thesis supported / refuted / partial — alongside (not replacing)
-  the per-H verdicts. The parent claim is itself falsifiable; it does not
-  get to escape rejection by spawning a derived Purpose that re-asserts it.
-- Set the **Purpose-header items** before any code: name the downstream
-  Consumer, the Decision they are blocked on, the Decision rule (YES / NO
-  with binding axis / KICK-UP, committed before the Purpose's investigation
-  runs), the Knowledge output, and the target sub-claim id. The H portfolio
-  is *derived from* the decision rule, not improvised. See
-  `references/purpose_design.md`.
-- **Run a why-why chain** (5-whys) at every per-H verdict — supported,
-  rejected, partial, or parked — terminating at a mechanism-level cause
-  before any derived H is admissible. The bare fact of the verdict (or
-  the `failure_mode` label) is not a legitimate root for derivation; the
-  next H's purpose is derived from the chain's terminal answer. See
-  `references/why_why_analysis.md`.
-- Enforce time-series validation
-- Verify robustness before declaring completion (per Hypothesis)
-- Iterate hypotheses instead of stopping after one — usually inside the
-  same notebook (= same Purpose). Iteration ends when the consumer can
-  apply the decision rule (Primary YES / Fallback NO with binding axis /
-  KICK-UP — all three are equivalent research outputs); N=5 / N=8 are
-  emergency stops, not the intended termination.
-- Make differentiation against prior work explicit so the research is not a degraded
-  reimplementation
+## First Decision: Research Mode
 
-## Purpose vs. Hypothesis (read this before deciding to start a new notebook)
+Before designing any Purpose, notebook, hypothesis, model, or backtest, choose
+one mode and follow its reference:
 
-These are two different layers and must not be confused. The user-facing
-mistake this skill is built to prevent is letting a hypothesis quietly become
-the goal of an investigation — which happens whenever a researcher splits a
-notebook for every new H without asking whether the *Purpose* changed.
-
-| | **Purpose** (= research thesis = parent claim) | **Hypothesis** (= child claim, tested by one experiment) |
+| Mode | Use when | Required reference |
 |---|---|---|
-| What it is | A parent claim about the world the notebook is built to test (= the thesis) | A specific, falsifiable comparison statement that decomposes the parent claim |
-| Form | "X works on Y under conditions C" (declarative, falsifiable at the notebook level) | "Method A beats baseline B on test Sharpe by ≥ N" |
-| Count | One per notebook | One or more per notebook (each one tested by one experiment) |
-| Where it lives | Notebook header (the `## Purpose` cell) — verdicted at notebook closure | Each round inside the notebook (the `## H<id>` block) — verdicted via the per-H 4-gate flow |
-| Examples | "Mean-reversion at H1 frequency on EUR/USD generates risk-adjusted edge net of cost" / "PCA factors carry next-day return information beyond a market-cap factor" / "Chronos embeddings add information beyond a frozen-embedding baseline" | "RSI≤30 entry × signal-flip exit beats B&H test Sharpe ≥ 0.5 with fee 1 bp/side" |
-
-A hypothesis serves a Purpose by partly decomposing the parent claim. The
-notebook is the unit of one Purpose; the hypothesis log inside is where the
-parent claim is tested by individual experiments. The Purpose itself is
-verdicted at notebook closure (supported / refuted / partial); per-H
-verdicts feed that Purpose-level verdict but do not replace it.
-
-### Derived hypothesis admissibility (= what may legally become an H<id>)
-
-A derived hypothesis is admitted to the hypothesis log only when **all
-four** of the following hold:
-
-1. **Why-why chain citation** — the parent H's why-why chain (per
-   `references/why_why_analysis.md`) has been written (≥ 3 levels,
-   terminating at a mechanism-level cause), and the derived H's
-   per-H design header cites a specific terminal answer from that
-   chain. The citation tells the reader and the protocol *what
-   mechanism-level reading the derived H is grounded in*. This rule
-   fires identically on parents with `verdict='supported'` and on
-   parents with `verdict='rejected'`: a derived H whose only
-   motivation is the bare verdict or the `failure_mode` label is
-   inadmissible regardless of which verdict the parent had.
-2. **Own falsifiable claim** distinct from the parent H's claim — the
-   derived H's acceptance / rejection threshold is on a different
-   decision axis (not just a tighter / looser threshold on the
-   parent's axis). The "different axis" is the one the chain
-   terminal isolates.
-3. **Own stated purpose** — one sentence answering "what new question
-   does this H answer that the parent H did not?". The answer is
-   derivable from the chain terminal — the new question is *to
-   falsify or isolate the chain terminal*, not "to retry the parent
-   under different parameters". Written in the per-H design header,
-   not retrofitted at interpretation time.
-4. **Meaningful research unit** — the H is at the granularity of an
-   independent finding, not a 1-axis parameter sweep over the parent's
-   pipeline. A sweep over sizing / threshold / regime / lookback is
-   robustness analysis (Step 12), not a new H.
-
-Admissible derived-H types (each must still pass the four conditions
-above):
-
-- A **failure-diagnosis** H ("H1 was rejected; H2 tests whether the
-  rejection is driven by the threshold or by a regime composition
-  change") — admissible when the diagnosis is itself a falsifiable claim
-  with an axis distinct from H1's headline metric AND grounded in a
-  chain-terminal mechanism-level reading.
-- A **specialization / refinement** H ("H1 supported overall; H2 tests
-  whether the edge is conditional on a *named, pre-committed* regime
-  signal external to the strategy") — admissible when the regime
-  conditioning is a research question on its own (e.g. "does the signal
-  encode regime-specific information?"), not a fitting attempt to
-  recover headline performance after rejection AND grounded in the
-  parent's chain.
-- An **alternative formulation** H ("H1 used RSI; H2 tests whether
-  Bollinger as a different operationalization of the same mechanism
-  yields the same conclusion") — admissible when H2's purpose is to test
-  whether the *conclusion* is robust to operationalization, not to find
-  a sibling parameterization that rescues a rejected H1, AND the
-  operationalization swap targets a chain-terminal property.
-
-Inadmissible (= these belong elsewhere, NOT in the hypothesis log):
-
-- **Derivation without a chain citation** — proposed before the
-  parent's why-why chain was written, OR proposed against a chain that
-  terminates at a metric / threshold / parameter / `failure_mode`
-  label rather than a mechanism-level cause. Run the chain first per
-  `references/why_why_analysis.md`; only then is the derived H
-  eligible. This is the most common shallowness pattern.
-- **Sensitivity / parameter-sweep** variant of an earlier H — belongs in
-  Step 12 robustness battery (`references/robustness_battery.md`),
-  reported as 2D / 3D grids inside the parent H's section, not as a
-  separate H<id>. Adding `signal × vol-targeted sizing` and registering
-  it as `H2` is a sweep escalated to a hypothesis; the sizing axis is
-  robustness, not a new finding.
-- **Follow-on layer** on top of an earlier H ("H1's signal × X") where X
-  is a sizing / cost / portfolio-construction layer that does not change
-  the underlying claim about the world — belongs in Step 10 portfolio
-  construction or Step 12 robustness, not as a new H.
-- **Threshold-variation** rerun of an earlier H ("H1 with acceptance
-  threshold lowered to recover marginal cases") — explicit
-  anti-rationalization, never admissible.
-
-In all admissible cases the *Purpose* the notebook is testing is the same.
-The next H is the next round inside the same hypothesis log, not a new
-notebook. In inadmissible cases, the work is real and may still be
-necessary, but it is not an H — it is a robustness or engineering pass
-inside the parent H's section.
-
-### When to open a new notebook
-
-Open a new notebook **only** when the Purpose itself changes. Concrete
-triggers:
-
-- Different phenomenon under investigation (mean-reversion → momentum,
-  return prediction → volatility prediction)
-- Different cross-section / asset class (FX → equity, single-name → index)
-- Different prediction target where the target change reflects a new
-  question (not just a different metric on the same target)
-- Different model class **only when** that change reflects a different
-  question (e.g. "is mean-reversion in this market?" vs. "do
-  foundation-model embeddings add information here?")
-
-### Anti-rationalizations to resist
-
-| Excuse | Reality |
-|---|---|
-| "H2 is a different central hypothesis, so it goes in a new notebook." | The notebook is per-Purpose, not per-Hypothesis. "Different central hypothesis" is no longer a split criterion. Ask: did the Purpose change? |
-| "pur_001 is already verdict='supported' and finalized; opening it again is dirty." | A finalized H1 inside a notebook does not seal the notebook. The notebook stays open for further admissible H's serving the same Purpose. Each H has its own verdict, and the notebook itself carries a Purpose-level verdict at closure (the parent thesis is verdicted supported / refuted / partial). The notebook is sealed only at Purpose-level closure, not at the first H reaching `supported`. |
-| "H2 is a vol-targeted sizing variant of H1's signal — that's a follow-on layer, so it goes in the hypothesis log." | A sizing-layer / threshold-sweep / regime-conditioning variant whose only difference from the parent is one robustness axis is a sensitivity sweep escalated to a hypothesis. It belongs in Step 12 robustness battery, not in the hypothesis log. See "Derived hypothesis admissibility". |
-| "H1 was rejected; let me run H2 with a tighter threshold / different period to see if it survives." | This is fishing for survival on the parent's axis. Inadmissible as a new H. Either (a) close H1 rejected and run a *failure-diagnosis* H with a different axis (Step 1.5 Pathway 4) grounded in H1's why-why chain terminal, or (b) record the threshold-sensitivity as robustness inside H1 and accept its rejection. |
-| "H1 was supported; let me extend H2 to GBP/USD to see if it generalises." | The chain-citation rule fires identically on supported parents. Without H1's why-why chain naming what the apparatus *actually* tested at mechanism level, a sibling-instrument extension propagates whatever H1 was conflating. Run the chain on H1 first; the extension is admissible only if it cites a specific chain terminal (e.g. "tests whether H1's mechanism-level finding 'X' generalises to a market where Y differs"). |
-| "Without a Purpose-level verdict the notebook is fine — H verdicts cover everything." | They do not. Per-H verdicts cover individual decompositions; the parent thesis (= Purpose) is itself a falsifiable claim and must receive its own verdict at notebook closure. Without it, the parent claim escapes rejection by spawning a derived Purpose that re-asserts it. |
-| "I need clean re-runnability per hypothesis, so each H needs its own notebook." | Re-runnability is a marimo cell-graph property, not a file property. Use H-suffixed variable names (`signal_h1`, `signal_h2`) and per-H sub-sections inside one notebook. See `references/marimo_cell_granularity.md`. |
-| "The derived H needs to read intermediate files from the earlier H — that's a dependency, so it's a different experiment." | If H2 builds on H1's signal, the natural place for H2 is the same notebook where H1's signal already lives. Intermediate-file passing across notebooks is the correct pattern only when the Purpose differs. |
-| "If I keep adding H's the notebook will grow unmanageable." | Multi-Hypothesis notebooks legitimately exceed the old "10-30 cells / 200-500 lines" guidance. That guidance no longer applies. Physical splits (one Purpose, two `.py` files) are not a planned case. |
-| "Run-now derived hypothesis means start the next notebook." | The old rule was wrong and has been replaced. Run-now derived H's serving the same Purpose continue in the same notebook. See `references/hypothesis_iteration.md`. |
-
-## Notebook is a communication artifact from the start (not after-the-fact)
-
-The notebook serves two readers (the `.py` source reader and the marimo reader)
-and must communicate to both. Communication design — *what figure tells the
-story, what observation each figure raises, what the reader takes away* — is
-a **pre-implementation** concern, not an end-of-pipeline cleanup. If the
-headline figure and the reader's takeaway are not designed before any code
-runs, the notebook ends up as a calculation log retrofitted with charts.
-
-Concretely:
-
-- Step 2 (research design) requires the **headline figure plan** alongside
-  Purpose / H1 / Universe / Data ranges — written before implementation.
-- Each `## H<id>` block names its **per-H headline figure** in the per-H
-  design header before any code in that round runs.
-- The full figure / observation / interpretation discipline lives in
-  `references/notebook_narrative.md`. Read it **before** writing the first H,
-  not after. Treating it as an end-of-notebook polish step is the failure
-  mode this skill is built to prevent.
-
-The figure-plan-up-front rule is what differentiates a research notebook
-from a script that happened to produce numbers.
-
-## When to use
-
-- Strategy backtests of any kind
-- Alpha-factor research (mathematical or ML based)
-- Return / price prediction with ML
-- Reinforcement learning for execution or portfolio rebalancing
-- State-space models or stochastic-process models of markets
-- Foundation-model applications (e.g. Chronos, TimesFM, Moirai) to financial time series
-
-Out of scope: pure implementation tasks (CRUD, bug fix, refactor).
-
-## Research lifecycle
-
-```
-[New project]
-       ↓
-  (Stage 0: Pre-hypothesis exploration) — IF the start state is
-    data-without-candidate-phenomenon. Skipped when the researcher
-    arrives with a candidate from prior intuition, a paper to
-    extend, or a derived Purpose handed off from a previous notebook.
-       ↓
-  Literature review (literature/)
-       ↓
-  (Hypothesis generation: declare pathway 1-6 OR ad-hoc-with-provenance)
-       ↓
-  Hypothesis portfolio (hypotheses.md) — first H per Purpose
-       ↓
-[Open a notebook for one Purpose]
-       ↓
-  Set the Purpose-header items (purpose_design.md) — name the
-  Consumer, the Decision they are blocked on, the Decision rule
-  (YES / NO with binding axis / KICK-UP, committed BEFORE the
-  investigation runs), the Knowledge output, and the target
-  sub-claim id. The H portfolio below is derived from the decision
-  rule.
-       ↓
-  Create the notebook (purposes/pur_NNN_<purpose-slug>.py) with a
-  Purpose header AND the five Purpose-header items
-       ↓
-  Test H1 (= one or more sub-claims of the decision rule) →
-    bug_review (if triggered) → robustness → experiment-review →
-    H1 verdict → why-why chain (always) → append one row to
-    results.parquet
-       ↓
-  Can the consumer apply the decision rule yet? (Primary YES /
-    Fallback NO with binding axis / KICK-UP — see
-    hypothesis_iteration.md)
-       ↓ no                                   ↓ yes
-  Did a derived H emerge that serves         Close the Purpose on
-    the SAME Purpose AND a sub-claim of      the primary stop that
-    the same decision rule AND cites a       fired.
-    chain terminal of the parent?
-       ↓ yes              ↓ no (new Purpose)
-  Test H2 inside           Close this notebook;
-    the same notebook      open pur_<NNN+1>_*.py
-       ↓
-  Continue until consumer can decide (primary stop), OR the
-    emergency stop fires (N=5 advisory / N=8 hard cap — emergency
-    stops indicate frame mismatch, force cross-H synthesis)
-       ↓
-  Purpose-level conclusion = primary-stop outcome + synthesis across
-    H1…HN + derived Purposes (= candidates for new notebooks)
-       ↓
-[Completion]
-       ↓
-  Per-Hypothesis robustness battery → research-quality checklist (per project)
-```
-
-## Project folder layout
-
-When starting a new research project, create this layout (the helper script
-`scripts/new_project.py` generates it):
-
-```
-notebooks/<project-name>/
-├── README.md                 # Research goal + sub-claim list (G1.1, G1.2, ...) with status
-├── literature/
-│   ├── papers.md             # Related papers with one-paragraph summaries
-│   └── differentiation.md    # Differentiation matrix vs. prior work
-├── hypotheses.md             # H rows with target_sub_claim_id / pathway / chain_terminal_cited / Status (planned-runnow / ... / supported / rejected)
-├── purposes/                # One file per Purpose (= one research thesis); each H block inside is one experiment
-│   ├── INDEX.md              # List of Purpose notebooks with one-line Purpose-level verdicts
-│   ├── pur_001_<slug>.py
-│   ├── pur_002_<slug>.py
-│   └── ...
-├── decisions.md              # Per-Purpose entries with design hypothesis (open/close) + sub-claim progress update
-├── results/
-│   ├── results.parquet       # Aggregated numeric results across all experiments
-│   └── figures/              # Figures intended for a report or paper
-└── reproducibility/
-    ├── env.lock              # Dependency lock file
-    ├── data_hashes.txt       # SHA-256 of input data files
-    └── seed.txt
-```
-
-The four-layer model (Research goal → Design hypothesis → Purpose →
-Hypothesis) ties these files together. See
-`references/research_goal_layer.md`. Briefly:
-
-| Layer | Lives in | Question it answers |
-|---|---|---|
-| Research goal | `README.md` (sub-claim list with stable IDs `G1.1`, `G1.2`, …) | What is this project trying to find out? |
-| Design hypothesis | `decisions.md` Purpose entries (at-open prediction, at-close verification) | Why this Purpose, in what order, given the research goal? |
-| Purpose | Notebook header (5th Purpose-header item: `target_sub_claim_id`); verdicted at notebook closure | What parent claim does this notebook test (= the research thesis)? |
-| Hypothesis | Notebook `## H<id>` blocks; `hypotheses.md` rows with `target_sub_claim_id` | What falsifiable claim does this round test? |
-
-Each derived hypothesis carries an explicit `target_sub_claim_id`
-(inherited from parent or overridden with reason in `hypotheses.md`).
-This is what prevents derived H's from drifting into "the natural next
-test" status without an anchor in the project's research goal — the
-failure mode the four-layer model exists to prevent.
-
-## Mandatory order before touching code
-
-### 0. Pre-hypothesis exploration (conditional — only when no candidate phenomenon yet)
-
-See `references/pre_hypothesis_exploration.md`. Run this stage **only**
-when the start state is *data without a candidate phenomenon* (new
-dataset, new exchange, new asset class, ambient curiosity). Skip when
-the researcher arrives with a candidate from prior intuition, a paper
-to extend, or a derived Purpose handed off from a previous notebook —
-in which case the H's origin is recorded in `decisions.md` and the
-researcher proceeds directly to Step 1.
-
-The stage's job is to produce a candidate H1 from data without
-contaminating the data that the rest of the lifecycle will use to test
-that H1. Four protocol inventions (all mandatory when the stage runs):
-
-- **Exploration set**: a held-out fraction (default 20 %) of the data
-  reserved for EDA. Never used in train / val / test of any H produced
-  from this stage. Committed to `reproducibility/exploration_set.txt`.
-- **Structural-only observations**: EDA records the *existence* of a
-  phenomenon, not its *parameter values*. Recording the values turns
-  Stage 0 into in-sample fit on the exploration set.
-- **EDA → H provenance**: every candidate H cites the EDA observation
-  that motivated it. Captured in `eda/findings.md` per phenomenon.
-- **Stop rule**: N ≤ 5 candidates, time-boxed; lock H1 when a candidate
-  clears Strong/Medium tier in literature differentiation.
-
-An H produced without Stage 0 (or its conditional-skip equivalent) and
-without any traceable origin in either an EDA finding or a literature
-paper is treated as Stage-0-required — i.e. the researcher loops back
-into Stage 0 before Step 1 proceeds.
-
-### 1. Literature review (avoid producing a degraded reimplementation)
-
-See `references/literature_review.md`. Collect 5-10 prior papers and write the
-differentiation against them in `literature/differentiation.md`. Skipping this makes the
-research likely to reinvent or weaken known results.
-
-### 1.5. Hypothesis generation — declare the pathway
-
-See `references/hypothesis_generation.md`. Every H declares **exactly one
-primary pathway** chosen from a taxonomy of six legal generation
-pathways, plus an ad-hoc escape hatch that pays a higher
-differentiation hurdle. The pathway determines which provenance files
-the H must point to and what differentiation tier is forecasted.
-
-Pathways:
-
-1. **Data-driven** — EDA finding from Stage 0 (provenance:
-   `eda/findings.md` Phenomenon entry).
-2. **Literature-extension** — re-test a paper's claim in a new
-   universe / period / frequency / asset class (provenance: paper +
-   section/page + differentiation matrix row).
-3. **Literature-refutation** — test a paper's claim under stricter,
-   adversarial conditions argued *a priori* to be where it fails
-   (provenance: paper + a-priori argument).
-4. **Failure-derived** — H_n's named failure axis → H_{n+1} that
-   targets that one axis (provenance: parent H row + failure-mode
-   analysis entry in `decisions.md` AND a specific terminal answer
-   from the parent's why-why chain). Routing of H_{n+1} (same
-   notebook vs. new) is owned by `hypothesis_iteration.md`; this
-   pathway owns *content*.
-5. **Cross-asset / cross-regime extension** — known phenomenon in
-   market A → test in market B or regime R (provenance: source-market
-   evidence + transfer-mechanism argument).
-6. **Mechanism-driven** — causal mechanism (economic /
-   microstructural / behavioural) implies an observable, H tests the
-   observable (provenance: mechanism description, *not* retrofit to
-   data).
-
-An H with no declared pathway and no documented ad-hoc origin defaults
-to Stage 0. An ad-hoc H (legal escape hatch) is allowed when origin is
-documented in `decisions.md`, the differentiation matrix is filled,
-and the H clears at least Medium tier in differentiation.
-
-The pathway taxonomy makes generation provenance explicit *before*
-Step 2 (research design) tries to formalize the H. Without it, content
-is filled silently from the researcher's background and the protocol's
-review layers cannot tell where the H came from.
-
-### 2. Write the research design first in Markdown — including Purpose-header items and figure plan
-
-See `references/research_design.md` and `references/purpose_design.md`.
-At the top of each notebook, write:
-
-- **Purpose** — the parent claim the notebook tests, written as a
-  declarative falsifiable statement (= the research thesis). The
-  notebook's closure verdict will be on this exact statement. Avoid
-  "Does X work on Y?" question form — that hides the parent claim
-  inside an interrogative; the form makes Purpose-level verdict
-  ambiguous
-- **Purpose-header items — five required pre-implementation items**,
-  see `purpose_design.md`:
-  - **Consumer** — concretely named (next derived Purpose, production
-    strategy build, paper section, portfolio-sizing decision). "The
-    research community", "future researchers", "myself someday" are not
-    consumers; if the only consumer is that vague, return to Stage 0.
-    "My own next Purpose, named as <slug>" is a legal escape hatch when
-    the next Purpose is *nameable in one phrase*.
-  - **Decision the consumer is blocked on** — the yes/no/pivot the
-    consumer cannot make without this Purpose's output, in one sentence.
-  - **Decision rule** — the predicate the consumer applies to the
-    knowledge output to land their decision. Three branches required:
-    YES (numeric / structural threshold for going forward), NO (numeric
-    / structural threshold for not going forward, with the binding axis
-    that would justify it), KICK-UP (structural condition indicating the
-    Purpose's frame is the wrong layer). Committed *before* the
-    investigation runs; without pre-commitment the rule becomes post-hoc
-    rationalization.
-  - **Knowledge output** — the artifact (per-H rows in results.parquet
-    + Purpose-level synthesis paragraph + headline figure) onto which
-    the decision rule is applied.
-  - **Target sub-claim id** — the project README's research-goal
-    sub-claim ID(s) this Purpose is expected to advance. Primary: 1
-    sub-claim; secondary: 0-2. The link from this notebook to the
-    project's running question. See `references/research_goal_layer.md`
-    for the four-layer model (Research goal / Design hypothesis /
-    Purpose / Hypothesis) — without `target_sub_claim_id`, the
-    Purpose's relationship to the project's research goal is implicit
-    and the next Purpose's selection becomes invisible.
-- **First Hypothesis (H1)** — a specific falsifiable comparison statement
-  serving the Purpose, with numeric acceptance / rejection thresholds.
-  H1 is *derived from* the decision rule above: it tests one or more
-  conjuncts of the YES / NO / KICK-UP branches. An H without a
-  sub-claim mapping is not in the portfolio under this frame.
-- Universe (list at least three instruments, or describe the cross-section)
-- Data range (train / val / test, embargo size)
-- **Headline figure plan** — what the one-and-only figure that conveys the
-  answer to the Purpose will *show* (axes, comparison, observation the
-  reader is supposed to draw). Written before any code runs; only the
-  numeric values come from the data.
-- **Reader takeaway** — one sentence: what the reader (`.py` or marimo)
-  walks away knowing after reading this notebook end-to-end.
-
-When a derived H emerges serving the same Purpose, add a new `## H<id>`
-block inside the same notebook with its own falsifiable statement,
-acceptance / rejection thresholds, **sub-claim mapping** to the decision
-rule, **per-H headline figure plan**, **`chain_terminal_cited`** value
-(citing the specific terminal answer from the parent H's why-why chain
-this derived H is grounded in), and per-H result row. The sub-claim
-mapping is enforced at carry-forward time by `hypothesis_iteration.md`
-routing rule sub-step 1.5 (= conjunct contribution gate); the
-`chain_terminal_cited` is enforced at carry-forward time by routing
-rule sub-step 0 (= admissibility gate).
-
-The Purpose-header items, the figure plan, and the reader takeaway are
-required pre-implementation items. The Purpose-header items in
-particular are what the H portfolio is *derived from* — without them,
-H's are improvised per Purpose and downstream judgment becomes
-inconsistent. "I'll figure out the figure when I have the data" /
-"I'll know the consumer's decision when I see H1's result" are the
-failure modes this step is built to prevent.
-
-See `references/purpose_design.md` for the derivation of why the
-Purpose-header items exist and how to fill the five items, and
-`references/research_goal_layer.md` for the four-layer model that the
-5th item (`target_sub_claim_id`) ties the notebook into, and
-`references/notebook_narrative.md` for the full communication-artifact
-spec. Read all three before writing H1's first code cell.
-
-#### 2.5. Data availability gate (verified before instantiating the Purpose)
-
-If the real data required to apply the Decision rule is **unavailable**
-in the execution environment AND the Purpose's research subject is
-real-world behavior (markets, instruments, regimes, mechanisms), the
-Purpose's investigation is **BLOCKED**. Synthetic substitution within
-an instantiated Purpose is forbidden; synthetic-data scaffolding
-outside the protocol (no Purpose-header items, no verdict cell, no
-`results.parquet` row) is engineering work, tracked separately.
-Synthetic data IS the research subject only when the Decision rule is
-about an estimator / algorithm / mathematical property whose ground
-truth lives in the DGP itself (parameter recovery, convergence rate,
-estimator bias on a known DGP).
-
-A BLOCKED Purpose is itself a research output — it surfaces a
-data-acquisition dependency the project must address before the
-Purpose's sub-claim can be attacked. File the unavailability in
-`decisions.md` as a structural finding, mark the Purpose suspended,
-and pivot to a data-available Purpose (or return to project portfolio
-re-prioritization). See `references/experiment_protocol.md`
-"Data availability gate" for the full rule, the diagnostic test
-distinguishing real-world subjects from estimator-recovery subjects,
-the forward path when BLOCKED, and the anti-rationalization table.
-
-### 3. One Purpose = one notebook
-
-See `references/experiment_protocol.md`. The unit of one notebook is one
-**Purpose** (= one research thesis = one parent claim about the world),
-not one Hypothesis. Multiple admissible hypotheses serving the same
-Purpose are tested as successive rounds inside the same notebook; each
-H block is one experiment that tests the parent thesis on a particular
-falsifiable axis. The notebook closes with a Purpose-level verdict on
-the parent thesis (in addition to the per-H verdicts).
-
-Reasons one notebook still maps to one Purpose:
-
-- The Purpose is the durable intent of the investigation; tying it to the
-  notebook is what prevents derived hypotheses from quietly becoming the
-  goal
-- All H's under one Purpose share the same upstream data, splits, and
-  baselines — duplicating those across notebooks per H is wasteful and
-  invites silent divergence
-- The Purpose-level synthesis (which H worked, which didn't, what the
-  collective answer is) needs all the H's in one place to be readable
-
-Reasons one notebook does **not** map to one Hypothesis (anti-rule, was
-true under the previous protocol and is no longer):
-
-- "Different central hypothesis = different notebook" — discarded
-- "Run-now derived hypothesis = next notebook" — discarded
-- "Sensitivity / refinement / failure-diagnosis = stays in the same
-  notebook only as a sub-cell of the original H" — replaced by "is its own
-  H<id> block in the same notebook"
-
-The cell-graph constraints (marimo's no-redefinition rule, independent
-re-runnability) are now handled by H-suffixed variable naming
-(`signal_h1`, `signal_h2`) and per-H sub-sections, not by file splitting.
-See `references/marimo_cell_granularity.md`.
-
-### 4. Pick math vs. ML deliberately
-
-See `references/modeling_approach.md`. Choose between mathematical models (OU, PCA,
-AR(1), HMM), classical ML (regression, trees), deep learning, reinforcement learning, or
-foundation models based on the structure of the hypothesis. "Default to ML" or "default to
-math" is not allowed as a reason.
-
-### 5. Treat feature / factor construction as its own experiment
-
-See `references/feature_construction.md`. Building features or factors is research in its
-own right — give it its own notebook. Run leak checks (look-ahead bias, target leakage) on
-every feature.
-
-### 6. Time-series validation
-
-See `references/time_series_validation.md`. Required:
-
-- Time-ordered split (train < val < test)
-- Embargo when features depend on future-leaking horizons
-- Walk-forward (rolling window) to assess time stability
-- Purged k-fold or CPCV (López de Prado) for ML research
-- Test set is touched only once for the final evaluation
-
-### 7. Verify model assumptions
-
-See `references/model_diagnostics.md`. For mathematical models, statistically test the
-assumptions (stationarity, normality, mean-reversion speed). For ML models, run overfit
-checks (learning curves, feature-importance stability, prediction distribution).
-
-### 8. Separate prediction from decision (ML research)
-
-See `references/prediction_to_decision.md`. Prediction accuracy (AUC, RMSE) and trading
-performance (Sharpe, drawdown) are not the same thing. Keep the layers separate.
-
-### 9. Make exits a first-class design choice
-
-See `references/exit_strategy_design.md`. Time-stop alone is not a valid exit strategy.
-Compare signal-flip / TP-SL / trailing-stop / volatility-based exits in parallel; if a
-time-stop is used at all, use it as a max-hold safety net.
-
-### 10. Portfolio construction (strategy research)
-
-See `references/portfolio_construction.md`. Sizing, hedging, market-neutralization, and
-leverage should all be deliberate choices.
-
-## Two review layers — boundary at a glance (read before steps 11 and 13)
-
-Steps 11 and 13 are two separate review layers. They are intentionally *not* merged.
-Both are required before `verdict = "supported"` **on any individual hypothesis**.
-The gate fires per Hypothesis, not per notebook: a notebook with H1, H2, H3 inside
-runs the two review layers up to three times — once per H whose verdict is being
-declared `supported`. Multiple H's completing in the same session can be batched
-into one inline review summary, but every H named in the summary must be covered
-by every dimension. The most common confusion is between the two `validation`
-scopes — one in each layer.
-
-| | **Step 11: `bug_review`** (in this skill) | **Step 13: `experiment-review`** (separate skill) |
-|---|---|---|
-| One-line | Are the code and numbers correct? | Is the claim warranted by the design? |
-| Question | Is the implementation contaminated? | Is the claim oversold relative to evidence? |
-| Looks at | Code, data, PnL series | Hypothesis, universe, baselines, claim, notebook artifact |
-| Specialists | 5: leakage / pnl-accounting / **validation (correctness)** / statistics (metric arithmetic) / code-correctness | 7: question / scope / method / **validation (sufficiency)** / claim / literature / narrative |
-| Adversarial reviewer (minimum bundle) | code + reported numbers | `.py` file alone |
-| Order in this skill | Step 11 (precondition) | Step 13 (postcondition, after robustness battery) |
-| Verdict gate | **Both must pass.** | **Both must pass.** |
-
-`validation` boundary rule of thumb:
-
-- Step 11's `validation` checks "is the embargo wired in correctly?" (correctness)
-- Step 13's `validation` checks "is N=8 walk-forward windows enough power to
-  distinguish Sharpe 0.4 from 1.1?" (sufficiency)
-- A finding genuinely on both axes is flagged independently by both layers.
-
-### 11. Multi-agent bug review (per Hypothesis, runs *before* that H's robustness battery)
-
-See `references/bug_review.md` and `references/sanity_checks.md`. A passing robustness
-battery is necessary but not sufficient — leaks, misalignments, and accounting bugs
-contaminate every robustness gate uniformly and turn the green ticks into false
-confidence. This step fires **per Hypothesis** when any *trigger condition* is met
-for that H:
-
-- Numeric red flag (e.g. test Sharpe > 3, walk-forward mean Sharpe > 2, ML AUC > 0.65 on
-  return-sign, headline metric outside bootstrap 95 % CI, headline ≥ 2 × walk-forward
-  mean — full table in `bug_review.md`)
-- State-change trigger: before `verdict = "supported"` is set for this H; before the
-  test set is touched for this H; after any change to data ingestion, target, embargo,
-  fold, feature scaling, signal alignment, or fee model that affects this H
-
-If multiple H's in the same notebook are about to receive `verdict = "supported"` in
-the same session, the bug-review pass may be batched (one inline summary covering
-all of them) provided every H is named explicitly under every reviewer dimension.
-
-When fired, dispatch six sub-agents *in parallel*: five specialist reviewers — one
-each for leakage, PnL accounting, validation-correctness, statistics / metric
-correctness, and generic code correctness — plus one adversarial cold-eye reviewer
-with a deliberately minimum context bundle (code + reported numbers only; no other
-reviewers' findings, no `decisions.md`, no `hypotheses.md`). The asymmetry of the
-adversarial bundle is the mechanism that breaks same-model anchoring — see
-`bug_review.md` for the exact bundle and instruction.
-
-Each returns severity-tagged findings; `high` and `medium` findings block re-running
-the battery and block any verdict change until resolved. Findings are aggregated
-**inline in the assistant's reply** — the skill does not write to `decisions.md`
-or create any file. The session transcript is the audit surface; if the user
-wants a durable record they can copy the inline summary themselves.
-
-The notebook also runs the programmatic subset (random-signal benchmark, shuffled-target
-test, PnL reconciliation, cost monotonicity, sign-flip identity, NaN/Inf scan, time-
-shift placebo) in a "Sanity checks" cell *before* section 12 below. See
-`scripts/sanity_checks.py`.
-
-If parallel sub-agent dispatch is unavailable, run the six scopes sequentially in six
-distinct passes — do not collapse them into one. The adversarial pass is run with the
-minimum bundle only even in the fallback.
-
-#### 11b. Post-review reconciliation pass (mandatory before step 12)
-
-After the inline review summary, before re-running the robustness battery, run the
-reconciliation pass — see `references/post_review_reconciliation.md`. The reconciliation
-pass enforces three things:
-
-1. **A 4-pattern placement decision per finding** — every reflected change is one of
-   P1 (in-place rewrite), P2 (same-section re-compute / sanity cell at the end of the
-   existing `§N`), P3 (a single `## Post-review addenda` block placed immediately before
-   the verdict cell), or P4 (a new `## H<id>` block). New chapters with lowercase /
-   decimal suffixes (`§6a`, `§7b`) and figures that violate the up-front figure plan
-   (`Fig 2b`) are forbidden.
-2. **Definition of Done** — re-execute every dependent cell, align all abstract /
-   per-H abstract / interpretation numbers with the post-fix pipeline output,
-   regenerate every figure, rewrite every observation cell to describe the regenerated
-   figure, and check that *past-round* findings are still reflected in the new numbers.
-3. **A final verification pass** — read the notebook from top to bottom once and
-   confirm that no reviewer vocabulary (`leakage-reviewer`, `claim-reviewer`,
-   `(literature dimension)`), edit-history language ("after bug_review fix",
-   "~~2.4~~ → 0.93"), or planning notes (`parked`, `follow-up`, `next-session`) has
-   leaked into the notebook body. The notebook body is the **research artifact**;
-   the inline review summary (chat transcript) is the **audit trail**;
-   `decisions.md` / `hypotheses.md` is the **planning state**. The three are kept
-   separate.
-
-Without the reconciliation pass, "fixed" in the inline summary is premature — the
-finding is at most "addressed in code." Step 12 (robustness battery) does not start
-until reconciliation is complete.
-
-### 12. Robustness battery before declaring completion
-
-See `references/robustness_battery.md`. **Run only after step 11 has produced a clean
-bill of health.** At minimum:
-
-- Threshold sensitivity (2D grid)
-- Fee sensitivity sweep
-- Walk-forward Sharpe distribution
-- Bootstrap CI (block bootstrap)
-- Probabilistic / Deflated Sharpe Ratio
-- Regime conditional (trending / ranging, high / low vol, session)
-
-### 12.5. Why-why analysis (per Hypothesis, mandatory at every verdict regardless of value)
-
-See `references/why_why_analysis.md`. **MANDATORY for every per-H verdict** —
-supported, rejected, partial, or parked. Runs *after* Steps 11 and 12 have
-produced clean numbers and *before* Step 13's experiment review interprets the
-claim, *and* before any derived H is proposed in `hypotheses.md`.
-
-Why this is its own step: the bare verdict (and the `failure_mode` label that
-accompanies a `rejected` verdict) is not enough material to ground the next H.
-Without a mechanism-level reading, derived H's are generated from the verdict
-itself — "the parent failed, let's vary X" or "the parent worked, let's try
-sibling Y" — which is the depth failure the protocol exists to prevent. The
-why-why chain is the entry point for derivation.
-
-What this step produces:
-
-- An explicit **why-why chain** (≥ 3 consecutive levels) written into the per-H
-  interpretation cell, with each "why?" taking the previous answer as its
-  subject. The chain terminates only when the answer is a **mechanism-level
-  cause** (= what the strategy was actually exposed to / harvested / selected,
-  what structural property of the data drove the result), not a metric,
-  threshold, parameter, or `failure_mode` label.
-- **Each level pinned to a computed observation.** Every "why?" answer
-  cites a specific cell / value of an analysis output (a table, a
-  distribution, a correlation, a stratified statistic) computed in the
-  notebook before the chain references it. Prose mechanism statements
-  with no number nearby and no table / figure citation are not pinned —
-  the chain is reasoning about what the data would show, not citing what
-  it shows. See `references/why_why_analysis.md` "Observation grounding".
-- **When an analysis cannot be run, the chain stops and surfaces the gap.**
-  A level whose required analysis is unavailable in the current session is
-  written as "level N: cannot be answered without analysis A on artifact X.
-  Chain incomplete." The chain is then **not eligible** to ground a
-  derived H. Writing a plausible chain to compensate for missing
-  computation is the failure mode this step is built to catch.
-- The chain's terminal answer recorded as a one-phrase entry in `decisions.md`'s
-  Purpose entry (under the H sub-bullet) — so cross-Purpose derivations can
-  cite it as `chain_terminal_cited`.
-- Each derived H proposed for `hypotheses.md` (whether same-Purpose or
-  new-Purpose) carries a `chain_terminal_cited` field naming which terminal
-  answer it is grounded in. A derived H without this citation, **or with a
-  citation pointing to an unpinned (prose-only) chain level**, is rejected
-  at routing sub-step 0 of `hypothesis_iteration.md`.
-
-The rule applies to **both supported and rejected verdicts**. A supported H
-without a chain produces sibling-extension derivations that propagate whatever
-the apparatus actually tested (which may differ from what its name claimed). A
-rejected H without a chain produces parameter-tweak derivations that try to
-recover the parent's headline. Both are the same shallowness pattern.
-
-Common rationalizations to resist:
-
-| Excuse | Reality |
-|---|---|
-| "The verdict is unambiguous; the chain is overhead." | The verdict is the *result*; the chain explains the result. The next H's purpose is derived from the chain, not from the verdict. |
-| "The `failure_mode` label *is* the cause." | A label is a one-word categorization; it is at most level-1 of the chain. Treating it as the cause prevents the chain from reaching mechanism level. |
-| "The H was supported, so there is nothing to dig into." | Sibling extensions of a supported parent inherit whatever the apparatus actually tested. Without a chain, the next H may extend a misspecified mechanism instead of the named one. |
-| "I'll skip the chain on this H and run it later." | "Later" is the audit trail of the skip — by then the next H is on the page, and was generated from the verdict. The chain is what should have grounded that H. |
-| "The chain reads plausibly — that's enough." | Coherent prose is the LLM's default output; the rule requires that each level cite a specific computed cell / value the prose summarizes. "Reads plausibly" is the failure mode the observation-grounding rule is built to catch — see `why_why_analysis.md`. |
-| "The analyses are expensive / not available — let me write the chain from what they would probably show." | "Would probably show" is plausibility, not observation. Stop the chain at the level whose analysis has not been computed; surface the gap explicitly; do not admit a derived H from a partial chain. |
-
-### 13. Multi-agent experiment review (per Hypothesis, research quality) — invokes the `experiment-review` skill
-
-The `experiment-review` skill is a **separate skill**. Invoke it via the Skill tool at
-this step. **MANDATORY co-gate with step 11.** Both must pass before
-`verdict = "supported"` is set for any individual hypothesis. This step is not
-optional or advisory; it is a required gate.
-
-The reviewer reads the entire notebook (Purpose header, all H<id> blocks up to and
-including this H, the per-H result row schema), but the verdict gate it controls is
-per-H. Multiple H's may share one experiment-review pass when they enter the gate
-in the same session, provided every H is named explicitly in the dimension findings.
-
-Why two layers: step 11 (`bug_review`) asks "is the implementation correct?" Step 13
-(`experiment-review`) asks "is the claim warranted by the experimental design?" These
-are distinct questions with distinct failure modes. A clean experiment-review on top of
-a buggy implementation produces confidence in a contaminated PnL — `bug_review` is
-the precondition. A clean bug_review on top of an unsupported claim (wrong baseline,
-single instrument, missed prior work) produces a deployment-ready overstatement —
-`experiment-review` is the postcondition.
-
-What `experiment-review` does: dispatches 7 specialist sub-agents in parallel (question /
-scope / method / validation-sufficiency / claim / literature / narrative) plus 1
-adversarial cold-eye reviewer that reads the `.py` file alone with deliberately minimum
-context. Returns severity-tagged findings aggregated **inline in the assistant's
-reply** — the skill does not write a review report file or modify any project
-artifact. See the `experiment-review` skill's own SKILL.md and references for
-the dimension scopes and dispatch protocol.
-
-Sequence inside this skill:
-
-1. Step 11 (`bug_review`) clean — every `high` and `medium` resolved **and step 11b
-   reconciliation pass complete**
-2. Step 12 (robustness battery) green
-3. Step 12.5 (why-why analysis) chain written, mechanism-level terminal reached
-4. **Invoke `experiment-review` skill via the Skill tool** ← this step
-5. Address every `high` and `medium` finding from `experiment-review`
-6. **Step 13b reconciliation pass** — re-run `references/post_review_reconciliation.md`
-   on the changes from step 5. `experiment-review` findings frequently touch the
-   abstract, per-H abstract, claim wording, and the literature section, so the
-   verification pass is what keeps reviewer dimension names (`validation-sufficiency`,
-   `literature`, `claim`, `narrative`) and edit history out of the notebook body
-7. Step 14 (result aggregation), then completion gate
-
-Do NOT proceed to step 14 (result aggregation) until both `bug_review` and
-`experiment-review` findings are addressed **and both reconciliation passes are
-complete**. Setting `verdict = "supported"` before both layers pass is a protocol
-violation that downgrades the result to *preliminary screening*. Skipping
-reconciliation is the same violation in a quieter form: the inline summary will
-read "fixed" while the notebook body still carries pre-fix figures, edit history,
-and reviewer vocabulary.
-
-Common rationalization to resist: "`bug_review` already ran, that is the review layer."
-Different question (correctness vs. claim-warrant); both required.
-
-### 14. Result aggregation (per Hypothesis) and Purpose-level synthesis
-
-See `references/results_db_schema.md`. **Each Hypothesis in the notebook produces
-its own row** in `results/results.parquet`. The schema carries `purpose_id`
-(= the notebook = the Purpose; the prior name `experiment_id` was a vocabulary
-inversion that conflated the notebook with an experiment, retired here),
-`hypothesis_id` (= the individual H within the Purpose; each H block is itself
-**one experiment**, the apparatus that tests that H), the H's `pathway`
-declaration (from Step 1.5), `forecasted_tier`, `chain_terminal_cited` (from
-Step 12.5; `n/a` for initial H's that have no parent chain), and — filled
-post-review — `verdict`, `failure_mode` (controlled vocabulary when
-verdict=rejected), `parent_hypothesis_id` (when pathway=4), and `achieved_tier`
-(from the experiment-review literature dimension's novelty check). A notebook
-with three H's emits three rows, all sharing the same `purpose_id`. The
-append happens at the end of each H's round inside the notebook; `verdict`
-and `achieved_tier` are *updated* after Steps 11 and 13 finalize them.
-
-When the Purpose closes (or when N ≥ 3 H have been tested under it), the
-notebook also writes a **Purpose-level conclusion** following
-`references/cross_h_synthesis.md`. The conclusion reads H1…HN's rows together
-and extracts the *meta-finding* — what the cluster says about the world that
-no single H said (e.g. Pattern A: "all H's failed on the same `fee_model`
-axis → fees are the binding constraint here"). Without this synthesis,
-`results.parquet` accumulates per-H rows but the project carries no durable
-cross-H knowledge forward to derived Purposes. The synthesis itself is prose
-in the notebook plus an entry in `decisions.md`; the cross-H query surface
-the synthesis runs on is provided by the schema's pathway / verdict /
-failure_mode / tier fields.
-
-At Purpose closure, `decisions.md`'s Purpose entry also carries the
-**research-goal layer's bookkeeping** (see `references/research_goal_layer.md`):
-
-- **Research-goal sub-claim progress update** — for each sub-claim this
-  Purpose touched, the transition (e.g., G1.1: in progress → confirmed).
-  Sub-claims not touched are listed unchanged so the project's running
-  state is fully visible at every Purpose closure.
-- **Design hypothesis at close** — verification of the prediction
-  recorded at Purpose open (CONFIRMED / FALSIFIED / PARTIAL with a
-  one-phrase reason). Falsified is a legitimate research output, not a
-  process failure.
-
-These two items are what the next Purpose's selection reads. Without
-them, the next Purpose is chosen from per-H numeric observations alone
-and the project's relationship to its research goal collapses into
-implicit reasoning. Per-H planning state (run-now / next-session / drop)
-lives in `hypotheses.md`'s `Status` column (`planned-runnow` /
-`planned-nextsession` / `planned-drop`), single source of truth.
-
-### 15. marimo cell granularity
-
-See `references/marimo_cell_granularity.md`. One cell = one fit / one evaluation. Do not
-loop over models × features × targets in a single cell.
-
-### 16. Notebook as a self-contained communication artifact
-
-See `references/notebook_narrative.md`. A reader who opens *only* the `.py` file must be
-able to follow what was investigated, why, how, and what was concluded — without running
-the notebook, without chat context, without slides. A reader who runs the notebook in
-marimo additionally gets large interactive figures and `mo.ui` widgets to drill into the
-evidence. Both readers must reach the same conclusion. Required: an abstract cell at the
-top, per-section *what & why* cells, per-figure *observation* cells, prose interpretation
-before the programmatic verdict, headline figures in plotly / altair at full width and
-≥ 450 px height, and at least one `mo.ui` widget for evidence drill-down (widgets must
-not select numbers that flow into `results.parquet`). Every figure is either intuitive
-at a glance or carries an embedded read-out (title naming the comparison, annotation
-stating how to read the encoding, or a one-line conclusion in the figure); sweep
-figures mark the adopted configuration when one exists. Every helper function defined
-in the notebook has a docstring stating intent, the responsibility split, args / returns
-with producing / consuming cells, and side effects. Each H block opens with a config
-cell naming sweep grids and chosen-configuration constants; downstream cells reference
-the names, not raw literals.
-
-**Per-H abstract leads with the falsifiable claim's answer** in the H's own terms
-(mechanism / market / regime / instrument). Implementation, library, and numerical
-correctness statements (computation reconciliation, leak-check residuals, library
-version match) belong in a clearly-bounded *Reproducibility note* at the end of the
-abstract — never as the lead. The first sentence is the answer to the world the H
-asked about; if that sentence is "the implementation is correct" or "the decomposition
-matches sklearn", the de facto deliverable has inverted from research to
-engineering. See `references/notebook_narrative.md` 1b "Format rule — first sentence
-is the market claim, not the implementation".
-
-### 17. Iterate hypotheses — and stop on the synthesis trigger
-
-See `references/hypothesis_iteration.md`. Do not stop after one Hypothesis. After
-each H inside the notebook (and after its why-why chain is in place per Step
-12.5), classify any derived hypotheses as "run now / next session / drop"
-and log them in `hypotheses.md` and `decisions.md`.
-
-- A run-now derived H **serving the same Purpose** is the next round inside the
-  same notebook (a new `## H<id>` block, not a new file).
-- A run-now derived H whose investigation reflects a **new Purpose** opens the
-  next notebook (`pur_<NNN+1>_*.py`).
-- "Run-now derived hypothesis = next notebook" is the **old** rule and has been
-  discarded. The new rule routes by Purpose continuity, not by run-readiness.
-
-But iteration is not unbounded. The exhaustion-trigger rule (in
-`hypothesis_iteration.md`) fires **before any H6 can be appended** when a
-Purpose has 5 H tested without a four-gate-clean `verdict='supported'`. At the
-trigger, cross-H synthesis (per `references/cross_h_synthesis.md`) is mandatory
-— its Pattern match (A-E) determines whether the next move is close, derive,
-split, or narrow. The hard cap at N=8 closes the Purpose mechanically; further
-work opens a new Purpose with the previous Purpose's synthesis as documented
-prior. Without the trigger, sunk-cost continuation is the modal failure of
-long Purposes.
-
-## Completion gate (per Hypothesis)
-
-Before declaring `verdict = "supported"` on **any individual hypothesis**, all
-**five** gates must pass for that H — *in this order*:
-
-1. **Step 11 — `bug_review` (in this skill)**: 5 specialist reviewers + 1 adversarial
-   cold-eye reviewer, no unresolved `high` or `medium` findings for this H.
-2. **Step 12 — Robustness battery**: pass on the items in
-   `references/robustness_battery.md`.
-3. **Step 12.5 — Why-why analysis**: a chain (≥ 3 levels, mechanism-level
-   terminal) is written into the per-H interpretation cell. This gate fires
-   on *every* verdict, not only `supported`; supported and rejected (and
-   partial / parked) all require a chain before the next H can be derived.
-4. **Step 13 — `experiment-review` (separate skill, invoke via Skill tool)**: 7
-   specialist reviewers + 1 adversarial cold-eye reviewer, no unresolved `high` or
-   `medium` findings for this H.
-5. **`references/research_quality_checklist.md`**: passes as final self-check for
-   the H (and at project level, the Purpose-level synthesis the notebook produces
-   from the H's it contains). **Achieved differentiation tier ≥ Medium**, matching
-   or exceeding the H's pathway-forecasted tier (declared in Step 1.5 via
-   `references/hypothesis_generation.md`). A Weak-tier achievement is a
-   degraded reimplementation, not a research advance, regardless of how clean
-   the bug_review and experiment-review passes look. A tier downgrade (e.g.
-   Pathway 6 forecasted Strong but the differentiation matrix shows Medium) is
-   not a moral failure — the right next move is usually to narrow the abstract
-   to match the achieved tier and re-run the relevant gates, not to relitigate
-   the pathway choice. This gate is mechanically subsumed by gate 4 (the
-   `literature` dimension's novelty check fires `high` on a sub-Medium tier),
-   but is listed explicitly here so the load-bearing rule is visible to the
-   researcher *before* the review fires.
-
-Setting `verdict = "supported"` on any H without all five is a protocol violation
-that downgrades that H's result to *preliminary screening*. Each gate's pass/fail
-must be visible in the assistant's reply (trigger, reviewer roster, findings,
-resolution) — the skills do not write to `decisions.md`. If the user wants a
-durable record they can copy the inline summaries themselves.
-
-Different H's inside the same notebook can land at different per-H verdicts
-(e.g. H1 = supported, H2 = rejected, H3 = parked). The notebook **also**
-carries a Purpose-level verdict on the parent thesis (see
-"Purpose-level closure gate" below); this is in addition to, not in place
-of, the per-H verdicts.
-
-The two review gates intentionally remain *separate skills* and are *not* merged: they
-answer different questions (correctness vs. claim-warrant) and their adversarial
-reviewers receive different minimum bundles tuned to different failure modes
-(`bug_review` adversary sees code + numbers; `experiment-review` adversary sees the
-`.py` file alone). Merging them would dilute both.
-
-## Purpose-level closure gate (per Notebook)
-
-Before declaring the notebook closed and opening a derived Purpose (or
-declaring the project Purpose-level finding), the **parent thesis** stated
-in the Purpose header must itself receive a verdict. Per-H verdicts are
-sub-claims; the parent thesis is its own falsifiable claim and must close.
-
-The gate fires when **any** of the following becomes true for the notebook:
-
-- All planned H's have reached per-H verdicts (supported / rejected /
-  parked) AND the Purpose-header items' Decision rule (YES / NO / KICK-UP)
-  is applicable
-- The exhaustion-trigger rule has fired (N=5 advisory) and the cross-H
-  synthesis has matched a Pattern (A-E) in `cross_h_synthesis.md`
-- The hard cap (N=8) has fired
-
-When fired, the notebook records a **Purpose-level verdict** with one of
-the following values:
-
-- **supported**: the parent thesis is supported by the cluster of H
-  results, with the qualifying conditions named explicitly
-- **refuted**: the parent thesis is rejected by the cluster of H
-  results; the binding axis is named explicitly
-- **partial**: the parent thesis is supported on a named subset of
-  conditions and refuted on another named subset; the partition is made
-  explicit (regime / instrument / horizon / cost regime / etc.)
-
-A `partial` verdict is a legitimate research output, *not* a placeholder
-for "I'll figure it out later". A notebook that closes with a
-Purpose-level verdict naming an unresolved direction is closed as
-`partial` with that direction as a derived-Purpose candidate; this is
-distinct from leaving the parent thesis unverdicted.
-
-Carrying the parent thesis forward into a derived Purpose (per
-`cross_h_synthesis.md` Pattern A / B) requires the parent thesis to be
-*verdicted* first. The derived Purpose tests a *different* parent thesis
-(typically a refinement, restriction, or alternative scope of the
-original), not the same parent thesis under a slightly modified label.
-Rephrasing "Mean-reversion works on EUR/USD intraday" as "Mean-reversion
-works on EUR/USD at lower frequencies" without first verdicting the
-former as `refuted` (binding axis: H1 frequency does not survive cost)
-is the explicit anti-pattern this gate exists to prevent.
-
-## Bundled helper scripts
+| **R&D / technology establishment** | The goal is to establish a technology, capability, pipeline, model class, validation method, or deployable research technique | `references/research_modes.md` and `references/technology_decomposition.md` |
+| **Pure Research** | The goal is to understand a phenomenon, answer a research question, or produce knowledge in a paper-like sense | `references/research_modes.md` and `references/pure_research_protocol.md` |
+
+If the request mixes both, split it. R&D can consume Pure Research findings,
+and Pure Research can study a technical artifact, but one active work unit must
+have one dominant mode.
+
+## R&D Mode
+
+R&D mode exists to establish a technology. Do not start by inventing a large
+hypothesis about the whole target. Decompose the target into small technical
+capabilities and knowledge prerequisites first.
+
+Required sequence:
+
+1. Write the target technology in one sentence.
+2. Decompose it into sub-capabilities, knowledge gaps, dependencies, and
+   interfaces.
+3. Assign a maturity level to each sub-capability using the project-local TRL
+   scale in `references/technology_decomposition.md`.
+4. Select the smallest blocking capability.
+5. Design one test whose success and failure both teach something about that
+   capability.
+6. After the test, update the technology map: maturity changed / dependency
+   changed / capability split / capability merged / blocked.
+
+Do not promote a whole technology because one component worked. Do not keep
+testing a component after its exit criteria have fired.
+
+## Pure Research Mode
+
+Pure Research mode exists to reduce ignorance, not to answer quickly.
+The first session usually should not end with a supported conclusion.
+It should end with a better research state.
+
+Required sequence:
+
+1. Survey prior work, including the user's own prior notebooks and decisions.
+2. Define the research question and what is currently unknown.
+3. Record competing explanations before running a test.
+4. Run the smallest discriminating trial.
+5. Analyze why the result landed where it did, especially when the hypothesis
+   failed.
+6. Update the research state ledger before proposing the next step.
+
+The normal outcome of a failed hypothesis is a better explanation set, not a
+new hypothesis pile. Read `references/pure_research_protocol.md` before
+starting, and `references/failure_analysis.md` before interpreting a miss.
+
+## Lightweight Hypothesis Quality Management
+
+Hypothesis management is a pruning system, not an accumulation system. Read
+`references/hypothesis_quality.md` before adding or running any hypothesis.
+
+Every hypothesis / experiment passes four lightweight gates:
+
+1. **Entry gate** — What live question, capability, or explanation does this
+   test update? If none, do not run it.
+2. **Design gate** — What does success distinguish, and what does failure
+   distinguish? If failure teaches nothing, redesign.
+3. **Interpretation gate** — What can be said directly from the result, what
+   remains ambiguous, and which competing explanations became weaker?
+4. **State update gate** — Which ledger rows become active, resolved, rejected,
+   merged, stale, or parked?
+
+Heavy review is reserved for promotion moments:
+
+- declaring a claim `supported`
+- external sharing, paper writing, or deployment recommendation
+- closing a research line
+- making a large project-direction decision
+
+At those moments, run the relevant bug-review / robustness /
+`experiment-review` gates. During ordinary exploration, do not bury the
+research under review bureaucracy that does not change the state.
+
+## Required Ledgers
+
+Use the project templates, but treat them as active state surfaces:
+
+- `research_state.md` — questions, explanations, capabilities, and claims by
+  status (`active`, `resolved`, `rejected`, `merged`, `stale`, `parked`)
+- `hypotheses.md` — only hypotheses that pass the entry gate; rows may be
+  downgraded, merged, or marked stale
+- `decisions.md` — only durable decisions and state transitions, not every
+  thought the agent had
+- `literature/papers.md` and `literature/differentiation.md` — prior work,
+  including the user's own earlier research
+
+Before adding a row, check whether an existing row should instead be updated,
+merged, or retired.
+
+## Guardrails Against Agent Failure Modes
+
+- Do not write "the result suggests..." unless the observation and at least one
+  competing explanation are named.
+- Do not use generic explanations such as "noise", "data quality", "sample
+  size", or "market regime" as terminal causes. Treat them as labels to
+  decompose.
+- Do not turn an implementation artifact into the research claim. If masking
+  library / model / process names leaves no claim about the world or technique,
+  the work is engineering, not research.
+- Do not keep a hypothesis alive because work has already been spent on it.
+  Mark it `rejected`, `merged`, `stale`, or `parked` when the state warrants it.
+- Do not continue after the consumer can decide, the capability exit criteria
+  fired, or the next discriminating test belongs to a different question.
+
+## References
+
+Read only what applies:
+
+- `references/research_modes.md` — choosing R&D vs Pure Research
+- `references/technology_decomposition.md` — R&D capability map, maturity, exit criteria
+- `references/pure_research_protocol.md` — slow research workflow and conclusion discipline
+- `references/failure_analysis.md` — deep analysis of failed or ambiguous trials
+- `references/hypothesis_quality.md` — lightweight gates and ledger pruning
+- `references/research_state.md` — state ledger schema and allowed transitions
+- `references/literature_review.md` — prior-work review and differentiation
+- `references/time_series_validation.md` — time-series validation when a quantitative test runs
+- `references/robustness_battery.md` — robustness checks for promotion gates
+- `references/bug_review.md` — correctness review for promotion gates
+- `references/modeling_approach.md` — model selection guidance
+
+## Bundled Helper Scripts
 
 | script | purpose |
 |---|---|
 | `new_project.py` | Initialize a research project folder with the standard layout |
-| `new_purpose.py` | Generate a numbered Purpose notebook (one parent thesis per file) from the template |
+| `new_purpose.py` | Generate a numbered Purpose notebook from the template |
 | `aggregate_results.py` | Append rows to `results/results.parquet` and query them |
 | `walk_forward.py` | Compute Sharpe distribution over rolling windows |
 | `bootstrap_sharpe.py` | Block-bootstrap CI for per-trade Sharpe |
 | `psr_dsr.py` | Probabilistic / Deflated Sharpe Ratio |
 | `fee_sensitivity.py` | Fee sweep with break-even fee extraction |
 | `sensitivity_grid.py` | 2D threshold sensitivity grid |
-| `vol_targeted_size.py` | Position sizing with size ∝ 1/volatility |
-| `purged_kfold.py` | Purged k-fold CV (López de Prado) |
-| `leakage_check.py` | Detect look-ahead bias and target leakage in features |
-| `sanity_checks.py` | Programmatic bug-detection helpers used by the multi-agent review layer (random-signal benchmark, shuffled-target test, PnL reconciliation, cost monotonicity, sign-flip, NaN/Inf scan, time-shift placebo) |
-
-## File templates
-
-| asset | purpose |
-|---|---|
-| `README.md.template` | Project root README |
-| `purpose.py.template` | marimo notebook template for one Purpose (one parent thesis, multiple H experiments inside) |
-| `INDEX.md.template` | Index of Purpose notebooks |
-| `hypotheses.md.template` | Hypothesis portfolio tracker |
-| `decisions.md.template` | Decision history log |
-| `papers.md.template` | Prior-work catalog |
-| `differentiation.md.template` | Differentiation-against-prior-work matrix |
-
-## Key references
-
-- López de Prado, *Advances in Financial Machine Learning* (2018) — purged k-fold, embargo,
-  CPCV, backtest overfitting
-- Bailey & López de Prado, *The Probabilistic Sharpe Ratio* (2012) and *The Deflated Sharpe
-  Ratio* (2014)
-- Bailey, Borwein, López de Prado, Zhu, *Pseudo-Mathematics and Financial Charlatanism* (2014)
-- Politis & Romano, *Block Bootstrap* (1994)
-- Avellaneda & Lee, *Statistical Arbitrage in the U.S. Equities Market* (Quantitative
-  Finance, 2010) — reference example for math-driven research
+| `vol_targeted_size.py` | Position sizing with size proportional to inverse volatility |
+| `purged_kfold.py` | Purged k-fold CV |
+| `leakage_check.py` | Detect look-ahead bias and target leakage |
+| `sanity_checks.py` | Programmatic sanity checks used before promotion |

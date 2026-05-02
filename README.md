@@ -1,28 +1,24 @@
 # quant-research-skill
 
-A Claude Code and Codex plugin that bundles two protocol skills for
-**agent-driven quantitative finance research**:
+A Claude Code and Codex plugin for **agent-driven quantitative finance
+research**. The `quant-research` skill now starts by choosing one of two modes:
 
-- `quant-research` — research lifecycle organised around one **Purpose** per
-  notebook (an open-ended investigation), with one or more falsifiable
-  **Hypotheses** tested as successive rounds inside it. Each H gets its own
-  per-Hypothesis verdict gate, robustness battery, and result row. Includes
-  a multi-agent **bug-review** layer (5 specialists + 1 adversarial cold-eye
-  reviewer) that fires per Hypothesis on numeric red flags or before any
-  `verdict = "supported"` decision. Headline-figure plan and reader takeaway
-  are required pre-implementation items, not end-of-pipeline decoration.
-  Every per-H verdict — supported or rejected — must precede any derived
-  hypothesis with a **why-why chain** (5-whys, ≥ 3 levels, mechanism-level
-  termination); the bare verdict / `failure_mode` label is not a legitimate
-  root for derivation.
-- `experiment-review` — a separate, parallel-dispatched **claim-warrant review**
-  (7 specialists + 1 adversarial cold-eye reviewer) that asks not "is the code
-  correct?" but "is the conclusion warranted by what was actually tested?"
+- **R&D / technology establishment** — for establishing a technical capability.
+  The skill decomposes the target technology into small capabilities, assigns a
+  maturity level, and tests the smallest blocking capability with explicit exit
+  criteria.
+- **Pure Research** — for paper-like research and phenomenon understanding.
+  The skill prioritizes prior-work review, competing explanations, failed-trial
+  analysis, and research-state updates over fast conclusions.
 
-Both layers are required as a co-gate before a result can be declared
-*supported*. They are intentionally not merged: they answer different questions
-and their adversarial reviewers receive deliberately different minimum context
-bundles, tuned to different failure modes.
+The core rule is: **prefer a precise unresolved state over a shallow
+conclusion**. Hypothesis quality management is intentionally lighter and more
+stateful than the previous protocol. A trial is complete only when it updates
+the research state: active / resolved / rejected / merged / stale / parked.
+
+The separate `experiment-review` skill remains available for promotion moments:
+declaring a claim `supported`, external sharing, deployment recommendation,
+closing a research line, or making a major direction decision.
 
 The skills cover both **mathematical-model research** (Ornstein–Uhlenbeck,
 state-space, PCA, factor models, regression) and **machine-learning research**
@@ -80,66 +76,31 @@ If you want Jupyter, you will be fighting the skill, not using it.
 
 ## What you get, in one paragraph
 
-Start a project → the skill scaffolds a folder with `hypotheses.md`,
-`literature/papers.md`, `literature/differentiation.md`, `purposes/`,
-`results/`, `decisions.md`, and `reproducibility/`. **One notebook = one
-Purpose** (= one parent research thesis, written as a declarative
-falsifiable claim about the world); one or more admissible falsifiable
-Hypotheses (each tested by one experiment = one `## H<id>` block)
-decompose the parent thesis as successive rounds inside it. New H
-emerging during the run continues in the same notebook as long as the
-Purpose is unchanged AND it satisfies admissibility (own falsifiable
-claim, own stated purpose distinct from parent, meaningful research unit
-— sensitivity sweeps and parameter-only follow-ons go in the robustness
-battery, not the hypothesis log); only a Purpose change opens a new
-notebook. The notebook closes with a Purpose-level verdict on the
-parent thesis (supported / refuted / partial / refuted-as-stated) in
-addition to per-H verdicts.
-The notebook template forces a *design cell* up front: Purpose, first
-hypothesis (H1), universe (≥ 3 instruments or a cross-section),
-acceptance / rejection thresholds, data range with embargo, **headline
-figure plan**, and **reader takeaway** — the last two are required
-pre-implementation items so the notebook is designed as a communication
-artifact from the start, not retrofitted with charts at the end.
-Validation is time-series only: time-ordered split, embargo ≥ target
-horizon, walk-forward, and purged k-fold or CPCV for ML. Exits are a
-first-class design choice — time-stop alone is rejected. When numeric red
-flags fire (test Sharpe > 3, walk-forward mean > 2, ML AUC on return-sign
-> 0.65, headline outside bootstrap 95 % CI, …), or before a
-`verdict = "supported"` for any individual Hypothesis, the bug-review
-layer dispatches six sub-agents in parallel; the adversarial sub-agent
-gets a deliberately minimum bundle (code + headline numbers, no other
-reviewers' findings, no `decisions.md`, no `hypotheses.md`). After
-bug-review passes for that H and the robustness battery (sensitivity,
-fee, bootstrap, PSR / DSR, regime conditional) is green, the
-`experiment-review` skill dispatches eight sub-agents in parallel for the
-claim-warrant review — its adversarial reviewer gets the `.py` file
-alone, no other inputs. A H becomes *supported* only when both review
-layers pass; one notebook can contain a mix of supported / rejected /
-parked verdicts across its H rounds, synthesised in a Purpose-level
-conclusion.
+Start a project → the skill scaffolds a folder with `research_state.md`,
+`hypotheses.md`, `literature/papers.md`, `literature/differentiation.md`,
+`purposes/`, `results/`, `decisions.md`, and `reproducibility/`. Work begins by
+choosing R&D or Pure Research. R&D work builds a technology map and advances one
+small capability at a time. Pure Research work builds a research-state map,
+lists competing explanations, runs the smallest discriminating trial, and treats
+misses / ambiguity as first-class evidence. Hypotheses are admitted only when
+both success and failure update a named state row. Heavy review remains
+available, but it is no longer the default unit of quality; ordinary quality is
+managed by entry, design, interpretation, and state-update gates.
 
-## The two review layers, side by side
+## Quality management
 
-|   | `bug_review` (in `quant-research`) | `experiment-review` (separate skill) |
-|---|---|---|
-| One-line | Are the code and numbers correct? | Is the claim warranted by the design? |
-| Failure mode it prevents | Contaminated PnL passing all robustness gates | Real numbers that don't support the abstract's claim |
-| Specialists | 5: leakage / pnl-accounting / **validation (correctness)** / statistics / code-correctness | 7: question / scope / method / **validation (sufficiency)** / claim / literature / narrative |
-| Adversarial reviewer's minimum bundle | code + reported numbers | the `.py` file alone |
-| Order | Precondition (run first) | Postcondition (run after robustness battery) |
-| Verdict gate | **Both must pass.** | **Both must pass.** |
+Routine quality management is handled by four lightweight gates:
 
-The `validation` overlap is the most subtle boundary: the bug-review version
-checks "is the embargo wired in correctly?" (correctness), the
-experiment-review version checks "is N=8 walk-forward windows enough power
-to distinguish Sharpe 0.4 from 1.1?" (sufficiency). Genuine findings on
-both axes are flagged independently by both.
+| Gate | Question |
+|---|---|
+| Entry | What live question, explanation, or capability does this update? |
+| Design | What does success distinguish, and what does failure distinguish? |
+| Interpretation | What can be said directly, and what competing explanations remain? |
+| State update | What becomes active / resolved / rejected / merged / stale / parked? |
 
-The eighth (adversarial) reviewer in each layer is the same model as the
-specialists, but with a deliberately *different* (minimum) context bundle.
-The asymmetry is the mechanism — see the *References* section for the
-empirical basis.
+Heavy review still exists, but only for promotion moments: supported-claim
+promotion, external sharing, deployment recommendation, research-line closure,
+or major direction decisions.
 
 ## Repository layout
 
@@ -194,53 +155,25 @@ The installed Codex skills are exposed as `quant-research` and
 
 ## Usage flow
 
-A typical research session, end-to-end:
+A typical research session:
 
-1. **Bootstrap a project.** Tell Claude what you want to investigate. The
-   skill auto-activates; it runs `scripts/new_project.py` to scaffold the
-   folder, asks you to fill `hypotheses.md` and `literature/`.
-2. **Pick a Purpose and create the notebook for it.**
-   `scripts/new_purpose.py` generates
-   `purposes/pur_NNN_<purpose-slug>.py` from the template with the
-   Purpose header, the headline-figure plan, the reader takeaway, and the
-   first H block (H1) skeleton already in place — to be filled in before
-   any code runs.
-3. **Run H1 inside the notebook.** Cells run reactively in marimo. The
-   skill enforces "one fit / one evaluation per cell", H-suffixed variable
-   naming (`signal_h1`, `pnl_h1`), and the "self-contained communication
-   artifact" rule via per-section *what & why* cells and per-figure
-   *observation* cells.
-4. **Run the robustness battery for H1**: threshold sensitivity grid, fee
-   sensitivity sweep, walk-forward Sharpe distribution, block-bootstrap
-   CI, PSR / DSR, regime-conditional metrics.
-5. **Trigger bug-review for H1.** Either Claude detects a numeric red
-   flag and fires it automatically, or you fire it manually before
-   declaring H1's verdict. Six parallel sub-agents return severity-tagged
-   findings. `high` / `medium` block H1's verdict until resolved.
-6. **Trigger experiment-review for H1.** Eight parallel sub-agents return
-   severity-tagged findings on hypothesis falsifiability, scope,
-   methodology, validation sufficiency, claim calibration, literature
-   coverage, notebook narrative, and an adversarial cold-eye pass.
-7. **Write H1's why-why chain.** ≥ 3 consecutive levels into the per-H
-   interpretation cell, terminating at a mechanism-level cause (what the
-   strategy was actually exposed to / harvested / selected — not at a
-   metric, threshold, parameter, or `failure_mode` label). Required at
-   *every* per-H verdict, supported and rejected alike, before any
-   derived H can be admitted.
-8. **Aggregate H1's result.** Append a row to `results/results.parquet`
-   for H1 (one row per Hypothesis, not per notebook) under the shared
-   schema. The verdict and the chain's terminal answer are recorded in
-   `decisions.md` for this Purpose's entry, with H1 as a sub-bullet.
-9. **Did a derived H emerge?** If yes and the Purpose is unchanged,
-   continue inside the same notebook with a new `## H2` block citing a
-   specific terminal answer from H1's why-why chain (and repeat steps
-   3–8 for H2, then H3, …). If a new investigation reflects a new
-   Purpose, open the next notebook (`pur_<NNN+1>_*.py`).
-10. **Synthesise across H1…HN.** At the end of the notebook, write the
-    Purpose-level conclusion (which H worked, which didn't, what the
-    collective answer to the Purpose is) and the derived Purposes for
-    future notebooks — the skill rejects the habit of stopping after
-    one Hypothesis.
+1. **Bootstrap a project.** The skill scaffolds `research_state.md`,
+   `hypotheses.md`, `decisions.md`, literature files, notebooks, results, and
+   reproducibility files.
+2. **Choose mode.** Write R&D or Pure Research in `research_state.md`.
+3. **Orient before testing.** Read prior work and the user's prior decisions.
+4. **Admit only useful hypotheses.** Add a hypothesis only if success and
+   failure both update a named state row.
+5. **Run the smallest discriminating trial.** Keep data splits and sanity checks
+   visible.
+6. **Analyze misses deeply.** Failed and ambiguous results must weaken, split,
+   or retire explanations rather than trigger a pile of new variants.
+7. **Update state before adding work.** Update `research_state.md`,
+   `hypotheses.md`, and `decisions.md`; merge or retire rows before adding new
+   ones.
+8. **Promote only when warranted.** Run robustness / bug-review /
+   `experiment-review` when a result will become a supported claim or drive a
+   high-impact decision.
 
 ## Bundled helper scripts
 
@@ -291,19 +224,47 @@ The skill leans on a small number of well-known references:
 
 ## Status
 
-- Version 0.15.0
+- Version 0.16.0
 - Two skills, two review layers, both required as co-gate.
 - Notebook unit is one Purpose (open-ended investigation); per-Hypothesis
   verdict gates and result rows.
 - R-side R&D protocol: Stage 0 (pre-hypothesis exploration), Step 1.5
-  (hypothesis generation pathways), why-why depth gate at every per-H
-  verdict (every level observation-pinned to a cited table / value;
-  prose plausibility ladders are rejected and the chain stops at the
-  first uncomputable level), cross-H synthesis, exhaustion trigger,
+  (hypothesis generation pathways), why-why result-analysis gate before
+  every per-H verdict (rooted in observed result pattern; every level
+  observation-pinned to a cited table / value and assigned a diagnostic
+  role; prose plausibility ladders are rejected and the chain stops at
+  the first uncomputable level), cross-H synthesis, exhaustion trigger,
   novelty / knowledge-advance gate.
 - Adversarial-reviewer mechanism backed by Song (2026); see *References*.
 
 ### Changelog
+
+**0.17.0** — Major research-state redesign.
+
+- Adds explicit R&D and Pure Research modes. R&D now starts from technology
+  decomposition, maturity, and capability exit criteria; Pure Research now
+  starts from prior work, competing explanations, failed-trial analysis, and
+  state updates rather than fast conclusions.
+- Replaces routine heavy hypothesis review with four lightweight gates:
+  entry, design, interpretation, and state update. Heavy bug-review /
+  robustness / experiment-review is reserved for promotion, external sharing,
+  deployment decisions, research-line closure, and major direction changes.
+- Adds `research_state.md` as the compact current map of active questions,
+  explanations, R&D capabilities, claims, and retired / merged / stale rows.
+  Hypotheses must update a named state row under both success and failure.
+
+**0.16.0** — Reframes the why-why chain as **pre-verdict result
+analysis** (F29), not a post-verdict explanation. F28 made chain levels
+stand on computed observations, but still allowed the chain root to be
+"why was this supported/rejected?", which lets an agent write a
+data-backed story after the label is chosen. F29 moves the chain before
+final `verdict` / `failure_mode` writing, forbids verdict-rooted chain
+questions, and requires each cited observation to state its diagnostic
+role: which question it answers and which superficial reading it rules
+in, rules out, or leaves unresolved. The chain may downgrade, qualify,
+or block an apparent `supported` result, or move a superficial rejection
+to `partial` / `parked` when the data shows underpower or design limits
+rather than falsification.
 
 **0.15.0** — Adds the **why-why observation-grounding rule** (F28),
 patching a gap left by 0.14.0's F27. F27 added the chain requirement
