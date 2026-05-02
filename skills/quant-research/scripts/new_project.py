@@ -6,6 +6,7 @@ Usage:
 Creates the standard project layout under notebooks/<project-name>/:
 
     README.md
+    research_state.md
     hypotheses.md
     decisions.md
     literature/
@@ -64,6 +65,7 @@ def init_project(
     )
     (project_dir / "README.md").write_text(readme, encoding="utf-8")
 
+    shutil.copy(ASSETS_DIR / "research_state.md.template", project_dir / "research_state.md")
     shutil.copy(ASSETS_DIR / "hypotheses.md.template", project_dir / "hypotheses.md")
     shutil.copy(ASSETS_DIR / "decisions.md.template", project_dir / "decisions.md")
     shutil.copy(ASSETS_DIR / "papers.md.template", project_dir / "literature" / "papers.md")
@@ -105,15 +107,16 @@ def main() -> None:
     project_dir = init_project(args.name, root=Path(args.root), start=args.start, end=args.end)
     print(f"created: {project_dir}")
     print("next steps:")
-    print(f"  1. Edit {project_dir}/README.md and fill in question, hypotheses, acceptance.")
-    print(f"  2. Add 5-10 prior papers to {project_dir}/literature/papers.md.")
+    print(f"  1. Edit {project_dir}/README.md and choose R&D or Pure Research mode.")
+    print(f"  2. Fill {project_dir}/research_state.md before adding hypotheses.")
+    print(f"  3. Add prior work to {project_dir}/literature/papers.md.")
     print(
-        f"  3. State differentiation against prior work in "
+        f"  4. State differentiation against prior work in "
         f"{project_dir}/literature/differentiation.md."
     )
-    print(f"  4. List H1, H2, ... in {project_dir}/hypotheses.md.")
+    print(f"  5. Add only entry-gate-passing hypotheses to {project_dir}/hypotheses.md.")
     print(
-        f"  5. python new_purpose.py --project {args.name} --slug <purpose> --hyp H1"
+        f"  6. python new_purpose.py --project {args.name} --slug <purpose> --hyp H1"
     )
 
 
