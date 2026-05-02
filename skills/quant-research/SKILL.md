@@ -1,6 +1,14 @@
 ---
 name: quant-research
-description: Use for quantitative-finance, algorithmic-trading, or financial time-series research. Supports two modes: R&D for establishing a technology by decomposing it into small technical capabilities with explicit maturity/exit criteria, and Pure Research for slow, literature-grounded research that prioritizes research-state updates, failure analysis, competing explanations, and reproducibility over fast conclusions. Use for alpha factors, backtests, return prediction, regime detection, execution, portfolio construction, and financial ML.
+description: >-
+  Use for quantitative-finance, algorithmic-trading, or financial time-series
+  research. Supports two modes: R&D for establishing a technology by decomposing
+  it into small technical capabilities with explicit maturity/exit criteria, and
+  Pure Research for slow, literature-grounded research that prioritizes
+  research-state updates, failure analysis, competing explanations, and
+  reproducibility over fast conclusions. Use for alpha factors, backtests,
+  return prediction, regime detection, execution, portfolio construction, and
+  financial ML.
 ---
 
 # Quant Research
