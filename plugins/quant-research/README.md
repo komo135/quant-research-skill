@@ -106,16 +106,11 @@ or major direction decisions.
 
 ```
 quant-research-skill/
-├── .agents/plugins/
-│   └── marketplace.json       # Codex marketplace entry
 ├── .claude-plugin/
 │   ├── plugin.json
 │   └── marketplace.json
 ├── .codex-plugin/
-│   └── plugin.json            # root manifest kept for local development
-├── plugins/quant-research/    # Codex marketplace plugin root
-│   ├── .codex-plugin/plugin.json
-│   └── skills/
+│   └── plugin.json
 ├── skills/
 │   ├── quant-research/
 │   │   ├── SKILL.md           # entry point — research lifecycle
@@ -148,18 +143,12 @@ After installation the skills are referenced as
 claude --plugin-dir /path/to/quant-research-skill
 ```
 
-### Codex: from GitHub
+### Codex: local plugin
 
-```bash
-codex plugin marketplace add https://github.com/komo135/quant-research-skill
-```
-
-Enable the installed plugin in `~/.codex/config.toml`:
-
-```toml
-[plugins."quant-research@quant-research-skill"]
-enabled = true
-```
+This repository includes a Codex manifest at `.codex-plugin/plugin.json`.
+For local Codex installation, place the checkout at `~/plugins/quant-research`,
+add a local marketplace root to `~/.codex/config.toml`, and enable
+`quant-research@local`.
 
 The installed Codex skills are exposed as `quant-research` and
 `experiment-review`.
