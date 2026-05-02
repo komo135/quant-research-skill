@@ -58,8 +58,10 @@ testing a component after its exit criteria have fired.
 ## Pure Research Mode
 
 Pure Research mode exists to reduce ignorance, not to answer quickly.
-The first session usually should not end with a supported conclusion.
-It should end with a better research state.
+The first session must not end with a `supported` conclusion unless the task
+is explicitly a bounded replication / verification of an already-defined claim,
+all required evidence is already present, and the promotion gates are run. It
+should normally end with a better research state.
 
 Required sequence:
 
@@ -74,6 +76,9 @@ Required sequence:
 The normal outcome of a failed hypothesis is a better explanation set, not a
 new hypothesis pile. Read `references/pure_research_protocol.md` before
 starting, and `references/failure_analysis.md` before interpreting a miss.
+If the user asks for a same-day conclusion, explicitly reframe the deliverable:
+the first-session deliverable is a research-state update, not a `supported`
+claim. Do not convert time pressure into weaker evidence standards.
 
 ## Lightweight Hypothesis Quality Management
 
@@ -99,8 +104,12 @@ Heavy review is reserved for promotion moments:
 - making a large project-direction decision
 
 At those moments, run the relevant bug-review / robustness /
-`experiment-review` gates. During ordinary exploration, do not bury the
-research under review bureaucracy that does not change the state.
+`experiment-review` gates. For `supported` promotion, "relevant" means all
+mandatory promotion gates: `bug_review` first, then the robustness battery,
+then `experiment-review`. Do not skip any layer because headline metrics are
+good or because the user asks to write the result as supported. During ordinary
+exploration, do not bury the research under review bureaucracy that does not
+change the state.
 
 ## Required Ledgers
 
@@ -132,6 +141,10 @@ merged, or retired.
   Mark it `rejected`, `merged`, `stale`, or `parked` when the state warrants it.
 - Do not continue after the consumer can decide, the capability exit criteria
   fired, or the next discriminating test belongs to a different question.
+- A whole R&D technology cannot be marked `supported` because an integrated
+  backtest is positive. It may be promoted only when all critical upstream
+  capabilities have fired their exit criteria, the integrated test was
+  unblocked before execution, and the mandatory promotion gates pass.
 
 ## References
 

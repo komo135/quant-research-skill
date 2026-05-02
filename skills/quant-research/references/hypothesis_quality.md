@@ -64,6 +64,12 @@ Run full bug-review / robustness / experiment-review only when:
 - closing a research line or making a major direction change
 - a numeric red flag suggests the result may be too good or contaminated
 
+Good headline metrics are never sufficient for promotion. Metrics can make a
+claim eligible for promotion review, but they do not themselves establish
+`supported`. Missing competing explanations, missing serious alternatives, or
+missing promotion gates block `supported` even when Sharpe, walk-forward, and
+fee sensitivity look favorable.
+
 Routine exploratory trials use the four gates above. Over-reviewing every
 trial creates a false sense of rigor while letting bad state accumulate.
 
@@ -73,6 +79,19 @@ trial creates a false sense of rigor while letting bad state accumulate.
   condition exists.
 - Do not create H2 when H1 should become a robustness sweep, merged variant, or
   stale row.
+- Do not create a new hypothesis by relaxing a failed threshold, lowering fees,
+  narrowing to a favorable regime, or changing a parameter after seeing the
+  result. First decide whether the change is a robustness sweep, a merged
+  variant, a stale row, or a genuinely new research question with an entry-gate
+  answer under both success and failure.
+- If the proposed hypothesis differs only by a parameter value from an active
+  or retired hypothesis, the default action is `merged`, not `planned`. A new
+  row requires naming the distinct research-state row that success and failure
+  would update.
+- In R&D mode, a large benchmark or backtest is not a hypothesis entry gate by
+  itself. It must name the specific capability row it updates. If success would
+  tempt promotion of the whole technology while failure would only lead to
+  parameter / model swapping, the test is too broad and must be decomposed.
 - Do not write decisions that merely narrate activity. `decisions.md` records
   durable state transitions and commitments.
 - Do not let `hypotheses.md` become a wish list. It is a queue of tests that

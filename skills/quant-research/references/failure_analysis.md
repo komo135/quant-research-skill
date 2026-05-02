@@ -65,3 +65,20 @@ Allowed ending shape:
 - "E2 is weaker because observation O contradicts prediction P. E1 and E3
   remain active. The next discriminating test is T because it separates E1 from
   E3 on observable axis A."
+
+## Cost / fee decomposition
+
+Do not write "cost killed the signal" as a terminal explanation. Decompose cost
+into observable sub-claims:
+
+- gross edge magnitude before cost
+- turnover and holding-period distribution
+- break-even fee / slippage
+- whether cost impact is uniform or regime-dependent
+- whether the favorable regime can be identified ex ante
+- whether the result changes because the execution assumption changed or
+  because the market effect is conditional
+
+A lower-fee rerun is a sensitivity check for an existing explanation, not a new
+hypothesis, unless it corresponds to a real execution venue or durable research
+question.

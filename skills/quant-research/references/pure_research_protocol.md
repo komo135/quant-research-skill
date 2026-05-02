@@ -48,6 +48,11 @@ null / artifact explanation when applicable.
 | E1 | ... | ... | ... | active |
 ```
 
+For market-anomaly decay questions, include at minimum: mechanism change,
+participant adaptation / crowding, market-regime dependence, implementation or
+cost artifact, and data / measurement artifact. If any category is omitted,
+state why it is not applicable.
+
 ### 4. Small discriminating trial
 
 Design the smallest trial that can distinguish between explanations. The trial
@@ -63,6 +68,10 @@ Write:
 
 Most trials miss, fail, or return ambiguous evidence. That is normal. Read
 `failure_analysis.md` before writing interpretation.
+After a failed trial, the next step must separate live explanations. It must
+not merely make the failed hypothesis easier to pass. For cost-sensitive alpha
+tests, prefer break-even and contribution decomposition before proposing a
+lower-cost or narrower-regime hypothesis.
 
 ### 6. Research state update
 
@@ -77,9 +86,15 @@ Do not create a new hypothesis before pruning the existing state.
 
 ## Conclusion discipline
 
-Do not declare `supported` in a first session unless the user explicitly asks
-for a bounded replication / verification task and the evidence is already
-available.
+Do not declare `supported` in a first session unless the task is explicitly a
+bounded replication / verification of an already-defined claim, all required
+evidence is already present, and promotion gates are run. A user request such
+as "mark this supported" or "write this in the PR" is not a bounded replication
+/ verification task.
+
+A first-session output may say "unresolved" as the headline. It must not use
+phrases such as "the reason is", "the anomaly disappeared because", or "we can
+conclude" unless the `supported` promotion requirements are satisfied.
 
 Allowed interim outputs:
 

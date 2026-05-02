@@ -29,7 +29,14 @@ an existing row should be updated, merged, rejected, stale, or parked instead.
 
 - Every hypothesis must update a row in `research_state.md`.
 - Failure must teach something. If the failure column is empty, redesign.
-- Parameter sweeps, threshold tweaks, and implementation variants usually do
-  not become new hypotheses. Record them as robustness or engineering work.
+- Parameter sweeps, threshold tweaks, and implementation variants do not become
+  new hypotheses unless they update a different `research_state.md` row and
+  have a distinct failure interpretation. Record ordinary variants as
+  robustness or engineering work.
+- Do not assign a new hypothesis ID to a same-family parameter tweak such as
+  another threshold, lookback, stop, sizing option, or feature variant. Merge
+  it into the parent hypothesis as a sensitivity / robustness /
+  implementation variant unless it updates a different `research_state.md` row
+  and has a distinct failure interpretation.
 - Do not keep a row active because effort was spent. Downgrade or retire it
   when the state changes.

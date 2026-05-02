@@ -23,6 +23,39 @@ Capability size rule: one capability should be small enough that one test can
 change its maturity or split it. If a capability requires several unrelated
 tests, split it before testing.
 
+## First-session R&D output
+
+In the first session of an R&D request, before any implementation or benchmark,
+record:
+
+- explicit mode choice
+- target technology in one sentence
+- intended use
+- capability map
+- maturity level for every capability
+- smallest blocking capability
+- one test design for that capability
+- ledger rows that mark whole-technology benchmarks as blocked until upstream
+  exits fire
+
+The first session must not run an integrated benchmark, large backtest, or
+whole-technology promotion unless this map already exists and shows the
+benchmark capability is unblocked.
+
+For financial ML / return-prediction R&D, do not accept a capability map unless
+it separates at least:
+
+- prediction task definition
+- data availability and point-in-time alignment
+- feature or embedding generation
+- leakage controls
+- baseline model
+- validation protocol
+- economic / backtest integration
+- robustness / promotion gate
+
+A row such as "use model X to predict returns" is too large and must be split.
+
 ## Project-local maturity scale
 
 This is adapted from TRL thinking, but tuned for agent-run research.

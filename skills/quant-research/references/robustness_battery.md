@@ -121,10 +121,15 @@ Robustness gates:
 ```
 
 If any gate fails, the conclusion is **preliminary screening**, not a completed result.
+Passing a subset of these checks is not a supported result. For example,
+positive walk-forward rate plus favorable fee sensitivity is still preliminary
+unless all required robustness checks pass and both review layers are clean.
 
 ## When a check fails
 
-Each failure suggests a new hypothesis:
+Each failure suggests a state update first. It becomes a new hypothesis only if
+it passes `hypothesis_quality.md`'s entry gate; otherwise it is a robustness
+finding, merged variant, rejected direction, stale row, or parked dependency.
 
 | Failed check | Direction for the next hypothesis |
 |---|---|
@@ -135,4 +140,6 @@ Each failure suggests a new hypothesis:
 | DSR < 0.95 | Too many hyperparameter trials; redesign and reduce trials |
 | Only one regime works | Adopt a conditional strategy |
 
-Log the failure in `decisions.md` and add the next hypothesis to `hypotheses.md`.
+Log durable state transitions in `decisions.md`. Add a next hypothesis to
+`hypotheses.md` only when success and failure would update a distinct
+`research_state.md` row.

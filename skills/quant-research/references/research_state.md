@@ -45,6 +45,9 @@ emerges.
 - `stale`: no longer valid after later evidence or scope change
 - `parked`: deferred with a named unblock condition
 - `blocked`: cannot progress until a dependency changes
+- `supported`: claim has passed the required promotion gate; use only in
+  Claims, never for an entire technology map row unless the R&D promotion rule
+  in `SKILL.md` has passed
 
 ## Update rules
 
@@ -56,3 +59,10 @@ emerges.
   `stale`.
 - Promotion to `supported` belongs in `Claims` and requires the promotion gate
   from `hypothesis_quality.md`.
+- Before accepting a new hypothesis ID, identify the parent question /
+  explanation / capability. If the candidate is only a parameter or
+  implementation variant of that parent, update the parent row's next
+  discriminating step instead of adding a new active row.
+- If the workspace is read-only or the ledger files do not yet exist, produce a
+  proposed ledger update block in the response with exact rows that would be
+  written. Mark it as `proposed`, not as completed state.
