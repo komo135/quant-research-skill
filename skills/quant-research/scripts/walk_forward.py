@@ -1,79 +1,136 @@
-"""walk_forward.py — Compute Sharpe (or any metric) distribution over rolling windows.
+"""walk_forward.py — Anchored / sliding walk-forward validation with refit.
+
+True walk-forward methodology: train the model on a window, test on the
+following window, slide forward, repeat. Per `references/shared/time_series_validation.md`.
+
+Two modes:
+- **anchored**: train window starts at t0 and grows ([t0, t_train_end])
+- **sliding**: train window has fixed length, sliding through time
+
+Each iteration:
+    train: data[train_start : train_end]
+    embargo: drop H bars between train_end and test_start (per AFML)
+    test:  data[train_end + H : test_end]
+
+Per-iteration: refit the model on train, evaluate on test, record the
+metric. The output is a per-iteration metric series + summary statistics.
+
+This differs from `rolling_segment_sharpe.py` which simply evaluates a
+fixed strategy over contiguous segments (no train/test split, no refit).
 
 Usage:
-    from walk_forward import walk_forward_sharpe
+    from walk_forward import walk_forward
 
-    stats, per_window = walk_forward_sharpe(
-        run_backtest=lambda df: vbt.Portfolio.from_signals(
-            df["close"], df["entry"], df["exit"]
-        ).sharpe_ratio(),
+    results = walk_forward(
+        fit_predict=lambda train_df, test_df: ...,  # returns metric per fold
         data=panel_pd,
-        window="3MS",
-        min_rows=1000,
+        train_size=252,        # 1 year of daily bars
+        test_size=63,          # 3 months
+        step=21,               # advance by 1 month each iteration
+        embargo=12,            # 12-bar embargo between train end and test start
+        mode="sliding",
     )
-    print(stats)        # mean, std, p05, p50, p95, pct_positive
-    print(per_window)   # per-window values
 """
 
 from __future__ import annotations
 
-from typing import Callable
+from typing import Callable, Literal
 
 import numpy as np
 import pandas as pd
 
 
-def walk_forward_sharpe(
-    run_backtest: Callable[[pd.DataFrame], float],
+def walk_forward(
+    fit_predict: Callable[[pd.DataFrame, pd.DataFrame], float],
     data: pd.DataFrame,
-    window: str = "3MS",
-    min_rows: int = 1000,
-) -> tuple[dict[str, float], pd.DataFrame]:
-    """Apply run_backtest to each rolling window of `data` and aggregate.
+    *,
+    train_size: int,
+    test_size: int,
+    step: int,
+    embargo: int = 0,
+    mode: Literal["anchored", "sliding"] = "sliding",
+    min_train: int | None = None,
+) -> dict[str, object]:
+    """Run walk-forward validation.
 
     Args:
-        run_backtest: callable returning a scalar metric per window.
-        data: pandas DataFrame indexed by time.
-        window: pandas frequency string (e.g. "3MS" = 3-month start).
-        min_rows: skip windows shorter than this.
+        fit_predict: callable (train_df, test_df) -> metric (scalar). Should
+            internally fit the model on train_df, evaluate on test_df.
+        data: pandas DataFrame indexed by integer position OR DatetimeIndex.
+        train_size: training window size in rows. For anchored mode this is
+            the INITIAL train size; the window grows.
+        test_size: test window size in rows.
+        step: how many rows to advance between iterations (typically equal to
+            test_size for non-overlapping test windows).
+        embargo: bars dropped between train end and test start. Per AFML, set
+            to ≥ target horizon to prevent label leakage.
+        mode: "anchored" (train window grows from t0) or "sliding" (fixed
+            train window).
+        min_train: minimum train size to actually fit (default: train_size).
 
     Returns:
-        stats: dict with mean / std / p05 / p50 / p95 / pct_positive / n_windows / worst.
-        per_window: DataFrame with one row per window.
+        dict with:
+            iterations: list of dicts {iter, train_start, train_end, test_start, test_end, metric}
+            stats: dict with mean / std / p05 / p50 / p95 / pct_positive / n_iters / worst
     """
-    assert isinstance(data.index, pd.DatetimeIndex), "data must be time-indexed"
-    starts = pd.date_range(
-        start=data.index.min().normalize(),
-        end=data.index.max().normalize(),
-        freq=window,
-        tz=data.index.tz,
-    )
+    n = len(data)
+    if min_train is None:
+        min_train = train_size
 
-    rows = []
-    for s, e in zip(starts[:-1], starts[1:]):
-        sub = data[(data.index >= s) & (data.index < e)]
-        if len(sub) < min_rows:
+    iterations: list[dict] = []
+    iter_num = 0
+
+    # First iteration: train spans rows [0, train_size), test spans [train_size + embargo, ...)
+    train_start = 0
+    train_end = train_size
+    while True:
+        test_start = train_end + embargo
+        test_end = test_start + test_size
+        if test_end > n:
+            break
+        if (train_end - train_start) < min_train:
+            # Advance and try again
+            train_start = train_start + step if mode == "sliding" else train_start
+            train_end += step
             continue
+
+        train_df = data.iloc[train_start:train_end]
+        test_df = data.iloc[test_start:test_end]
         try:
-            metric = float(run_backtest(sub))
+            metric = float(fit_predict(train_df, test_df))
         except Exception as exc:  # noqa: BLE001
             metric = float("nan")
-            print(f"warning: window {s.date()} failed: {exc}")
-        rows.append({"window_start": s.date(), "n_rows": len(sub), "metric": metric})
+            print(f"warning: iteration {iter_num} failed: {exc}")
 
-    per_window = pd.DataFrame(rows)
-    if per_window.empty or per_window["metric"].isna().all():
-        return {"n_windows": 0}, per_window
+        iterations.append({
+            "iter": iter_num,
+            "train_start": train_start,
+            "train_end": train_end,
+            "test_start": test_start,
+            "test_end": test_end,
+            "n_train": train_end - train_start,
+            "n_test": test_end - test_start,
+            "metric": metric,
+        })
 
-    arr = per_window["metric"].dropna().to_numpy()
+        iter_num += 1
+        # Advance windows
+        if mode == "sliding":
+            train_start += step
+        train_end += step
+
+    if not iterations:
+        return {"iterations": [], "stats": {"n_iters": 0}}
+
+    arr = np.array([it["metric"] for it in iterations if not np.isnan(it["metric"])])
     stats = {
-        "n_windows":    int(len(arr)),
-        "mean":         round(float(arr.mean()), 3),
-        "std":          round(float(arr.std(ddof=1)) if len(arr) > 1 else 0.0, 3),
-        "p05":          round(float(np.percentile(arr, 5)), 3),
-        "p50":          round(float(np.percentile(arr, 50)), 3),
-        "p95":          round(float(np.percentile(arr, 95)), 3),
-        "pct_positive": round(float((arr > 0).mean()), 3),
-        "worst":        round(float(arr.min()), 3),
+        "n_iters":      len(arr),
+        "mean":         round(float(arr.mean()), 4) if len(arr) else float("nan"),
+        "std":          round(float(arr.std(ddof=1)), 4) if len(arr) > 1 else 0.0,
+        "p05":          round(float(np.percentile(arr, 5)), 4) if len(arr) else float("nan"),
+        "p50":          round(float(np.percentile(arr, 50)), 4) if len(arr) else float("nan"),
+        "p95":          round(float(np.percentile(arr, 95)), 4) if len(arr) else float("nan"),
+        "pct_positive": round(float((arr > 0).mean()), 4) if len(arr) else float("nan"),
+        "worst":        round(float(arr.min()), 4) if len(arr) else float("nan"),
     }
-    return stats, per_window
+    return {"iterations": iterations, "stats": stats}

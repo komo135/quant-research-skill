@@ -1,123 +1,199 @@
-"""new_project.py — Initialize a new research project folder.
+"""new_project.py — Initialize a new quant-research project folder, mode-aware.
+
+Per CHARTER C1 / C2 / C3 / D-2 (`.rebuild/CHARTER.md`): R&D and Pure Research
+are separate disciplines with different primary state objects. This script
+scaffolds the correct artifacts based on --mode.
 
 Usage:
-    python new_project.py <project-name> [--root notebooks/] [--start YYYY-MM-DD] [--end YYYY-MM-DD]
+    python new_project.py <name> --mode rd
+    python new_project.py <name> --mode pure-research
+    python new_project.py <name> --mode rd --root projects/
 
-Creates the standard project layout under notebooks/<project-name>/:
+What gets created:
+    Common (both modes):
+        README.md                          (mode-specific from assets/<mode>/README.md.template)
+        decisions.md                       (from assets/shared/decisions.md.template)
+        literature/papers.md               (from assets/shared/papers.md.template)
+        literature/differentiation.md      (from assets/shared/differentiation.md.template)
+        purposes/INDEX.md                  (from assets/shared/INDEX.md.template)
+        prereg/                            (empty; populated by prereg_freeze.py)
+        results/figures/                   (empty)
+        results/intermediate/              (empty)
+        reproducibility/data_hashes.txt    (header-only)
+        reproducibility/uv.lock            (placeholder; user runs `uv lock`)
+        reproducibility/seed.txt           (default seed 42)
 
-    README.md
-    research_state.md
-    hypotheses.md
-    decisions.md
-    literature/
-        papers.md
-        differentiation.md
-    purposes/
-        INDEX.md
-    results/
-        figures/
-        intermediate/
-    reproducibility/
-        env.lock
-        data_hashes.txt
-        seed.txt
+    R&D mode adds:
+        charter.md                         (from assets/rd/charter.md.template)
+        capability_map.md                  (from assets/rd/capability_map.md.template)
 
-Templates are copied from the plugin's assets/ directory.
+    Pure Research mode adds:
+        prfaq.md                           (from assets/pure_research/prfaq.md.template)
+        explanation_ledger.md              (from assets/pure_research/explanation_ledger.md.template)
+        imrad_draft.md                     (from assets/pure_research/imrad_draft.md.template, started early)
+
+Exit codes:
+    0: project created
+    1: project already exists at target path
+    2: missing template asset
 """
 
 from __future__ import annotations
 
 import argparse
 import shutil
-from datetime import date
+import sys
 from pathlib import Path
 
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 
 
-def init_project(
-    name: str,
-    root: Path = Path("notebooks"),
-    start: str | None = None,
-    end: str | None = None,
-) -> Path:
-    """Create a new research project folder with the standard layout."""
+COMMON_FILES = [
+    # (source_template_name, dest_relative_path)
+    # Templates are looked up in shared/ first, then root assets/ for backward compat.
+    ("decisions.md.template", "decisions.md"),
+    ("papers.md.template", "literature/papers.md"),
+    ("differentiation.md.template", "literature/differentiation.md"),
+    ("INDEX.md.template", "purposes/INDEX.md"),
+]
+
+RD_FILES = [
+    ("charter.md.template", "charter.md"),
+    ("capability_map.md.template", "capability_map.md"),
+    ("README.md.template", "README.md"),
+]
+
+PR_FILES = [
+    ("prfaq.md.template", "prfaq.md"),
+    ("explanation_ledger.md.template", "explanation_ledger.md"),
+    ("imrad_draft.md.template", "imrad_draft.md"),
+    ("README.md.template", "README.md"),
+]
+
+
+def find_template(name: str, mode_subdir: str | None) -> Path:
+    """Find a template under assets/<mode_subdir>/ or assets/shared/ or assets/ root."""
+    candidates = []
+    if mode_subdir:
+        candidates.append(ASSETS_DIR / mode_subdir / name)
+    candidates.extend([
+        ASSETS_DIR / "shared" / name,
+        ASSETS_DIR / name,  # legacy path
+    ])
+    for c in candidates:
+        if c.exists():
+            return c
+    raise FileNotFoundError(f"template not found in any of: {candidates}")
+
+
+def init_project(name: str, root: Path, mode: str) -> Path:
+    if mode not in ("rd", "pure-research"):
+        raise ValueError(f"unknown mode: {mode}")
+
     project_dir = root / name
     if project_dir.exists():
-        raise FileExistsError(f"Project already exists: {project_dir}")
+        raise FileExistsError(f"project already exists: {project_dir}")
 
+    # Directory layout
     for sub in [
         "literature",
         "purposes",
+        "prereg",
         "results/figures",
         "results/intermediate",
         "reproducibility",
     ]:
         (project_dir / sub).mkdir(parents=True, exist_ok=True)
 
-    # Render README from template
-    readme_template = (ASSETS_DIR / "README.md.template").read_text(encoding="utf-8")
-    readme = (
-        readme_template
-        .replace("{{PROJECT_NAME}}", name)
-        .replace("{{START}}", start or "TBD")
-        .replace("{{END}}", end or "TBD")
-    )
-    (project_dir / "README.md").write_text(readme, encoding="utf-8")
-
-    shutil.copy(ASSETS_DIR / "research_state.md.template", project_dir / "research_state.md")
-    shutil.copy(ASSETS_DIR / "hypotheses.md.template", project_dir / "hypotheses.md")
-    shutil.copy(ASSETS_DIR / "decisions.md.template", project_dir / "decisions.md")
-    shutil.copy(ASSETS_DIR / "papers.md.template", project_dir / "literature" / "papers.md")
-    shutil.copy(
-        ASSETS_DIR / "differentiation.md.template",
-        project_dir / "literature" / "differentiation.md",
-    )
-    shutil.copy(ASSETS_DIR / "INDEX.md.template", project_dir / "purposes" / "INDEX.md")
-
-    # Reproducibility files
-    (project_dir / "reproducibility" / "env.lock").write_text(
-        "# dependency lock content here\n", encoding="utf-8"
-    )
-    (project_dir / "reproducibility" / "data_hashes.txt").write_text(
-        "# format: <relative path>  <sha256>\n", encoding="utf-8"
-    )
-    (project_dir / "reproducibility" / "seed.txt").write_text("42\n", encoding="utf-8")
-
+    # .gitkeep for empty dirs
     for keep in [
+        "prereg/.gitkeep",
         "results/.gitkeep",
         "results/figures/.gitkeep",
         "results/intermediate/.gitkeep",
     ]:
         (project_dir / keep).touch()
 
+    # Common templates (from shared/)
+    for tmpl_name, dest_rel in COMMON_FILES:
+        src = find_template(tmpl_name, "shared")
+        dest = project_dir / dest_rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(src, dest)
+
+    # Mode-specific templates
+    mode_subdir = "rd" if mode == "rd" else "pure_research"
+    mode_files = RD_FILES if mode == "rd" else PR_FILES
+    for tmpl_name, dest_rel in mode_files:
+        src = find_template(tmpl_name, mode_subdir)
+        dest = project_dir / dest_rel
+        # Substitute project name in README
+        if dest_rel == "README.md":
+            content = src.read_text(encoding="utf-8").replace("<REPLACE: project name>", name)
+            dest.write_text(content, encoding="utf-8")
+        else:
+            shutil.copy(src, dest)
+
+    # Reproducibility scaffolding
+    (project_dir / "reproducibility" / "data_hashes.txt").write_text(
+        "# format: <relative path>  <sha256>\n", encoding="utf-8"
+    )
+    (project_dir / "reproducibility" / "shared_pins.txt").write_text(
+        "# format: <shared module path>  <commit hash>\n", encoding="utf-8"
+    )
+    (project_dir / "reproducibility" / "uv.lock").write_text(
+        "# placeholder — run `uv lock` from the project root to populate\n", encoding="utf-8"
+    )
+    (project_dir / "reproducibility" / "seed.txt").write_text(
+        f"# format: <component>  <seed>\nproject_default_seed  42\n", encoding="utf-8"
+    )
+
     return project_dir
 
 
+def print_next_steps(project_dir: Path, mode: str) -> None:
+    print(f"\n✅ Created: {project_dir} (mode: {mode})")
+    print()
+    print("Next steps:")
+    if mode == "rd":
+        print(f"  1. Edit {project_dir}/charter.md — answer Heilmeier 8 questions")
+        print(f"     OR run: python scripts/charter_interview.py --output {project_dir}/charter.md")
+        print(f"  2. Freeze: python scripts/prereg_freeze.py --type charter --path {project_dir}/charter.md")
+        print(f"  3. Edit {project_dir}/capability_map.md — Layer 1 (Core Technologies)")
+        print(f"     Apply operational filter per references/rd/core_technologies.md")
+        print(f"  4. Verify Layer 1 closure, then add Layer 2 capabilities")
+        print(f"  5. Run: python scripts/validate_ledger.py --project-dir {project_dir}")
+    else:
+        print(f"  1. Edit {project_dir}/prfaq.md — write the press release + ≥10 FAQ entries")
+        print(f"  2. Freeze: python scripts/prereg_freeze.py --type prfaq --path {project_dir}/prfaq.md")
+        print(f"  3. Run targeted literature: python scripts/lit_fetch.py --project-dir {project_dir} --query '<your query>'")
+        print(f"  4. Edit {project_dir}/prereg/PR_001.md — pre-register first trial")
+        print(f"  5. Freeze: python scripts/prereg_freeze.py --type prereg --id PR_001 --path {project_dir}/prereg/PR_001.md")
+        print(f"  6. Edit {project_dir}/explanation_ledger.md — add Q1 + ≥2 competing E + null")
+        print(f"  7. Run: python scripts/new_trial.py --project {project_dir} --mode pure-research --prereg-id PR_001")
+    print()
+    print("Reminder: per SKILL.md § Initial-day prohibitions, no implementation / trial")
+    print("execution on day 1. Setup, charter / PR-FAQ, and pre-registration only.")
+
+
 def main() -> None:
-    p = argparse.ArgumentParser(
-        description="Initialize a new quant-research project folder.",
-    )
-    p.add_argument("name", help="project name (used directly as the folder name)")
-    p.add_argument("--root", default="notebooks", help="root directory (default: notebooks/)")
-    p.add_argument("--start", default=None, help="data range start (YYYY-MM-DD)")
-    p.add_argument("--end", default=str(date.today()), help="data range end (default: today)")
+    p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    p.add_argument("name", help="project name (folder name)")
+    p.add_argument("--mode", required=True, choices=["rd", "pure-research"])
+    p.add_argument("--root", default="projects", type=Path,
+                   help="root directory (default: projects/)")
     args = p.parse_args()
 
-    project_dir = init_project(args.name, root=Path(args.root), start=args.start, end=args.end)
-    print(f"created: {project_dir}")
-    print("next steps:")
-    print(f"  1. Edit {project_dir}/README.md and choose R&D or Pure Research mode.")
-    print(f"  2. Fill {project_dir}/research_state.md before adding hypotheses.")
-    print(f"  3. Add prior work to {project_dir}/literature/papers.md.")
-    print(
-        f"  4. State differentiation against prior work in "
-        f"{project_dir}/literature/differentiation.md."
-    )
-    print(f"  5. Add only entry-gate-passing hypotheses to {project_dir}/hypotheses.md.")
-    print(
-        f"  6. python new_purpose.py --project {args.name} --slug <trial> --hyp H1"
-    )
+    try:
+        project_dir = init_project(args.name, args.root, args.mode)
+    except FileExistsError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
+    except FileNotFoundError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(2)
+
+    print_next_steps(project_dir, args.mode)
 
 
 if __name__ == "__main__":

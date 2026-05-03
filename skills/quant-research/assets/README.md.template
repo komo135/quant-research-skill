@@ -1,44 +1,10 @@
-# {{PROJECT_NAME}}
+# README.md.template (RETIRED at this location)
 
-## Research mode
+Replaced by mode-specific README templates per CHARTER C1:
 
-[R&D / Pure Research. State the reason in one sentence.]
+- R&D: `assets/rd/README.md.template`
+- Pure Research: `assets/pure_research/README.md.template`
 
-## Research goal
+`scripts/new_project.py --mode rd|pure-research` selects the correct one.
 
-[One-sentence goal. In R&D mode, name the target technology. In Pure Research
-mode, name the phenomenon or research question.]
-
-## Current state
-
-- Current question / capability: [Q1 / C1]
-- Current status: [active / blocked / ready-for-promotion-review / ...]
-- Next discriminating step: [...]
-
-## Universe
-
-- Instruments: [3+ instruments, or describe the cross-section]
-- Period: {{START}} to {{END}}
-- Frequency: [primary timeframe + auxiliary]
-
-## Navigation
-
-- [research_state.md](research_state.md) — compact state map; update before adding work
-- [literature/](literature/papers.md) — prior papers and differentiation
-- [hypotheses.md](hypotheses.md) — hypotheses that passed the entry gate
-- [purposes/INDEX.md](purposes/INDEX.md) — notebooks / trials
-- [decisions.md](decisions.md) — durable state transitions and commitments
-- [results/](results/) — aggregated results and figures
-- [reproducibility/](reproducibility/) — env lock, data hashes, seed
-
-## Workflow
-
-1. Choose mode: R&D or Pure Research.
-2. Fill `research_state.md`.
-3. Review prior work, including the user's own earlier notebooks.
-4. Add a hypothesis only if success and failure both update state.
-5. Run the smallest discriminating trial.
-6. Analyze misses and ambiguous results before proposing more work.
-7. Update `research_state.md`, `hypotheses.md`, and `decisions.md`.
-8. Run heavy review only for promotion, external sharing, deployment decisions,
-   research-line closure, or major direction changes.
+Do not use this template directly.

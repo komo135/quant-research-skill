@@ -8,8 +8,8 @@
     {
       "name": "quant-research",
       "source": "./",
-      "description": "Research-state protocols for algorithmic trading and quantitative finance research. Bundles `quant-research` for R&D technology decomposition, Pure Research state management, failure analysis, lightweight hypothesis quality gates, and promotion-only heavy review, plus `experiment-review` for independent claim-warrant review before supported conclusions.",
-      "version": "0.17.0"
+      "description": "v1.0 — Quant finance research protocol skill: R&D / Pure Research disciplines, Heilmeier / PR-FAQ entry, two-layer decomposition with TRL + lifecycle, Cooper Stage-Gates, A0-A5 analysis depth as primary deliverable, AEA-style pre-registration with hash-lock + diff, two-axis review (process + conclusion). v1.0 removes standalone experiment-review (folded in).",
+      "version": "1.0.0"
     }
   ]
 }
