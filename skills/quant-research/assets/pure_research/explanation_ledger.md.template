@@ -1,0 +1,65 @@
+# Explanation Ledger — <REPLACE: project name>
+
+The single state object for this Pure Research project. Schema:
+`references/pure_research/explanation_ledger_schema.md`. Every trial
+must move at least one row.
+
+## Mode
+
+Pure Research. <REPLACE: one-sentence reason this is Pure Research,
+not R&D. E.g., "The deliverable is understanding of phenomenon X, not
+a deployable capability.">
+
+---
+
+## Active questions
+
+| ID | parent_Q | question | why_it_matters | current_best_answer | Status | next_discriminating_step |
+|---|---|---|---|---|---|---|
+| Q1 | | <REPLACE: research question, framed as unknown to reduce> | <REPLACE: why answering this matters> | <REPLACE: current evidence summary, updated as trials run> | active | <REPLACE: smallest next test that would advance Q1> |
+
+---
+
+## Explanations
+
+| ID | parent_Q | statement | mechanism | supports | weakens | current_evidence_summary | last_trial | Status | next_discriminating_step |
+|---|---|---|---|---|---|---|---|---|---|
+| E1 | Q1 | <REPLACE: explanation statement> | <REPLACE: causal mechanism> | <REPLACE: observable evidence that would strengthen> | <REPLACE: observable evidence that would weaken> | <REPLACE: best one-paragraph summary of evidence so far> | | active | <REPLACE: best discriminating test vs E2 or E_null> |
+| E2 | Q1 | <REPLACE> | <REPLACE> | <REPLACE> | <REPLACE> | <REPLACE> | | active | <REPLACE> |
+| E_null | Q1 | <REPLACE: null / artifact / sample-variance explanation> | <REPLACE> | <REPLACE> | <REPLACE> | <REPLACE> | | active | <REPLACE> |
+
+---
+
+## Claims (supported explanations only)
+
+| Q-ID | E-ID | claim phrasing | scope conditions | promotion review date | IMRAD draft path |
+|---|---|---|---|---|---|
+
+(Empty until first promotion. Negative claims — rejected E's that
+constitute findings — also belong here.)
+
+---
+
+## Retired / merged / stale
+
+| ID | row type (Q/E) | new state | reason | date |
+|---|---|---|---|---|
+
+(Tracks rows that transitioned out of `active`. Do not delete; keep
+for traceability.)
+
+---
+
+## Notes
+
+- Status transitions: active / weakened / rejected / merged /
+  supported / parked (for E); active / answered / split / merged /
+  stale / parked (for Q). See schema reference for allowed
+  transitions.
+- Promotion to `supported` requires the full
+  `references/pure_research/pr_promotion_gate.md` checklist to pass.
+- Negative claims (rejected E's) are first-class research findings
+  and belong in the Claims section with the same A4+ rigor as
+  positive claims.
+- Every trial must move at least one row, or `decisions.md` records
+  `no progress: <reason>` per session-end ritual.

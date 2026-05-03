@@ -1,194 +1,417 @@
 ---
 name: quant-research
 description: >-
-  Use for quantitative-finance, algorithmic-trading, or financial time-series
-  research. Supports two modes: R&D for establishing a technology by decomposing
-  it into small technical capabilities with explicit maturity/exit criteria, and
-  Pure Research for slow, literature-grounded research that prioritizes
-  research-state updates, failure analysis, competing explanations, and
-  reproducibility over fast conclusions. Use for alpha factors, backtests,
-  return prediction, regime detection, execution, portfolio construction, and
-  financial ML.
+  Activates for quantitative-finance, algorithmic-trading, alpha-factor work,
+  backtests, return prediction, regime detection, portfolio construction,
+  financial machine learning, signal pipelines, execution research, or any
+  empirical research where conclusions must survive replication. Drives one of
+  two disciplines: R&D mode establishes a technical capability via Heilmeier
+  charter, TRL-tracked capability map with kill criteria, Cooper-style
+  stage-gates, and operational prototype demonstration. Pure Research mode
+  resolves a phenomenon via Working Backwards PR/FAQ, hash-locked
+  pre-registration, competing-explanation pruning, and IMRAD-shaped manuscript
+  draft. Enforces analysis depth (A0–A5 tier) as the primary deliverable: the
+  gold standard is not "we found a thing" but "we found a thing AND we know
+  why" at estimation or assertion level. Use whenever the user is doing serious
+  quantitative research, including ad-hoc backtests they may later want to
+  defend.
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
 # Quant Research
 
-A protocol skill for agent-driven technical research in quantitative finance.
-The primary job is not to produce quick answers. The job is to keep the
-research state clean, make uncertainty explicit, and move the investigation
-forward by the smallest defensible step.
+A protocol skill for agent-driven research in quantitative finance. The job is
+not to produce quick answers. The job is to keep research state honest, push
+analysis to estimation or assertion level, and progress by the smallest
+defensible step.
 
 ## Prime Directive
 
-Prefer a precise unresolved state over a shallow conclusion.
+**Fact collection is not research. Fact + causal analysis at A4 (estimation)
+or A5 (assertion) is research.**
 
-No experiment is complete until it changes the research state. A result may
-change the state by confirming, weakening, splitting, merging, parking, or
-deleting a question / hypothesis / explanation. Merely appending another
-verdict or another decision log entry is not progress.
+A `supported` claim — for either an R&D capability or a Pure Research finding
+— requires the analysis to reach **A4 minimum**. "It worked" and "it failed"
+are both A0, not results. Read `references/shared/analysis_depth.md` before
+any trial interpretation, and `references/shared/result_analysis.md` before
+writing any explanation of success or failure.
 
-## First Decision: Research Mode
+## First Decision: Choose the Discipline
 
-Before designing any notebook, hypothesis, model, or backtest, choose one mode
-and follow its reference:
+Before any charter, capability map, hypothesis, or backtest: choose one
+discipline and commit. Do not mix; if a single project needs both, split it
+into two projects with separate ledgers.
 
-| Mode | Use when | Required reference |
-|---|---|---|
-| **R&D / technology establishment** | The goal is to establish a technology, capability, pipeline, model class, validation method, or deployable research technique | `references/research_modes.md` and `references/technology_decomposition.md` |
-| **Pure Research** | The goal is to understand a phenomenon, answer a research question, or produce knowledge in a paper-like sense | `references/research_modes.md` and `references/pure_research_protocol.md` |
+| Discipline | Use when | Entry document | Primary state object | Deliverable |
+|---|---|---|---|---|
+| **R&D** | The goal is to make a technical capability exist | `references/rd/rd_charter.md` (Heilmeier 8 questions) | `capability_map.md` (TRL + kill criteria) | TRL-6 demonstrated capability with A4+ analysis |
+| **Pure Research** | The goal is to understand a phenomenon | `references/pure_research/prfaq.md` + `references/pure_research/preregistration.md` | `explanation_ledger.md` (questions + competing explanations) | IMRAD-shaped manuscript draft with A4+ analysis |
 
-If the request mixes both, split it. R&D can consume Pure Research findings,
-and Pure Research can study a technical artifact, but one active work unit must
-have one dominant mode.
+If the discipline shifts mid-trial, never silently switch. Use the **pivot
+protocol**:
 
-## R&D Mode
+1. Document the trigger in `decisions.md` — what observation, result, or
+   reflection forced the pivot? Triggers can be a trial result, an analysis
+   artifact, a literature finding, OR a structured realization in
+   conversation / planning. A reflection-based trigger is acceptable but
+   must name the specific belief that changed and what evidence (even if
+   prior) prompted the change.
+2. Decide between two paths based on sunk work:
+   - **Suspend + restart**: freeze the current ledger (append a final
+     summary row), start a new project with the correct discipline,
+     link both via a `parent_project_id` reference.
+   - **Add secondary project**: keep the primary project active, initialize
+     a secondary project of the other discipline, declare cross-project
+     dependencies in both `decisions.md` files. Use this when the original
+     primary is still valuable in its discipline.
+3. Either path requires the explicit decision in `decisions.md` before any
+   work proceeds in the new direction.
 
-R&D mode exists to establish a technology. Do not start by inventing a large
-hypothesis about the whole target. Decompose the target into small technical
-capabilities and knowledge prerequisites first.
+Sneaking the pivot in by relabeling rows or quietly broadening scope is the
+failure mode this protocol prevents.
 
-Required sequence:
+### Status terminology (R&D)
 
-1. Write the target technology in one sentence.
-2. Decompose it into sub-capabilities, knowledge gaps, dependencies, and
-   interfaces.
-3. Assign a maturity level to each sub-capability using the project-local TRL
-   scale in `references/technology_decomposition.md`.
-4. Select the smallest blocking capability.
-5. Design one test whose success and failure both teach something about that
-   capability.
-6. After the test, update the technology map: maturity changed / dependency
-   changed / capability split / capability merged / blocked.
+Three distinct status terms apply at three different scopes. They are not
+interchangeable; conflating them invalidates promotion review.
 
-Do not promote a whole technology because one component worked. Do not keep
-testing a component after its exit criteria have fired.
+| Term | Scope | Meaning | Gate it controls |
+|---|---|---|---|
+| **matured** | Capability (Layer 2) | Reached its target TRL (≤ TRL-6 for ship), kill criteria un-fired | End of capability's trial loop |
+| **established** | Core technology (Layer 1) | All child capabilities matured, kill criteria un-fired, analysis at A4+ | Core tech ready for upstream consumption |
+| **promoted** | Project (target) | All core techs established, integration test ran AFTER upstream exits, and (if any core tech is `継続改善型`) maintenance plan filed | Project closure or transition to maintenance cadence |
 
-## Pure Research Mode
+For Pure Research the equivalent project-level term is **`supported`** for
+a claim, with the same A4+ requirement at the analysis-depth axis.
 
-Pure Research mode exists to reduce ignorance, not to answer quickly.
-The first session must not end with a `supported` conclusion unless the task
-is explicitly a bounded replication / verification of an already-defined claim,
-all required evidence is already present, and the promotion gates are run. It
-should normally end with a better research state.
+## R&D Discipline
 
-Required sequence:
+R&D establishes a technical capability. Required sequence — read each linked
+reference before executing the step:
 
-1. Survey prior work, including the user's own prior notebooks and decisions.
-2. Define the research question and what is currently unknown.
-3. Record competing explanations before running a test.
-4. Run the smallest discriminating trial.
-5. Analyze why the result landed where it did, especially when the hypothesis
-   failed.
-6. Update the research state ledger before proposing the next step.
+1. **Charter** (`references/rd/rd_charter.md`) — answer the 8 Heilmeier
+   questions, including kill criteria (H6: what evidence would kill this
+   project). Without a charter on file, decomposition is forbidden.
+2. **Core Technologies** (`references/rd/core_technologies.md`) —
+   intellectual decomposition. Identify the minimal set of technologies that
+   require research investment to establish for this target. Each core
+   technology gets a research question, target contribution, lifecycle type
+   (永続型 / 継続改善型), and prior-work link. See § Decomposition Discipline
+   below for the operational filter.
+3. **Capability map** (`references/rd/capability_map_schema.md`) —
+   operational decomposition. For each core technology, list capabilities
+   sized so one test changes one capability's TRL. Each capability row
+   references its parent `core_tech_id` (or `integration` for cross-cutting),
+   and carries a kill criterion alongside its exit criterion.
+4. **Maturity** (`references/rd/trl_scale.md`) — assign TRL-0 to TRL-6. TRL-6
+   (operational prototype) is the promotion line. TRL skipping is forbidden;
+   a strong test result moves one capability one level, not the whole stack.
+5. **Stages** (`references/rd/rd_stages.md`) — for each capability run
+   Scoping → De-risk → Build → Validate → Integrate, with a Go/Kill gate
+   between each. Tackle the hardest sub-question first; de-risk to kill, not
+   to confirm.
+6. **Workflow** (`references/rd/rd_workflow.md`) — initial-day prohibitions,
+   session-end ritual, stop conditions.
+7. **Promotion** (`references/rd/rd_promotion_gate.md`) — promote a target
+   only when every core technology is `established` (all child capabilities
+   matured to TRL-6 with kill criteria un-fired and analysis at A4+),
+   integration test ran AFTER all upstream exits fired (timestamp verified),
+   and — if any core technology is `継続改善型` — a maintenance plan is on
+   file in `decisions.md`.
 
-The normal outcome of a failed hypothesis is a better explanation set, not a
-new hypothesis pile. Read `references/pure_research_protocol.md` before
-starting, and `references/failure_analysis.md` before interpreting a miss.
-If the user asks for a same-day conclusion, explicitly reframe the deliverable:
-the first-session deliverable is a research-state update, not a `supported`
-claim. Do not convert time pressure into weaker evidence standards.
+## Pure Research Discipline
 
-## Lightweight Hypothesis Quality Management
+Pure Research reduces ignorance about a phenomenon. Required sequence — read
+each linked reference before executing the step:
 
-Hypothesis management is a pruning system, not an accumulation system. Read
-`references/hypothesis_quality.md` before adding or running any hypothesis.
+1. **PR/FAQ** (`references/pure_research/prfaq.md`) — write the press release
+   for the finding you would publish if research succeeded. If you cannot
+   write a coherent PR/FAQ, the question is not ready. **Do this first**:
+   without a scoped question, literature search is unfocused and
+   pre-registration is premature.
+2. **Targeted literature** (`references/shared/literature_review.md`) —
+   survey prior work scoped by the PR/FAQ, including the user's own past
+   notebooks and decisions. Stop when competing explanations are clear and
+   prior failure modes are documented.
+3. **Pre-registration** (`references/pure_research/preregistration.md`) —
+   freeze question, competing explanations (≥2), test design, and expected
+   diff under each explanation. Hash-lock via `scripts/prereg_freeze.py`.
+   After the trial, diff actual vs frozen via `scripts/prereg_diff.py`.
+4. **Explanation ledger**
+   (`references/pure_research/explanation_ledger_schema.md`) — single state
+   object. Every trial must move at least one explanation row.
+5. **Workflow** (`references/pure_research/pr_workflow.md`) — discriminating
+   trial loop, deviation handling (deviation severity rubric is enforced
+   here), session-end ritual, stop conditions. Push analysis depth on the
+   current trial before designing a new trial.
+6. **Promotion** (`references/pure_research/pr_promotion_gate.md`) — promote a
+   claim only when a discriminating test against ≥1 serious alternative
+   passed, multiple-testing correction is honest, analysis depth reaches
+   A4+, and an IMRAD draft (`references/pure_research/imrad_draft.md`) is
+   producible.
 
-Every hypothesis / experiment passes four lightweight gates:
+## Analysis Depth (both disciplines)
 
-1. **Entry gate** — What live question, capability, or explanation does this
-   test update? If none, do not run it.
-2. **Design gate** — What does success distinguish, and what does failure
-   distinguish? If failure teaches nothing, redesign.
-3. **Interpretation gate** — What can be said directly from the result, what
-   remains ambiguous, and which competing explanations became weaker?
-4. **State update gate** — Which ledger rows become active, resolved, rejected,
-   merged, stale, or parked?
+Analysis depth is the primary deliverable, not a side note. Tier scale:
 
-Heavy review is reserved for promotion moments:
+| Tier | Meaning |
+|---|---|
+| A0 | Observation only |
+| A1 | Hypothesized explanation named, no evidence |
+| A2 | ≥1 competing explanation identified |
+| A3 | Discriminating evidence between primary and ≥1 alternative (preliminary) |
+| A4 | Estimation: mechanism named, alternatives excluded, scope precise, multiple sources of supporting evidence |
+| A5 | Assertion: mechanism causal, alternatives systematically excluded, replicable across instruments and periods, external prediction holds |
 
-- declaring a claim `supported`
-- external sharing, paper writing, or deployment recommendation
-- closing a research line
-- making a large project-direction decision
+`supported` requires A4 minimum. A3 is `preliminary`. Below A3 is observation
+only.
 
-At those moments, run the relevant bug-review / robustness /
-`experiment-review` gates. For `supported` promotion, "relevant" means all
-mandatory promotion gates: `bug_review` first, then the robustness battery,
-then `experiment-review`. Do not skip any layer because headline metrics are
-good or because the user asks to write the result as supported. During ordinary
-exploration, do not bury the research under review bureaucracy that does not
-change the state.
+The principle applies symmetrically to success and failure. "It worked
+because the model is good" is A1 with a generic terminal label and is
+forbidden as a final claim. The same standard applies to "it failed because
+of noise / regime / cost / data quality" — see
+`references/shared/result_analysis.md` for decomposition patterns and bad/good
+examples.
 
-## Required Ledgers
+Before designing a new trial, push the analysis on the current trial as far
+as it can go. Increasing analysis depth on existing data is research;
+collecting more data without analyzing existing observations is not.
 
-Use the project templates, but treat them as active state surfaces:
+## Decomposition Discipline (R&D)
 
-- `research_state.md` — questions, explanations, capabilities, and claims by
-  status (`active`, `resolved`, `rejected`, `merged`, `stale`, `parked`)
-- `hypotheses.md` — only hypotheses that pass the entry gate; rows may be
-  downgraded, merged, or marked stale
-- `decisions.md` — only durable decisions and state transitions, not every
-  thought the agent had
-- `literature/papers.md` and `literature/differentiation.md` — prior work,
-  including the user's own earlier research
+R&D decomposition is a **two-layer** structure. Mixing the layers, or skipping
+the intellectual layer to go straight to capabilities, hides the research
+questions that justify the project.
 
-Before adding a row, check whether an existing row should instead be updated,
-merged, or retired.
+### Layer 1: Core Technologies (intellectual)
 
-## Guardrails Against Agent Failure Modes
+The minimal set of technologies that require research investment to establish
+for this target. Each row in `capability_map.md` Section 1:
 
-- Do not write "the result suggests..." unless the observation and at least one
-  competing explanation are named.
-- Do not use generic explanations such as "noise", "data quality", "sample
-  size", or "market regime" as terminal causes. Treat them as labels to
-  decompose.
-- Do not turn an implementation artifact into the research claim. If masking
-  library / model / process names leaves no claim about the world or technique,
-  the work is engineering, not research.
-- Do not keep a hypothesis alive because work has already been spent on it.
-  Mark it `rejected`, `merged`, `stale`, or `parked` when the state warrants it.
-- Do not continue after the consumer can decide, the capability exit criteria
-  fired, or the next discriminating test belongs to a different question.
-- A whole R&D technology cannot be marked `supported` because an integrated
-  backtest is positive. It may be promoted only when all critical upstream
-  capabilities have fired their exit criteria, the integrated test was
-  unblocked before execution, and the mandatory promotion gates pass.
+| Field | Meaning |
+|---|---|
+| ID | K1, K2, ... |
+| コア技術 | Name (1 short phrase) |
+| 研究で確立する問い | The single research question this core tech needs answered |
+| target への寄与 | Why this is needed for the target |
+| 発展性 | `永続型` (establish-once) or `継続改善型` (continuous-improvement, requires maintenance plan) |
+| 先行研究 | Link to `literature/papers.md` section |
+| Status | active / established / blocked / split / merged / stale / parked |
+
+**Operational filter for "is this a core tech?"** A candidate qualifies only
+when ALL three hold:
+
+1. Requires research / establishment work for THIS target (cannot be obtained
+   off-the-shelf).
+2. Can be expressed as a single distinct research question.
+3. The question is independent of other core techs' questions.
+
+If the candidate fails (1) → it is a dependency (use as-is, do not list).
+If it fails (3) → merge into the parent core tech.
+If you cannot write a research question for it → it is a capability or task,
+not a core tech.
+
+There is **no count target**. Target difficulty determines the count
+naturally; if you find yourself with 20+ candidates, the filter is too loose
+(many are dependencies); if 1, decompose harder or reconsider whether this
+should be Pure Research instead.
+
+### Layer 2: Capabilities (operational)
+
+For each core technology, list capabilities sized so one test changes one
+capability's TRL by exactly one level. Each capability row references its
+parent `core_tech_id` (or `integration` for cross-cutting work). See
+`references/rd/capability_map_schema.md` for the full schema.
+
+### Lifecycle implications
+
+A target's promotion expression and termination semantics depend on the
+lifecycle composition of its core technologies:
+
+- All core techs `永続型` and `established` → "fully completed", project freezes.
+- Any core tech `継続改善型` → completion = "v1 established + maintenance plan
+  scheduled". The project's closing entry in `decisions.md` MUST name the
+  re-evaluation cadence and the re-investment trigger condition.
+
+### Decomposition status transitions
+
+Same vocabulary at both layers (active / established (core tech only) /
+matured (capability only, = TRL reached target) / blocked / split / merged /
+stale / parked). Splits create child rows under the parent; merges absorb
+duplicate rows; stale rows are kept (not deleted) for historical traceability.
+
+## Review (run before promotion)
+
+Two-axis review, run both before any promotion to `supported`:
+
+- **Process review** (`references/review/process_review.md`) — was the
+  discipline followed? Charter / pre-registration / kill criteria / TRL
+  ordering / pre-reg diff / generic-label decomposition / mode mixing.
+- **Conclusion review** (`references/review/conclusion_review.md`) — are the
+  conclusions warranted? Implementation correctness / statistical sufficiency
+  / claim discipline / **analysis depth (A4+)** / reproducibility / cold-eye
+  check from the artifact alone.
+
+Both axes are agent-self-executable checklists. Each item requires concrete
+evidence citation (file:line, hash, numeric value, or tool output). "Overall
+OK" / "looks good" / "appears correct" verdicts are forbidden.
+
+## Guardrails
+
+- **Kill > Promote**. A kill criterion firing once is sufficient to kill;
+  promotion requires every checklist item to pass with concrete evidence
+  cited. The asymmetry exists to counterweight the agent's structural bias
+  toward `supported`.
+- **Evidence citation is mandatory**. Any claim of "passed" / "verified" /
+  "confirmed" must reference a specific file:line, hash, numeric value, or
+  tool output. Summary verdicts without citation are forbidden.
+- **Initial-day prohibitions**.
+  - R&D first day: no implementation, charter and capability map (with
+    core technologies) only. *Why*: kill criteria (Heilmeier H6) must be
+    frozen before a trial can fire one. Code written before kill criteria
+    exist accumulates sunk cost that biases future kill decisions.
+    Typical time investment: 1-2 hours of charter writing prevents weeks
+    of effort on a misframed target.
+  - Pure Research first day: no trial execution, PR/FAQ + targeted
+    literature + pre-registration only. *Why*: a pre-registered test
+    survives the garden of forking paths. A trial run before the
+    pre-registration is locked is a shopping trip — once you have seen the
+    data, "pre-registration" is theater. Typical time investment: 30-60
+    minutes of PR/FAQ writing prevents months of post-hoc rationalization
+    on weak findings.
+  - **What IS allowed on day 1**: data infrastructure setup, environment
+    pinning (`uv.lock`), data hash recording, raw data sourcing, scaffold
+    file creation. The prohibition targets evidence-producing work
+    (implementation that runs / trial that produces metrics), not
+    enabling work.
+- **Session-level R&D sequencing**. Once the charter is complete, the seven
+  R&D steps must be completed in order across sessions, not in parallel:
+  - No capability row may be written until Layer 1 (Core Technologies) is
+    100% filled and passes the operational filter (§ Decomposition
+    Discipline).
+  - **No Stage gate (Scoping–De-risk–Build–Validate–Integrate) may be run
+    on any capability while ANY core technology in Layer 1 is still in
+    `active` status without complete fields.** The check is global to
+    Layer 1, not just the immediate parent of the capability under work.
+    A sibling core tech with a missing research question or undefined
+    lifecycle type blocks every Stage gate, including in unrelated
+    branches. Rationale: capability-level evidence often forces upstream
+    re-scoping; running gates with partial Layer 1 produces results that
+    have to be re-evaluated when missing core techs are formalized.
+  - Any rollback to an earlier step requires a dated deviation entry in
+    `decisions.md` citing the blocker. The session-end ritual alone does
+    not satisfy this — moving any ledger row is necessary but not
+    sufficient.
+- **Session-end ritual**. Every session must move at least one ledger row,
+  or explicitly record `no progress: <reason>` in `decisions.md`.
+- **Reproducibility 3-tuple**. Every trial that produces a metric stamps
+  data hash + git commit + env lock via `scripts/reproducibility_stamp.py`.
+- **Frozen artifacts**. Charter, pre-registration, and kill-criteria fire
+  log are SHA-256 hash-locked and append-only. After-the-fact editing is
+  structurally impossible; any deviation requires an explicit deviation
+  entry in `decisions.md`.
+- **No placeholders in deliverables**. Templates produce real content; any
+  remaining `TBD`, `TODO`, `XXX`, `???`, or `{{...}}` blocks the deliverable.
+
+## Required Artifacts (per project)
+
+Common to both disciplines:
+
+```
+README.md                        # mode declaration, goal, current state
+decisions.md                     # durable state transitions only
+literature/papers.md             # prior work
+literature/differentiation.md    # how this differs from prior work
+purposes/INDEX.md                # trial index
+results/results.parquet          # mode-aware aggregated trial results
+reproducibility/{env.lock,data_hashes.txt,seed.txt}
+```
+
+R&D adds:
+
+```
+charter.md                       # frozen, hash-locked (Heilmeier 8 Q)
+capability_map.md                # primary state object
+                                 #   Section 1: Core Technologies (intellectual layer)
+                                 #   Section 2: Capabilities (operational layer, with core_tech_id)
+```
+
+Pure Research adds:
+
+```
+prfaq.md                         # working-backwards entry document
+prereg/PR_<id>.lock              # hash-locked pre-registration, one per trial
+explanation_ledger.md            # primary state object
+imrad_draft.md                   # paper-shaped deliverable, started early
+```
 
 ## References
 
-Read only what applies:
+Read only what applies to your current step. References are organized by
+audience.
 
-- `references/research_modes.md` — choosing R&D vs Pure Research
-- `references/technology_decomposition.md` — R&D capability map, maturity, exit criteria
-- `references/pure_research_protocol.md` — slow research workflow and conclusion discipline
-- `references/failure_analysis.md` — deep analysis of failed or ambiguous trials
-- `references/hypothesis_quality.md` — lightweight gates and ledger pruning
-- `references/research_state.md` — state ledger schema and allowed transitions
-- `references/literature_review.md` — prior-work review and differentiation
-- `references/time_series_validation.md` — time-series validation when a quantitative test runs
-- `references/robustness_battery.md` — robustness checks for promotion gates
-- `references/bug_review.md` — correctness review for promotion gates
-- `references/modeling_approach.md` — model selection guidance
-- `references/results_db_schema.md` — queryable result ledger schema
-- `references/sanity_checks.md` — pre-promotion sanity check patterns
-- `references/psr_dsr_formulas.md` — PSR / DSR formulas used by helper scripts
-- Domain method references when needed: `feature_construction.md`,
-  `model_diagnostics.md`, `prediction_to_decision.md`,
-  `portfolio_construction.md`, `exit_strategy_design.md`
+**Shared (both disciplines)**
+
+| Reference | When to read |
+|---|---|
+| `shared/analysis_depth.md` | Before any trial interpretation. MANDATORY. |
+| `shared/result_analysis.md` | Before writing any explanation of success or failure. |
+| `shared/literature_review.md` | Project initialization, before any new hypothesis or capability. |
+| `shared/time_series_validation.md` | Designing splits or running walk-forward / CV. |
+| `shared/sanity_checks.md` | Programmatic correctness checks before any promotion review. |
+| `shared/psr_dsr_formulas.md` | Computing PSR / DSR. |
+| `shared/multiple_testing.md` | When ≥2 hypotheses, parameter sweeps, or multiple strategies are compared. |
+| `shared/reproducibility.md` | Setting up data hash + git commit + env lock for a trial. |
+| `shared/modeling_approach.md` | Choosing a model class. |
+| `shared/feature_construction.md` | Designing features. |
+| `shared/model_diagnostics.md` | Validating math-model assumptions or ML overfit. |
+| `shared/prediction_to_decision.md` | Mapping ML output to trading actions. |
+| `shared/portfolio_construction.md` | Multi-instrument sizing, neutralization, leverage. |
+| `shared/exit_strategy_design.md` | Designing strategy exits (parallel comparison required). |
+| `shared/results_db_schema.md` | Appending interpreted trial results. |
+
+**R&D** — see § R&D Discipline above for the entry sequence. Key references:
+`rd/rd_charter.md` (Heilmeier 8 Q) ·
+`rd/core_technologies.md` (intellectual decomposition, lifecycle) ·
+`rd/capability_map_schema.md` (operational decomposition with core_tech_id) ·
+`rd/trl_scale.md` ·
+`rd/rd_stages.md` (Cooper Stage-Gate per capability) ·
+`rd/rd_workflow.md` ·
+`rd/rd_promotion_gate.md`.
+
+**Pure Research** — see § Pure Research Discipline above for the entry
+sequence.
+
+**Review** — see § Review above.
 
 ## Bundled Helper Scripts
 
-| script | purpose |
+| Script | Purpose |
 |---|---|
-| `new_project.py` | Initialize a research project folder with the standard layout |
-| `new_purpose.py` | Generate a numbered trial notebook from the template |
-| `aggregate_results.py` | Append interpreted trial rows to `results/results.parquet` and query them |
-| `walk_forward.py` | Compute Sharpe distribution over rolling windows |
-| `bootstrap_sharpe.py` | Block-bootstrap CI for per-trade Sharpe |
-| `psr_dsr.py` | Probabilistic / Deflated Sharpe Ratio |
+| `new_project.py --mode rd|pure-research` | Initialize a project with the discipline-specific layout |
+| `new_trial.py` | Generate a numbered trial notebook (mode-aware template) |
+| `aggregate_results.py` | Append interpreted trial rows (mode-aware schema, includes `analysis_tier`) |
+| `validate_ledger.py` | Lint capability_map / explanation_ledger / prereg / analysis-section consistency |
+| `prereg_freeze.py` | SHA-256 + timestamp lock for a pre-registration |
+| `prereg_diff.py` | Diff actual analysis against the frozen pre-registration |
+| `reproducibility_stamp.py` | Capture data hash + git commit + env lock |
+| `render_capability_dag.py` | Mermaid DAG of the R&D capability dependency graph |
+| `render_explanation_dag.py` | Mermaid DAG of the explanation hierarchy |
+| `charter_interview.py` | Interactive Heilmeier 8-question elicitation |
+| `draft_imrad.py` | Generate IMRAD draft from explanation_ledger + decisions + results |
+| `standup.py` | Summarize the last 24h of decisions.md transitions |
+| `lit_fetch.py` | Batch fetch from arxiv (q-fin.*) and Semantic Scholar |
+| `sanity_checks.py` | PnL reconciliation, cost monotonicity, sign flip, NaN/Inf, time-shift placebo, etc. |
+| `leakage_check.py` | Look-ahead via truncation; target leakage scan |
+| `walk_forward.py` | Anchored / sliding refit walk-forward |
+| `rolling_segment_sharpe.py` | Sharpe distribution over non-overlapping segments |
+| `cpcv.py` | Combinatorial Purged Cross Validation (López de Prado AFML 7) |
+| `pbo.py` | Probability of Backtest Overfitting (Bailey, Borwein, López de Prado, Zhu) |
+| `bootstrap_sharpe.py` | Stationary block bootstrap (Politis & Romano 1994) for Sharpe CI |
+| `psr_dsr.py` | Probabilistic / Deflated Sharpe Ratio (per-period API) |
+| `multiple_testing.py` | Romano-Wolf step-down multiple-hypothesis correction |
 | `fee_sensitivity.py` | Fee sweep with break-even fee extraction |
-| `sensitivity_grid.py` | 2D threshold sensitivity grid |
-| `vol_targeted_size.py` | Position sizing with size proportional to inverse volatility |
-| `purged_kfold.py` | Purged k-fold CV |
-| `leakage_check.py` | Detect look-ahead bias and target leakage |
-| `sanity_checks.py` | Programmatic sanity checks used before promotion |
+| `sensitivity_grid.py` | 2D parameter sensitivity grid |
+| `vol_targeted_size.py` | Vol-targeted sizing with ATR-to-std conversion |
+| `exit_compare.py` | Parallel comparison of exit strategy types |
+| `regime_label.py` | HMM / threshold / exogenous regime labelers |

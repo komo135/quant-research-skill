@@ -1,34 +1,11 @@
-# Research state
+# research_state.md.template (RETIRED)
 
-## Mode
+Replaced by mode-specific primary state objects per CHARTER C2 / C3:
 
-[R&D / Pure Research, with one-sentence reason.]
+- R&D: use `assets/rd/capability_map.md.template` (Layer 1 + Layer 2)
+- Pure Research: use `assets/pure_research/explanation_ledger.md.template`
 
-## Active questions
+The new `scripts/new_project.py --mode rd|pure-research` automatically
+selects the correct template.
 
-| ID | Question | Why it matters | Current best answer | Status | Next discriminating step |
-|---|---|---|---|---|---|
-| Q1 | ... | ... | ... | active | ... |
-
-## Explanations
-
-| ID | Explanation | Supports | Weakened by | Status | Next test |
-|---|---|---|---|---|---|
-| E1 | ... | ... | ... | active | ... |
-
-## R&D capabilities
-
-| ID | Capability | Maturity | Exit criteria | Status | Next test |
-|---|---|---|---|---|---|
-| C1 | ... | TRL-0 | ... | active | ... |
-
-## Claims
-
-| ID | Claim | Evidence | Status | Promotion gate |
-|---|---|---|---|---|
-| CL1 | ... | ... | active | ... |
-
-## Retired / merged / stale
-
-| ID | Old row | New state | Reason | Date |
-|---|---|---|---|---|
+Do not use this template for new projects.

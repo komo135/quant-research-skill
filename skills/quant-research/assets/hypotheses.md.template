@@ -1,42 +1,14 @@
-# Hypothesis portfolio
+# hypotheses.md.template (RETIRED)
 
-Queue of hypotheses that passed the entry gate. This is not a brainstorming
-dump and not a permanent wish list.
+The "hypothesis" abstraction has been removed in both modes per CHARTER
+C2 / C3. New unit per mode:
 
-Before adding a row, read `references/hypothesis_quality.md` and check whether
-an existing row should be updated, merged, rejected, stale, or parked instead.
+- R&D: capability (next test = next TRL transition for one capability)
+- Pure Research: explanation discrimination (next test = next discriminating
+  trial under hash-locked pre-registration)
 
-## Status legend
+Use the mode-specific trial templates instead:
+- R&D: `assets/rd/rd_trial.py.template`
+- Pure Research: `assets/pure_research/pr_trial.py.template`
 
-- `planned`: accepted into the queue, not yet running
-- `in-progress`: currently being tested
-- `supported-candidate`: result may support the claim, but promotion review has not run
-- `supported`: promotion review passed; claim is warranted at stated scope
-- `rejected`: contradicted or acceptance condition failed in an informative way
-- `partial`: narrowed result; scope or condition must be named
-- `merged`: duplicate / variant absorbed into another row
-- `stale`: no longer relevant after later evidence or scope change
-- `parked`: deferred with a named unblock condition
-- `dropped`: failed entry gate or no longer worth testing
-
-## Entries
-
-| ID | Question / capability updated | Statement | Status | Success distinguishes | Failure distinguishes | Cannot distinguish | Linked state row | Next update |
-|---|---|---|---|---|---|---|---|---|
-| H1 | Q1 | [Falsifiable comparison statement.] | planned | [what becomes stronger] | [what becomes weaker / split] | [known ambiguity] | Q1 / E1 / C1 | YYYY-MM-DD |
-
-## Rules
-
-- Every hypothesis must update a row in `research_state.md`.
-- Failure must teach something. If the failure column is empty, redesign.
-- Parameter sweeps, threshold tweaks, and implementation variants do not become
-  new hypotheses unless they update a different `research_state.md` row and
-  have a distinct failure interpretation. Record ordinary variants as
-  robustness or engineering work.
-- Do not assign a new hypothesis ID to a same-family parameter tweak such as
-  another threshold, lookback, stop, sizing option, or feature variant. Merge
-  it into the parent hypothesis as a sensitivity / robustness /
-  implementation variant unless it updates a different `research_state.md` row
-  and has a distinct failure interpretation.
-- Do not keep a row active because effort was spent. Downgrade or retire it
-  when the state changes.
+Do not use this template for new projects.

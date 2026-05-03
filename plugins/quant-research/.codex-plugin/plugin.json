@@ -1,7 +1,7 @@
 {
   "name": "quant-research",
-  "version": "0.17.0",
-  "description": "Research-state protocols for algorithmic trading and quantitative finance research.",
+  "version": "1.0.0",
+  "description": "Research-state protocols for algorithmic trading and quantitative finance research. v1.0 BREAKING CHANGE: experiment-review skill removed (folded into quant-research's review/ subfolder); R&D and Pure Research are now strictly separate disciplines with mode-specific entry documents (Heilmeier charter / PR/FAQ + pre-registration); analysis depth (A0-A5) is the primary deliverable axis; integration pattern (Pattern 1/2/3) must be declared in charter.",
   "author": {
     "name": "komoootv",
     "email": "komoootv@gmail.com"
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "Quant Research",
     "shortDescription": "Quant finance research protocols for Codex",
-    "longDescription": "Protocol skills for agent-driven quantitative finance research. Bundles quant-research for R&D technology decomposition, Pure Research state management, failure analysis, lightweight hypothesis quality gates, time-series validation, and promotion-only heavy review, plus experiment-review for independent claim-warrant review before supported conclusions.",
+    "longDescription": "v1.0 — Protocol skill for agent-driven quantitative finance research. Two strict disciplines: R&D mode (Heilmeier charter, two-layer decomposition with TRL maturity + lifecycle, Cooper-style stage-gates per capability, integration pattern declared upfront) and Pure Research mode (Working Backwards PR/FAQ, AEA-style hash-locked pre-registration, explanation-pruning ledger, IMRAD-shaped manuscript draft). Analysis depth (A0-A5 tier system) is the primary deliverable. Promotion gates require both process review and conclusion review pass with concrete evidence cited. v1.0 removes the standalone experiment-review skill (folded into the unified review structure).",
     "developerName": "komoootv",
     "category": "Research",
     "capabilities": [

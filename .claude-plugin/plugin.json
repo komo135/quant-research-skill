@@ -1,7 +1,7 @@
 {
   "name": "quant-research",
-  "description": "Research-state protocols for algorithmic trading and quantitative finance research. Bundles `quant-research` for choosing R&D vs Pure Research, decomposing technologies into small capabilities, managing Pure Research as slow state updates rather than fast conclusions, analyzing failed and ambiguous trials, pruning hypotheses instead of accumulating them, and reserving heavy review for supported-claim promotion / external sharing / deployment / line closure. Also bundles `experiment-review` for independent claim-warrant review before supported conclusions.",
-  "version": "0.17.0",
+  "description": "v1.0 — Protocol skill for agent-driven quantitative finance research. Two strict disciplines (R&D / Pure Research) with mode-specific entry documents (Heilmeier charter / PR/FAQ + AEA-style pre-registration), two-layer decomposition (Core Technologies + Capabilities) with TRL maturity and lifecycle, Cooper-style stage-gates, A0-A5 analysis-depth tier as primary deliverable, integration pattern (Pattern 1/2/3) declared in charter, and unified two-axis review (process + conclusion) replacing the separate experiment-review skill.",
+  "version": "1.0.0",
   "author": {
     "name": "komoootv",
     "email": "komoootv@gmail.com"

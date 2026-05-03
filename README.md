@@ -235,124 +235,98 @@ The skill leans on a small number of well-known references:
 
 ## Status
 
-- Version 0.16.0
-- Two skills, two review layers, both required as co-gate.
-- Notebook unit is one Purpose (open-ended investigation); per-Hypothesis
-  verdict gates and result rows.
-- R-side R&D protocol: Stage 0 (pre-hypothesis exploration), Step 1.5
-  (hypothesis generation pathways), why-why result-analysis gate before
-  every per-H verdict (rooted in observed result pattern; every level
-  observation-pinned to a cited table / value and assigned a diagnostic
-  role; prose plausibility ladders are rejected and the chain stops at
-  the first uncomputable level), cross-H synthesis, exhaustion trigger,
-  novelty / knowledge-advance gate.
-- Adversarial-reviewer mechanism backed by Song (2026); see *References*.
+- **Version 1.0.0** — single skill, two review axes (process + conclusion).
+- Two strict disciplines: R&D mode (Heilmeier charter → two-layer
+  decomposition → Cooper Stage-Gate per capability) and Pure Research mode
+  (PR/FAQ → AEA-style hash-locked pre-registration → explanation-pruning
+  ledger → IMRAD draft).
+- Analysis depth (A0–A5 tier) is the primary deliverable axis. Promotion
+  requires A4 (estimation) minimum; A5 is assertion-level.
+- Integration pattern (Pattern 1 vertical-slice / Pattern 2 bottom-up /
+  Pattern 3 skeleton+spike, default) declared upfront in charter.
 
-### Changelog
+<details>
+<summary>Changelog (click to expand)</summary>
 
-**0.17.0** — Major research-state redesign. This is a structural rewrite of
-`quant-research`, not a small protocol patch.
+### v1.0.0 (current)
 
-- **Two research modes.** The skill now starts by choosing either R&D / technology
-  establishment or Pure Research. R&D decomposes a target technology into small
-  capabilities with maturity levels, dependencies, and exit criteria. Pure
-  Research treats the deliverable as a research-state update: prior work,
-  competing explanations, failed-trial analysis, and the next discriminating
-  question.
-- **Research state as the central artifact.** New projects now include
-  `research_state.md`, a compact map of active questions, explanations, R&D
-  capabilities, claims, and retired / merged / stale rows. A trial is not
-  complete until it changes this state.
-- **Hypothesis quality rebuilt around pruning.** Routine hypothesis management
-  now uses four lightweight gates: entry, design, interpretation, and state
-  update. Hypotheses must name what state row changes under both success and
-  failure. Parameter tweaks, threshold variants, lower-fee reruns, and
-  same-family signal variants default to `merged` / robustness work, not new H
-  rows.
-- **Pure Research conclusion discipline.** First-session Pure Research cannot
-  end with `supported` unless it is a bounded replication / verification task
-  with all evidence already present and promotion gates run. Same-day conclusion
-  pressure is explicitly reframed as a research-state update, not weaker evidence
-  standards.
-- **Failure analysis strengthened.** `failure_analysis.md` now requires generic
-  labels such as noise, regime, cost, sample size, overfitting, or data quality
-  to be decomposed into observable sub-claims. Cost-sensitive alpha failures get
-  explicit gross-edge, turnover, holding-period, break-even fee, slippage, and
-  regime-dependence checks before any lower-fee or narrower-regime follow-up.
-- **Heavy review moved to promotion moments.** Full bug-review, robustness, and
-  `experiment-review` are no longer the default for every exploratory trial.
-  They are mandatory for supported-claim promotion, external sharing, deployment
-  decisions, research-line closure, or major direction changes. Good headline
-  metrics make a claim eligible for review; they do not establish `supported`.
-- **R&D shortcuts blocked.** A whole technology cannot be marked `supported`
-  because one integrated backtest looks good. For financial ML / return
-  prediction, the capability map must separate task definition, point-in-time
-  data, feature / embedding generation, leakage controls, baselines, validation,
-  economic integration, and promotion gates.
-- **Templates rebuilt.** `README.md.template`, `research_state.md.template`,
-  `hypotheses.md.template`, `decisions.md.template`, and `purpose.py.template`
-  now reflect the state-led workflow. `new_project.py` creates
-  `research_state.md` and points the user to fill it before adding hypotheses.
-- **Pressure-tested with five adversarial scenarios.** Multi-agent read-only
-  pressure tests covered R&D big-backtest pressure, Pure Research same-day
-  conclusion pressure, fee/regime failure analysis, RSI threshold hypothesis
-  proliferation, and premature `supported` promotion from good metrics. The
-  resulting hardening patches are included in this release.
+**Major rebuild.** A from-scratch redesign that replaces the previous 0.x
+series. Not a backward-compatible patch.
 
-**0.16.0** — Made the why-why chain a pre-verdict result-analysis gate rather
-than a post-verdict explanation. The chain had to start from the observed result
-pattern, state the diagnostic role of each observation, and be able to downgrade,
-qualify, or block an apparent verdict before final wording.
+What changed:
 
-**0.15.0** — Added observation grounding to why-why analysis. Each chain level
-had to cite a computed cell / value / distribution / correlation instead of
-stacking plausible prose. If the required analysis was unavailable, the protocol
-had to stop and surface the gap rather than admit a derived hypothesis.
+- **Single skill, two review axes.** The standalone `experiment-review`
+  skill is removed; its functionality is folded into
+  `references/review/conclusion_review.md` (claim-warrant axis) alongside
+  the existing process audit. The previous 423-line `bug_review.md`
+  protocol with 6-reviewer parallel dispatch is replaced by two
+  agent-self-executable checklists totaling ~620 lines. Coverage parity
+  verified (35/35 bug patterns from the old `bug_review.md`).
+- **Two strict disciplines, no mode mixing.** R&D and Pure Research now
+  have separate primary state objects (`capability_map.md` vs
+  `explanation_ledger.md`), entry documents (Heilmeier charter vs PR/FAQ
+  + pre-registration), promotion gates, and deliverable shapes (TRL-6
+  capability vs IMRAD draft).
+- **Heilmeier 8 questions as the R&D entry.** DARPA Heilmeier Catechism
+  becomes the charter format. Without a frozen charter, capability
+  decomposition is forbidden.
+- **Two-layer R&D decomposition.** Layer 1 (Core Technologies,
+  intellectual) sits above Layer 2 (Capabilities, operational). Each
+  core technology is classified `永続型` (one-time) or `継続改善型`
+  (continuous-improvement); the latter requires a maintenance plan at
+  promotion.
+- **Integration pattern declared in charter.** Pattern 1 (vertical
+  slice / framework-first), Pattern 2 (bottom-up / component-first), or
+  Pattern 3 (skeleton + spike, recommended default). Surfaces the
+  "no working version yet" risk explicitly.
+- **AEA-style pre-registration.** Pure Research trials are hash-locked
+  before execution. Post-trial diff (`prereg_diff.py`) classifies
+  deviations as minor (proceed with documentation) or major (trial
+  invalidated, new pre-registration required).
+- **Analysis depth tier A0–A5 is the primary deliverable.** Each trial
+  has a 5-field Analysis section (Observation / Decomposition / Evidence
+  weighing / Tier rating / Gap to next tier). `supported` / `matured`
+  promotion requires A4 minimum. Generic terminal labels ("noise",
+  "regime", "model is good") are forbidden as final claims; the rule
+  applies symmetrically to success and failure.
+- **Reproducibility as a 3-tuple.** Every promotion-eligible trial stamps
+  `data hash + git commit + uv.lock hash` via
+  `scripts/reproducibility_stamp.py`. The standardized environment is uv.
+- **Bundled scripts (15 new + 6 audited).** New: `prereg_freeze`,
+  `prereg_diff`, `reproducibility_stamp`, `reproducibility_verify`,
+  `validate_ledger`, `charter_interview`, `draft_imrad`, `standup`,
+  `render_capability_dag`, `render_explanation_dag`, `lit_fetch`,
+  `cpcv`, `pbo`, `multiple_testing`, `regime_label`, `exit_compare`,
+  `build_plugin`. Audited fixes in: `psr_dsr` (per-period vs annualized
+  SR clarified), `bootstrap_sharpe` (Politis-Romano stationary bootstrap
+  implemented; previous version cited it but ran moving-block bootstrap),
+  `walk_forward` (true anchored / sliding refit; previous version was
+  segment evaluation, renamed to `rolling_segment_sharpe`),
+  `vol_targeted_size` (ATR → std conversion via √(π/2)), `sanity_checks`
+  (random-signal benchmark gains a `signal_kind="normal"` option),
+  `aggregate_results` (mode-aware schema with `analysis_tier`,
+  `core_tech_id`, `lifecycle`).
 
-**0.14.0** — Removed the duplicate "cycle" abstraction and attached decision
-rules, stop conditions, and Purpose closure directly to the Purpose layer. Also
-introduced the depth gate for derived hypotheses: a derived H needed a
-mechanism-level why-why terminal, not just a parent verdict or `failure_mode`
-label.
+Breaking changes from 0.x:
 
-**0.13.0** — Repaired the Purpose / Hypothesis / Experiment vocabulary. A
-Purpose became the notebook-level parent thesis; each `## H<id>` block became
-one experiment testing one child claim. Parameter sweeps and threshold variants
-were moved out of the hypothesis log and into robustness / implementation
-analysis.
+- `experiment-review` skill removed (functionality folded in).
+- `references/bug_review.md`, `hypothesis_quality.md`, `research_state.md`,
+  `research_modes.md`, `technology_decomposition.md`,
+  `pure_research_protocol.md`, `failure_analysis.md` are replaced by
+  files in `references/{rd,pure_research,shared,review}/`. Deprecation
+  stubs at the old paths point to the new locations.
+- `assets/research_state.md.template`, `hypotheses.md.template`,
+  `purpose.py.template`, `README.md.template` are replaced by mode-specific
+  templates in `assets/{rd,pure_research,shared}/`. Deprecation stubs at
+  the old paths point to the new locations.
+- `scripts/new_project.py` requires `--mode rd|pure-research`.
+  `scripts/new_purpose.py` is superseded by `scripts/new_trial.py`
+  (mode-aware).
 
-**0.12.0** — Added the research-goal layer so Purpose selection had to be tied
-back to project-level sub-claims and close with explicit progress updates rather
-than drifting from notebook to notebook.
+Migration: existing 0.17 projects can continue to run on the deprecation
+stubs; for new projects, run `scripts/new_project.py --mode <rd|pure-research>`.
 
-**0.11.0** — Added review-dispatch efficiency rules so expensive multi-agent
-reviews run only from clear triggers and with bounded context.
-
-**0.10.0** — Added subject-drift protection: notebooks must keep the research
-claim about the market / mechanism / technique, not silently turn into library,
-implementation, or process documentation.
-
-**0.9.0** — Added notebook narrative and post-review reconciliation rules so
-review fixes do not leave stale figures, contradictory prose, edit-history
-language, or reviewer vocabulary inside the research artifact.
-
-**0.8.0** — Introduced downstream-consumer framing: Purpose headers name the
-consumer, blocked decision, decision rule, and knowledge output before H design.
-
-**0.7.0** — Added the original R-side research protocol: pre-hypothesis
-exploration, hypothesis-generation pathways, novelty / differentiation checks,
-cross-H synthesis, and exhaustion triggers.
-
-**0.6.0** — Added notebook readability conventions: self-explanatory figures,
-per-figure observations, helper-function docstrings, and centralized config
-cells.
-
-**0.5.0** — Reframed the notebook unit from one hypothesis to one Purpose with
-multiple H rounds inside it.
-
-**0.4.0** — Initial public release with `quant-research` and
-`experiment-review`: falsifiable design, time-series validation, robustness,
-bug-review, and claim-warrant review.
+</details>
 
 ## License
 

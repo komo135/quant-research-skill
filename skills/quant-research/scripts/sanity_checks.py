@@ -26,21 +26,37 @@ def random_signal_benchmark(
     index: pd.Index,
     n_trials: int = 100,
     seed: int = 42,
+    signal_kind: str = "binary",
 ) -> dict:
-    """Run run_pipeline with i.i.d. ±1 signals; return the Sharpe distribution.
+    """Run run_pipeline with i.i.d. random signals; return the Sharpe distribution.
 
-    Pass condition: |median sharpe| < 0.5 across trials, and the real-signal Sharpe is
-    outside the 95 % CI of this distribution (the caller compares).
+    Args:
+        run_pipeline: callable taking a signal Series, returning {"sharpe": float, ...}
+        index: index for the synthetic signal series
+        n_trials: number of random-signal trials
+        seed: RNG seed
+        signal_kind: "binary" (i.i.d. ±1) or "normal" (i.i.d. N(0,1))
+
+    Pass condition: |median sharpe| < 0.5 across trials, and the real-signal
+    Sharpe is outside the 95% CI of this distribution (the caller compares).
     """
+    if signal_kind not in ("binary", "normal"):
+        raise ValueError(f"signal_kind must be 'binary' or 'normal', got {signal_kind!r}")
+
     rng = np.random.default_rng(seed)
     sharpes: list[float] = []
     for _ in range(n_trials):
-        sig = pd.Series(rng.choice([-1, 1], size=len(index)), index=index)
+        if signal_kind == "binary":
+            values = rng.choice([-1, 1], size=len(index))
+        else:  # normal
+            values = rng.standard_normal(size=len(index))
+        sig = pd.Series(values, index=index)
         out = run_pipeline(sig)
         sharpes.append(float(out["sharpe"]))
     arr = np.asarray(sharpes)
     return {
         "n_trials":      n_trials,
+        "signal_kind":   signal_kind,
         "sharpe_mean":   float(arr.mean()),
         "sharpe_median": float(np.median(arr)),
         "sharpe_p2_5":   float(np.percentile(arr, 2.5)),
@@ -118,6 +134,12 @@ def pnl_reconciliation(
             "rel_diff":         float(diff / scale),
             "ok":               abs(diff / scale) < rtol,
         })
+    else:
+        # No realized_pnl provided — caller can only inspect cum_pnl_recon.
+        # Emit a non-applicable ok so the caller's `if not result["ok"]:`
+        # logic doesn't KeyError (per audit fix).
+        out["ok"] = None  # None = not applicable (no comparison to validate)
+        out["rel_diff"] = None
     return out
 
 

@@ -1,0 +1,88 @@
+# <REPLACE: project name>
+
+R&D project — establishes a technical capability via Heilmeier charter,
+TRL-tracked capability map, and Cooper Stage-Gate per capability.
+
+## Status
+
+- **Current state**: <REPLACE: charter-drafting | charter-frozen | layer-1-active | layer-2-active | stage-N-on-Cn | promotion-review | promoted | killed | parked | pivoted>
+- **Charter**: [`charter.md`](charter.md) (frozen at <REPLACE: timestamp>, hash <REPLACE: short hash>)
+- **Capability map**: [`capability_map.md`](capability_map.md)
+- **Decisions log**: [`decisions.md`](decisions.md)
+- **Pending stop-condition decision**: <REPLACE: none | promote | kill | park | pivot>
+
+## Target
+
+<REPLACE: copy charter H1 verbatim>
+
+## Consumer
+
+<REPLACE: copy charter H4 verbatim — who is this for, what decision does it serve>
+
+## Lifecycle composition
+
+<REPLACE: count of 永続型 K's vs 継続改善型 K's; e.g., "3 永続型, 1 継続改善型 → maintenance plan required at promotion">
+
+## Critical path summary
+
+<REPLACE: short bullet list of capabilities on the critical path, with their parent K and current status. See `capability_map.md` for full detail.>
+
+- C1 (K1): <status>, TRL <current>/<target>
+- C2 (K2): <status>, TRL <current>/<target>
+- ...
+
+## Folder layout
+
+```
+<project_name>/
+├── README.md               # this file
+├── charter.md              # frozen Heilmeier 8 Q
+├── capability_map.md       # Section 1 (Layer 1) + Section 2 (Layer 2)
+├── decisions.md            # state transitions, deviation entries, session summaries
+├── prereg/
+│   └── charter.lock        # SHA-256 hash + UTC timestamp from prereg_freeze.py
+├── literature/
+│   ├── papers.md           # prior work, indexed by K
+│   └── differentiation.md  # how this project differs from prior work
+├── purposes/
+│   ├── INDEX.md            # numbered trial index
+│   └── trial_NNN_*.py      # marimo notebooks, one per trial
+├── results/
+│   ├── results.parquet     # mode-aware schema, includes analysis_tier and core_tech_id
+│   ├── figures/
+│   └── intermediate/       # parquet outputs of feature notebooks etc.
+└── reproducibility/
+    ├── data_hashes.txt     # sha256 of each data source
+    ├── shared_pins.txt     # commit hashes of shared/ infrastructure used
+    ├── uv.lock             # python env lock
+    └── seed.txt            # random seed(s)
+```
+
+## Workflow checklist
+
+For an agent or user to verify the project is in good shape at any
+point:
+
+- [ ] `charter.md` is frozen (`prereg/charter.lock` exists, hash matches)
+- [ ] `capability_map.md` Section 1 is closed-for-work (per
+  `references/rd/core_technologies.md` § Layer 1 closure)
+- [ ] No Stage gate has been run on a capability while any sibling K is
+  in `active` status with incomplete fields (per `SKILL.md` §
+  Session-level R&D sequencing)
+- [ ] Every trial in `purposes/` has a complete Analysis section (5
+  sub-fields, A0-A5 tier explicit)
+- [ ] `decisions.md` has chronological coverage (no gap > 4 weeks
+  without explicit "no progress: <reason>" entry)
+- [ ] Reproducibility 3-tuple is recorded for every promoted-eligible
+  trial via `scripts/reproducibility_stamp.py`
+
+## Promotion intent
+
+<REPLACE: "Promotion expected at <date>" | "Promotion blocked on <blocker>" | "Promoted at <date> as <fully completed | v1 + maintenance>" | "Killed at <date> per H6 criterion <id>" | "Parked since <date>, unblock condition: <...>">
+
+## Pivot history
+
+<REPLACE: "none" or "pivoted from project <name> at <date>; see decisions.md">
+
+If this project was pivoted from another, the source project's
+`README.md` should reference this one as `pivoted_to`.
