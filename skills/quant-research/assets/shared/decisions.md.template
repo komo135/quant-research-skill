@@ -26,8 +26,9 @@ Do not use this file to narrate every experiment.
   they name the exact unblock condition.
 - A decision entry is invalid if its only transition is `planned -> planned`,
   `none -> planned`, or "try / test / run X". Planning an experiment belongs in
-  `hypotheses.md`; `decisions.md` records pruning, merging, rejection, parking,
-  promotion, scope change, or durable commitment.
+  the trial notebook and the relevant state object (`capability_map.md` or
+  `explanation_ledger.md`); `decisions.md` records pruning, merging, rejection,
+  parking, promotion, scope change, or durable commitment.
 - User requests are not durable triggers by themselves. The trigger must name
   the evidence, dependency, contradiction, scope change, or state-compression
   reason that forced the decision.
