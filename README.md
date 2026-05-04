@@ -250,7 +250,18 @@ The skill leans on a small number of well-known references:
 <details>
 <summary>Changelog (click to expand)</summary>
 
-### v1.0.2 (current)
+### v1.0.3 (current)
+
+- Added an explicit protocol-layer / project-instance-layer boundary contract
+  to prevent reusable skill instructions from absorbing active research
+  candidates, tuned parameters, PnL snapshots, or trial conclusions.
+- New project scaffolds now include `configs/`, `src/`, and `tests/` as
+  project-instance work areas, keeping concrete experiments out of protocol
+  state files.
+- Pure Research scaffolds now create `prereg/PR_001.md` and `new_trial.py`
+  no longer falls back to retired `purpose.py.template` assets.
+
+### v1.0.2
 
 - Codex marketplace installation now uses the repository root as the plugin
   root (`source.path = "."`), matching the Claude plugin layout.
