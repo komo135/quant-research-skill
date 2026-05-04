@@ -112,10 +112,7 @@ quant-research-skill/
 │   ├── plugin.json
 │   └── marketplace.json
 ├── .codex-plugin/
-│   └── plugin.json            # root manifest kept for local development
-├── plugins/quant-research/    # Codex marketplace plugin root
-│   ├── .codex-plugin/plugin.json
-│   └── skills/
+│   └── plugin.json            # Codex plugin manifest
 ├── skills/
 │   ├── quant-research/
 │   │   ├── SKILL.md           # entry point — research lifecycle
@@ -129,6 +126,10 @@ quant-research-skill/
 ├── README.md
 └── LICENSE
 ```
+
+The repository root is the plugin root for both Claude Code and Codex. The
+Codex marketplace entry points to `"path": "."`, so `skills/` is the single
+source of truth for distributed skills.
 
 ## Installation
 
@@ -248,7 +249,15 @@ The skill leans on a small number of well-known references:
 <details>
 <summary>Changelog (click to expand)</summary>
 
-### v1.0.0 (current)
+### v1.0.2 (current)
+
+- Codex marketplace installation now uses the repository root as the plugin
+  root (`source.path = "."`), matching the Claude plugin layout.
+- Removed the stale `plugins/quant-research/` distribution copy. `skills/` is
+  now the only distributed skill tree, preventing version numbers from pointing
+  at old skill contents.
+
+### v1.0.0
 
 **Major rebuild.** A from-scratch redesign that replaces the previous 0.x
 series. Not a backward-compatible patch.
@@ -296,8 +305,8 @@ What changed:
   `prereg_diff`, `reproducibility_stamp`, `reproducibility_verify`,
   `validate_ledger`, `charter_interview`, `draft_imrad`, `standup`,
   `render_capability_dag`, `render_explanation_dag`, `lit_fetch`,
-  `cpcv`, `pbo`, `multiple_testing`, `regime_label`, `exit_compare`,
-  `build_plugin`. Audited fixes in: `psr_dsr` (per-period vs annualized
+  `cpcv`, `pbo`, `multiple_testing`, `regime_label`, `exit_compare`.
+  Audited fixes in: `psr_dsr` (per-period vs annualized
   SR clarified), `bootstrap_sharpe` (Politis-Romano stationary bootstrap
   implemented; previous version cited it but ran moving-block bootstrap),
   `walk_forward` (true anchored / sliding refit; previous version was
