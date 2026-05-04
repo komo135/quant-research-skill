@@ -76,16 +76,15 @@ If you want Jupyter, you will be fighting the skill, not using it.
 
 ## What you get, in one paragraph
 
-Start a project → the skill scaffolds a folder with `research_state.md`,
-`hypotheses.md`, `literature/papers.md`, `literature/differentiation.md`,
-`purposes/`, `results/`, `decisions.md`, and `reproducibility/`. Work begins by
-choosing R&D or Pure Research. R&D work builds a technology map and advances one
-small capability at a time. Pure Research work builds a research-state map,
-lists competing explanations, runs the smallest discriminating trial, and treats
-misses / ambiguity as first-class evidence. Hypotheses are admitted only when
-both success and failure update a named state row. Heavy review remains
-available, but it is no longer the default unit of quality; ordinary quality is
-managed by entry, design, interpretation, and state-update gates.
+Start a project → the skill scaffolds a folder with mode-specific protocol
+state (`charter.md` + `capability_map.md` for R&D, or `prfaq.md` +
+`explanation_ledger.md` for Pure Research), plus `decisions.md`,
+`literature/`, `purposes/`, `results/`, `configs/`, `src/`, `tests/`, and
+`reproducibility/`. Work begins by choosing R&D or Pure Research and keeping the
+protocol layer separate from project-instance work. R&D advances one capability
+at a time through TRL gates. Pure Research prunes competing explanations through
+pre-registered discriminating trials. Generated reports are snapshots; durable
+state transitions live in the ledger and decision log.
 
 ## Quality management
 
@@ -169,21 +168,23 @@ The installed Codex skills are exposed as `quant-research` and
 
 A typical research session:
 
-1. **Bootstrap a project.** The skill scaffolds `research_state.md`,
-   `hypotheses.md`, `decisions.md`, literature files, notebooks, results, and
-   reproducibility files.
-2. **Choose mode.** Write R&D or Pure Research in `research_state.md`.
-3. **Orient before testing.** Read prior work and the user's prior decisions.
-4. **Admit only useful hypotheses.** Add a hypothesis only if success and
-   failure both update a named state row.
+1. **Bootstrap a project.** The skill scaffolds protocol/state artifacts,
+   literature files, trial notebooks, generated-results folders,
+   reproducibility files, and project-instance `configs/`, `src/`, and `tests/`
+   placeholders.
+2. **Choose mode.** R&D uses `charter.md` + `capability_map.md`; Pure Research
+   uses `prfaq.md` + `explanation_ledger.md`.
+3. **Keep boundaries clean.** Protocol docs define schemas, gates, statuses,
+   and promotion rules. Concrete symbols, candidates, parameters, data paths,
+   implementation, and generated reports stay in project-instance artifacts.
+4. **Orient before testing.** Read prior work and the user's prior decisions.
 5. **Run the smallest discriminating trial.** Keep data splits and sanity checks
    visible.
 6. **Analyze misses deeply.** Failed and ambiguous results must weaken, split,
-   or retire explanations rather than trigger a pile of new variants.
-7. **Update state before adding work.** Update `research_state.md`,
-   `hypotheses.md`, and `decisions.md`; merge or retire rows before adding new
-   ones.
-8. **Promote only when warranted.** Run robustness / bug-review /
+   park, or retire rows rather than trigger a pile of new variants.
+7. **Update state before adding work.** Update `capability_map.md` or
+   `explanation_ledger.md`, then record durable transitions in `decisions.md`.
+8. **Promote only when warranted.** Run robustness / process / conclusion review /
    `experiment-review` when a result will become a supported claim or drive a
    high-impact decision.
 
@@ -192,7 +193,7 @@ A typical research session:
 | script | purpose |
 |---|---|
 | `new_project.py` | Initialize a research project folder with the standard layout |
-| `new_purpose.py` | Generate a numbered Purpose notebook (one parent thesis per file) from the template |
+| `new_trial.py` | Generate a numbered trial notebook anchored to a capability or pre-registration |
 | `aggregate_results.py` | Append rows to `results/results.parquet` and query them |
 | `walk_forward.py` | Compute Sharpe distribution over rolling windows |
 | `bootstrap_sharpe.py` | Block-bootstrap CI for per-trade Sharpe |
@@ -249,7 +250,18 @@ The skill leans on a small number of well-known references:
 <details>
 <summary>Changelog (click to expand)</summary>
 
-### v1.0.2 (current)
+### v1.0.3 (current)
+
+- Added an explicit protocol-layer / project-instance-layer boundary contract
+  to prevent reusable skill instructions from absorbing active research
+  candidates, tuned parameters, PnL snapshots, or trial conclusions.
+- New project scaffolds now include `configs/`, `src/`, and `tests/` as
+  project-instance work areas, keeping concrete experiments out of protocol
+  state files.
+- Pure Research scaffolds now create `prereg/PR_001.md` and `new_trial.py`
+  no longer falls back to retired `purpose.py.template` assets.
+
+### v1.0.2
 
 - Codex marketplace installation now uses the repository root as the plugin
   root (`source.path = "."`), matching the Claude plugin layout.

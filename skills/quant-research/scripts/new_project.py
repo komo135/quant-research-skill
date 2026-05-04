@@ -16,6 +16,9 @@ What gets created:
         literature/papers.md               (from assets/shared/papers.md.template)
         literature/differentiation.md      (from assets/shared/differentiation.md.template)
         purposes/INDEX.md                  (from assets/shared/INDEX.md.template)
+        configs/                           (project-instance experiment configs)
+        src/                               (project-instance implementation)
+        tests/                             (project-instance verification)
         prereg/                            (empty; populated by prereg_freeze.py)
         results/figures/                   (empty)
         results/intermediate/              (empty)
@@ -29,6 +32,7 @@ What gets created:
 
     Pure Research mode adds:
         prfaq.md                           (from assets/pure_research/prfaq.md.template)
+        prereg/PR_001.md                   (from assets/pure_research/preregistration.md.template)
         explanation_ledger.md              (from assets/pure_research/explanation_ledger.md.template)
         imrad_draft.md                     (from assets/pure_research/imrad_draft.md.template, started early)
 
@@ -50,7 +54,6 @@ ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 
 COMMON_FILES = [
     # (source_template_name, dest_relative_path)
-    # Templates are looked up in shared/ first, then root assets/ for backward compat.
     ("decisions.md.template", "decisions.md"),
     ("papers.md.template", "literature/papers.md"),
     ("differentiation.md.template", "literature/differentiation.md"),
@@ -65,6 +68,7 @@ RD_FILES = [
 
 PR_FILES = [
     ("prfaq.md.template", "prfaq.md"),
+    ("preregistration.md.template", "prereg/PR_001.md"),
     ("explanation_ledger.md.template", "explanation_ledger.md"),
     ("imrad_draft.md.template", "imrad_draft.md"),
     ("README.md.template", "README.md"),
@@ -72,14 +76,11 @@ PR_FILES = [
 
 
 def find_template(name: str, mode_subdir: str | None) -> Path:
-    """Find a template under assets/<mode_subdir>/ or assets/shared/ or assets/ root."""
+    """Find a template under assets/<mode_subdir>/ or assets/shared/."""
     candidates = []
     if mode_subdir:
         candidates.append(ASSETS_DIR / mode_subdir / name)
-    candidates.extend([
-        ASSETS_DIR / "shared" / name,
-        ASSETS_DIR / name,  # legacy path
-    ])
+    candidates.append(ASSETS_DIR / "shared" / name)
     for c in candidates:
         if c.exists():
             return c
@@ -96,21 +97,27 @@ def init_project(name: str, root: Path, mode: str) -> Path:
 
     # Directory layout
     for sub in [
+        "configs",
         "literature",
         "purposes",
         "prereg",
         "results/figures",
         "results/intermediate",
         "reproducibility",
+        "src",
+        "tests",
     ]:
         (project_dir / sub).mkdir(parents=True, exist_ok=True)
 
     # .gitkeep for empty dirs
     for keep in [
+        "configs/.gitkeep",
         "prereg/.gitkeep",
         "results/.gitkeep",
         "results/figures/.gitkeep",
         "results/intermediate/.gitkeep",
+        "src/.gitkeep",
+        "tests/.gitkeep",
     ]:
         (project_dir / keep).touch()
 
@@ -130,6 +137,14 @@ def init_project(name: str, root: Path, mode: str) -> Path:
         # Substitute project name in README
         if dest_rel == "README.md":
             content = src.read_text(encoding="utf-8").replace("<REPLACE: project name>", name)
+            dest.write_text(content, encoding="utf-8")
+        elif dest_rel == "prereg/PR_001.md":
+            content = (
+                src.read_text(encoding="utf-8")
+                .replace("PR_<REPLACE: id, e.g., 001>", "PR_001")
+                .replace("PR_<id>", "PR_001")
+                .replace("<REPLACE: id>", "001")
+            )
             dest.write_text(content, encoding="utf-8")
         else:
             shutil.copy(src, dest)
@@ -170,7 +185,7 @@ def print_next_steps(project_dir: Path, mode: str) -> None:
         print(f"  4. Edit {project_dir}/prereg/PR_001.md — pre-register first trial")
         print(f"  5. Freeze: python scripts/prereg_freeze.py --type prereg --id PR_001 --path {project_dir}/prereg/PR_001.md")
         print(f"  6. Edit {project_dir}/explanation_ledger.md — add Q1 + ≥2 competing E + null")
-        print(f"  7. Run: python scripts/new_trial.py --project {project_dir} --mode pure-research --prereg-id PR_001")
+        print(f"  7. Run: python scripts/new_trial.py --project-dir {project_dir} --slug <trial_slug> --prereg-id PR_001 --question-id Q1 --discriminating 'E1 vs E2'")
     print()
     print("Reminder: per SKILL.md § Initial-day prohibitions, no implementation / trial")
     print("execution on day 1. Setup, charter / PR-FAQ, and pre-registration only.")

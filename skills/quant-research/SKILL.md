@@ -70,6 +70,38 @@ protocol**:
 Sneaking the pivot in by relabeling rows or quietly broadening scope is the
 failure mode this protocol prevents.
 
+## Framework Boundary
+
+This skill defines the **protocol layer**. It must stay separate from the
+**project instance layer**.
+
+| Layer | Owns | Must not contain |
+|---|---|---|
+| Protocol layer | Schemas, gates, status vocabulary, required evidence, promotion rules | Active candidates, selected symbols, tuned parameters, current PnL, experiment-specific conclusions |
+| Project instance layer | Concrete research target, candidate definitions, data paths, configs, implementation, generated reports | New protocol rules, reusable workflow changes, hidden state transitions |
+
+Do not embed active candidates in reusable workflow docs, skill templates, or
+protocol references. A phrase like "the current EURUSD h16 candidate" belongs
+in a project trial report, a config, a decision entry, or a project state
+index, not in this skill or its reusable templates.
+
+Generated reports are snapshots. They may summarize observations, but they are
+not the source of truth for state transitions. The authoritative state lives in
+`capability_map.md` or `explanation_ledger.md`, with durable transitions in
+`decisions.md` and evidence links to trial artifacts.
+
+When inheriting an existing project, diagnose boundary violations before doing
+new research:
+
+- Protocol documents should describe schemas and gates only.
+- State ledgers should contain IDs, status, TRL / analysis tier, blockers,
+  exit criteria, kill criteria, and evidence links.
+- Project-instance artifacts should contain concrete symbols, universes,
+  model classes, parameter grids, data paths, code, configs, and generated
+  reports.
+- If a file tries to be workflow guide + current candidate report + TODO list,
+  split it before promoting any claim.
+
 ### Status terminology (R&D)
 
 Three distinct status terms apply at three different scopes. They are not
@@ -324,6 +356,9 @@ literature/papers.md             # prior work
 literature/differentiation.md    # how this differs from prior work
 purposes/INDEX.md                # trial index
 results/results.parquet          # mode-aware aggregated trial results
+configs/                         # project-instance experiment configs
+src/                             # project-instance implementation, if any
+tests/                           # project-instance verification, if any
 reproducibility/{env.lock,data_hashes.txt,seed.txt}
 ```
 

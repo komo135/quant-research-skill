@@ -32,6 +32,15 @@ technologies. See § H3 for examples.>
 the decision currently blocked. If you cannot name the consumer and the
 blocked decision, the capability has no demand. See § H4.>
 
+## H4b. Research payload boundary
+
+<REPLACE: state what this R&D project will and will not claim. If this project
+builds a framework, pipeline, evaluator, or infrastructure, its success is the
+capability working against fixed acceptance fixtures. Newly discovered alpha,
+factor validity, market mechanism, or strategy profitability claims must be
+tracked as separate project-instance trials, and promoted only through the
+appropriate R&D capability gate or a separate Pure Research project.>
+
 ## H5. If we succeed, what changes downstream?
 
 <REPLACE: describe the world after success in concrete terms. What
