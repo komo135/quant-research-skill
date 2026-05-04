@@ -74,12 +74,10 @@ def find_template(mode: str) -> Path:
     if mode == "rd":
         candidates = [
             ASSETS_DIR / "rd" / "rd_trial.py.template",
-            ASSETS_DIR / "purpose.py.template",  # legacy fallback
         ]
     else:
         candidates = [
             ASSETS_DIR / "pure_research" / "pr_trial.py.template",
-            ASSETS_DIR / "purpose.py.template",  # legacy fallback
         ]
     for c in candidates:
         if c.exists():
