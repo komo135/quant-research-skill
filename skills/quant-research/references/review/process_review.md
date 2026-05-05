@@ -22,10 +22,10 @@ correct (caught by conclusion review), but a process violation
 (skipped pre-registration, mid-trial goalpost shift) corrupts every
 downstream check (caught here).
 
-**Process review fires every check; even one process violation blocks
-promotion**. Per the `Kill > Promote` asymmetry (CHARTER C10), a single
-fired check kills promotion eligibility, while promotion requires every
-check to pass with concrete evidence cited.
+**Process review separates blocking violations from logged gaps**. A
+load-bearing process violation blocks promotion; a non-load-bearing record gap
+is logged and may narrow the claim or require cleanup, but does not by itself
+kill promotion eligibility.
 
 ## How to run
 
@@ -38,8 +38,9 @@ walks each item below and writes:
 - [ ] item — N/A (justify why)
 ```
 
-"Looks good" / "obvious from context" / "I think this is OK" are
-forbidden. Each pass requires a specific citation.
+"Looks good" / "obvious from context" / "I think this is OK" are forbidden.
+Load-bearing passes require a specific citation. Lightweight process checks may
+use a concise summary when they are not used to support promotion.
 
 ## Common pre-conditions (both modes)
 
@@ -54,10 +55,12 @@ These checks apply regardless of discipline:
     pivot protocol per `SKILL.md` § First Decision was followed
     (suspend+restart or add secondary project, both with explicit
     `decisions.md` entry)
-- [ ] **Session-end ritual followed**: every session has either a
+- [ ] **Session-end ritual followed for durable state changes**: sessions
+  that changed ledgers, claims, gates, or promotion evidence have either a
   ledger row update or `no progress: <reason>` entry in `decisions.md`
-  - Evidence: scan `decisions.md` for chronological coverage; flag
-    any gap > 2 weeks without entry
+  - Evidence: scan `decisions.md` for chronological coverage of state
+    transitions; gaps are findings only when durable work occurred without a
+    corresponding entry
 - [ ] **Decision-log covers major project events**: `decisions.md`
   has entries for ALL major decision categories that should exist
   for this project's stage:
@@ -317,11 +320,11 @@ specifically targeting Hypothesizing After Results are Known)
 
 ## Outcome of process review
 
-- **All checks pass with citations** → process review CLEAN; proceed
+- **All load-bearing checks pass with citations** → process review CLEAN; proceed
   to `conclusion_review.md`
-- **Any check fails or N/A without justification** → process review
-  FAILED; cannot proceed to promotion until fix is applied AND
-  process re-reviewed
+- **Any load-bearing check fails or N/A without justification** → process
+  review FAILED; cannot proceed to promotion until fixed or the claim is
+  narrowed so it no longer depends on the failure
 - **Process review report** written into `decisions.md` under section
   `## YYYY-MM-DD Process review for promotion of <X>`
 
