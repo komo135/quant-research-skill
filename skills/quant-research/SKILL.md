@@ -139,9 +139,10 @@ reference before executing the step:
    (operational prototype) is the promotion line. TRL advancement is evidence-based;
    do not claim a level unless the evidence meets that level's definition.
 5. **Stages** (`references/rd/rd_stages.md`) — for each capability run
-   Scoping → De-risk → Build → Validate → Integrate, with a Go/Kill gate
-   between each. Tackle the hardest sub-question first; de-risk to kill, not
-   to confirm.
+   Scoping → De-risk → Build → Validate → Integrate, with Go / Kill /
+   Hold / Recycle decision points between each. Tackle the hardest
+   sub-question first; de-risk to learn whether to continue, hold, recycle,
+   or terminate, not to confirm.
 6. **Workflow** (`references/rd/rd_workflow.md`) — initial-day prohibitions,
    session-end ritual, stop conditions.
 7. **Promotion** (`references/rd/rd_promotion_gate.md`) — promote a target
@@ -345,8 +346,8 @@ verdicts are forbidden.
 - **Reproducibility 3-tuple**. Every promotion-eligible or claim-cited trial
   stamps data hash + git commit + env lock via
   `scripts/reproducibility_stamp.py`. Exploratory, smoke-test, and debugging
-  runs may use lightweight run notes; if later cited for promotion, stamp or
-  rerun under the promotion-eligible protocol.
+  runs may use lightweight run notes. If later needed for promotion, rerun under the promotion-eligible protocol; do not retroactively stamp exploratory output
+  as if it had been captured at trial time.
 - **Frozen artifacts**. Charter, pre-registration, and kill-criteria fire log
   are SHA-256 hash-locked as review anchors. Editing is detectable, not
   physically impossible; any load-bearing amendment requires an explicit

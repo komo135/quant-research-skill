@@ -80,10 +80,10 @@ These checks apply regardless of discipline:
   - Evidence: review first 1-2 days' commits and decisions; flag any
     code execution that produced metrics before charter / pre-reg
     was frozen
-- [ ] **Reproducibility 3-tuple stamped** on every promotion-eligible
-  trial via `scripts/reproducibility_stamp.py`
-  - Evidence: per-trial entry in `results.parquet` showing data hash
-    + git commit + env lock hash
+- [ ] **Reproducibility 3-tuple stamped** on every promotion-eligible or claim-cited trial via `scripts/reproducibility_stamp.py`
+  - Evidence: persisted JSON stamp record in `results.parquet`, the trial
+    analysis section, or another durable run log showing data hash + git
+    commit + env lock hash
 - [ ] **Frozen artifacts not edited in place**: charter, PR/FAQ,
   pre-registration files have hash matching their `.lock` files
   - Evidence: `git log` + hash comparison

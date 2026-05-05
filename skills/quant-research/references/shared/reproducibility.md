@@ -156,7 +156,7 @@ The helper script captures the 3-tuple at trial time:
 
 ```bash
 python scripts/reproducibility_stamp.py \
-  --project <project_name> \
+  --project-dir <project_dir> \
   --trial-id <trial_id> \
   --data-paths data/raw/spx_5min_2010_2024.parquet data/raw/vix_daily_1990_2024.parquet \
   [--seed 42]
@@ -186,7 +186,7 @@ auto-detect imports.
 
 The promotion gate (`rd_promotion_gate.md` § H,
 `pr_promotion_gate.md` § G) requires this script to have been run
-with exit 0 for every promotion-cited trial.
+with exit 0 for every promotion-eligible or claim-cited trial.
 
 ## Verification (re-running a stamped trial)
 
@@ -197,7 +197,8 @@ python scripts/reproducibility_verify.py --trial-id <trial_id>
 ```
 
 This script:
-1. Reads the trial's recorded 3-tuple from `results.parquet`
+1. Reads the trial's recorded 3-tuple from the durable run log
+   (`results.parquet`, trial analysis section, or equivalent)
 2. Verifies the current Git commit matches (or warns if checked out
    to a different commit)
 3. Hashes the current `data/raw/` files and compares to recorded
@@ -238,7 +239,7 @@ Cited claim: E<id> at status `supported`
 Source trial: trial_<NNN>
 Source 3-tuple:
   - Data hash: <hash from source project's data_hashes.txt>
-  - Git commit: <hash from source project's results.parquet>
+  - Git commit: <hash from source project's persisted stamp record>
   - Env lock hash: <hash from source project's env_lock_hash.txt>
 ```
 

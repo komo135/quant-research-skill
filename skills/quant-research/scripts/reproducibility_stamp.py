@@ -1,5 +1,5 @@
 """reproducibility_stamp.py — Capture the 3-tuple (data hash + git commit + env lock)
-for a promotion-eligible trial.
+for a promotion-eligible or claim-cited trial.
 
 Per `references/shared/reproducibility.md` and CHARTER C12 / D-16 (uv).
 
@@ -12,8 +12,8 @@ Writes/updates files in <project_dir>/reproducibility/:
 Also returns / prints a JSON-formatted stamp record with:
     trial_id, stamped_at (UTC ISO), git_commit, env_lock_hash, data_hashes, seed
 
-The trial notebook should capture this output and persist it to results/results.parquet
-or to its own analysis section.
+The trial notebook or caller should capture this output and persist it to
+results/results.parquet, its own analysis section, or another durable run log.
 
 Usage:
     python scripts/reproducibility_stamp.py \\
