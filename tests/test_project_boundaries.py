@@ -113,7 +113,102 @@ class ProjectBoundaryTests(unittest.TestCase):
             content = (project / "prereg/PR_001.md").read_text(encoding="utf-8")
             self.assertIn("Pre-Registration", content)
 
-    def test_rd_trial_scaffold_is_protocol_agnostic_evidence_artifact(self) -> None:
+    def test_trial_scaffold_is_protocol_agnostic_evidence_artifact(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            for project_name, mode, forbidden in [
+                (
+                    "alpha",
+                    "rd",
+                    [
+                        "Capability under test",
+                        "Parent core technology",
+                        "TRL transition target",
+                        "Exit criterion under evaluation",
+                        "Kill criterion under evaluation",
+                    ],
+                ),
+                (
+                    "beta",
+                    "pure-research",
+                    [
+                        "Question under test",
+                        "E-pair being discriminated",
+                        "Trial design (copied from frozen pre-reg)",
+                        "State updates (explanation_ledger.md)",
+                    ],
+                ),
+            ]:
+                subprocess.run(
+                    [
+                        sys.executable,
+                        str(ROOT / "skills/quant-research/scripts/new_project.py"),
+                        project_name,
+                        "--mode",
+                        mode,
+                        "--root",
+                        tmp,
+                    ],
+                    check=True,
+                    cwd=ROOT,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                )
+
+                project = Path(tmp) / project_name
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        str(ROOT / "skills/quant-research/scripts/new_trial.py"),
+                        "--project-dir",
+                        str(project),
+                        "--slug",
+                        "latency_benchmark",
+                    ],
+                    cwd=ROOT,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                )
+
+                self.assertEqual(result.returncode, 0, result.stderr)
+                trial = project / "purposes/trial_001_latency_benchmark.py"
+                self.assertTrue(trial.exists())
+                content = trial.read_text(encoding="utf-8")
+                self.assertIn("Evidence artifact", content)
+                self.assertIn("purposes/trial_001_latency_benchmark.py", content)
+                self.assertNotIn("purposes/trial_001_latency benchmark.py", content)
+                for phrase in forbidden:
+                    self.assertNotIn(phrase, content)
+
+    def test_trial_index_tracks_evidence_artifacts_not_ledger_state_updates(self) -> None:
+        index_template = read_text("skills/quant-research/assets/shared/INDEX.md.template")
+
+        self.assertIn("evidence artifact", index_template.lower())
+        self.assertIn("ledger assessment", index_template.lower())
+        for phrase in [
+            "linked capability/explanation",
+            "state row updated",
+            "done only when it changes the project state",
+        ]:
+            self.assertNotIn(phrase, index_template)
+
+    def test_results_rows_are_evidence_records_not_protocol_state_records(self) -> None:
+        aggregate_results = load_module("skills/quant-research/scripts/aggregate_results.py")
+        for mode in ["rd", "pure-research"]:
+            row = {
+                "project": "alpha",
+                "trial_id": "trial_001",
+                "mode": mode,
+                "run_timestamp": "2026-05-06T00:00:00Z",
+                "verdict": "observed",
+                "notebook_path": "purposes/trial_001_latency_benchmark.py",
+                "analysis_tier": "A2",
+            }
+
+            self.assertEqual([], aggregate_results.validate_row(row))
+
+    def test_new_trial_inserts_entries_inside_index_table(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             subprocess.run(
                 [
@@ -131,9 +226,8 @@ class ProjectBoundaryTests(unittest.TestCase):
                 stderr=subprocess.PIPE,
                 text=True,
             )
-
             project = Path(tmp) / "alpha"
-            result = subprocess.run(
+            subprocess.run(
                 [
                     sys.executable,
                     str(ROOT / "skills/quant-research/scripts/new_trial.py"),
@@ -142,51 +236,17 @@ class ProjectBoundaryTests(unittest.TestCase):
                     "--slug",
                     "latency_benchmark",
                 ],
+                check=True,
                 cwd=ROOT,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
             )
 
-            self.assertEqual(result.returncode, 0, result.stderr)
-            trial = project / "purposes/trial_001_latency_benchmark.py"
-            self.assertTrue(trial.exists())
-            content = trial.read_text(encoding="utf-8")
-            self.assertIn("Evidence artifact", content)
-            for phrase in [
-                "Capability under test",
-                "Parent core technology",
-                "TRL transition target",
-                "Exit criterion under evaluation",
-                "Kill criterion under evaluation",
-            ]:
-                self.assertNotIn(phrase, content)
-
-    def test_trial_index_tracks_evidence_artifacts_not_ledger_state_updates(self) -> None:
-        index_template = read_text("skills/quant-research/assets/shared/INDEX.md.template")
-
-        self.assertIn("evidence artifact", index_template.lower())
-        self.assertIn("ledger assessment", index_template.lower())
-        for phrase in [
-            "linked capability/explanation",
-            "state row updated",
-            "done only when it changes the project state",
-        ]:
-            self.assertNotIn(phrase, index_template)
-
-    def test_results_rows_are_evidence_records_not_rd_state_records(self) -> None:
-        aggregate_results = load_module("skills/quant-research/scripts/aggregate_results.py")
-        row = {
-            "project": "alpha",
-            "trial_id": "trial_001",
-            "mode": "rd",
-            "run_timestamp": "2026-05-06T00:00:00Z",
-            "verdict": "observed",
-            "notebook_path": "purposes/trial_001_latency_benchmark.py",
-            "analysis_tier": "A2",
-        }
-
-        self.assertEqual([], aggregate_results.validate_row(row))
+            index = (project / "purposes/INDEX.md").read_text(encoding="utf-8")
+            row = "| trial_001 | rd | purposes/trial_001_latency_benchmark.py | none | in-progress | pending |"
+            self.assertIn(row, index)
+            self.assertLess(index.index(row), index.index("## Artifact-status legend"))
 
     def test_results_schema_doc_describes_queryable_evidence_not_state_transitions(self) -> None:
         schema = read_text("skills/quant-research/references/shared/results_db_schema.md")
@@ -212,6 +272,23 @@ class ProjectBoundaryTests(unittest.TestCase):
             "Critical path summary",
         ]:
             self.assertNotIn(phrase, readme_template)
+
+    def test_public_docs_do_not_describe_trials_as_protocol_anchored(self) -> None:
+        combined_docs = "\n".join(
+            [
+                read_text("README.md"),
+                read_text("skills/quant-research/assets/purpose.py.template"),
+            ]
+        )
+
+        self.assertIn("evidence artifact", combined_docs.lower())
+        for phrase in [
+            "anchored to a capability or pre-registration",
+            "capability + Stage-Gate anchored",
+            "pre-registration + explanation-discrimination anchored",
+            "core_tech_id, `lifecycle`",
+        ]:
+            self.assertNotIn(phrase, combined_docs)
 
     def test_project_helpers_do_not_fall_back_to_retired_templates(self) -> None:
         new_project = read_text("skills/quant-research/scripts/new_project.py")

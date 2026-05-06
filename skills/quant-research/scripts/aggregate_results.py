@@ -6,10 +6,6 @@ Common required fields (both modes):
     project, trial_id, mode, run_timestamp, sharpe (or primary_metric),
     verdict, notebook_path, analysis_tier (A0-A5)
 
-Pure Research-specific required fields (when mode == "pure-research"):
-    question_id (Q-id), prereg_id (PR_NNN), explanation_status_change
-    (e.g., "E2: active -> supported"), prereg_diff_exit (0/1/2)
-
 Reproducibility 3-tuple (both modes, recommended for promotion-eligible):
     data_hash_sha256, git_commit, env_lock_hash
 
@@ -63,13 +59,6 @@ COMMON_REQUIRED = {
     "analysis_tier",
 }
 
-PR_REQUIRED = {
-    "question_id",
-    "prereg_id",
-    "explanation_status_change",
-    "prereg_diff_exit",
-}
-
 VALID_MODES = {"rd", "pure-research"}
 VALID_TIERS = {"A0", "A1", "A2", "A3", "A4", "A5"}
 
@@ -85,16 +74,10 @@ def validate_row(row: dict[str, Any]) -> list[str]:
     mode = row.get("mode")
     if mode not in VALID_MODES:
         errors.append(f"mode must be one of {VALID_MODES}, got {mode!r}")
-    else:
-        if mode == "pure-research":
-            missing_pr = PR_REQUIRED - row.keys()
-            if missing_pr:
-                errors.append(f"Pure Research mode missing required fields: {sorted(missing_pr)}")
-            prereg_diff = row.get("prereg_diff_exit")
-            if prereg_diff not in (0, 1, 2):
-                errors.append(
-                    f"prereg_diff_exit must be 0/1/2, got {prereg_diff!r}"
-                )
+    elif row.get("prereg_diff_exit") is not None:
+        prereg_diff = row.get("prereg_diff_exit")
+        if prereg_diff not in (0, 1, 2):
+            errors.append(f"prereg_diff_exit must be 0/1/2, got {prereg_diff!r}")
 
     tier = row.get("analysis_tier")
     if tier and tier not in VALID_TIERS:

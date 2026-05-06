@@ -209,7 +209,7 @@ def _(mo):
 
     Suggested assessment entry:
 
-    - Evidence artifact: `purposes/trial_<REPLACE: NNN>_<REPLACE: short title>.py`
+    - Evidence artifact: `<REPLACE: artifact path>`
     - Used for: <REPLACE: ledger row / claim being assessed>
     - Judgment: <REPLACE: no transition | advance | block | terminal review opened>
     - Rationale: <REPLACE: evidence citation and analysis tier>

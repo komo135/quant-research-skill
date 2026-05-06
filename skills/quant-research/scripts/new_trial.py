@@ -6,7 +6,7 @@ template based on whether the project is R&D or Pure Research.
 Per CHARTER C1 and the templates:
 - R&D: assets/rd/rd_trial.py.template (protocol-agnostic evidence artifact)
 - Pure Research: assets/pure_research/pr_trial.py.template
-  (pre-registration-anchored)
+  (protocol-agnostic evidence artifact)
 
 Trial files are named `trial_NNN_<slug>.py` in `<project>/purposes/`.
 
@@ -15,8 +15,7 @@ Usage:
     python scripts/new_trial.py --project-dir <path> --slug latency_benchmark
 
     # Pure Research
-    python scripts/new_trial.py --project-dir <path> --slug vol_carry_decay_test \\
-        --prereg-id PR_001 --question-id Q1 --discriminating "E1 vs E2"
+    python scripts/new_trial.py --project-dir <path> --slug vol_carry_decay_test
 
 Exit codes:
     0: trial notebook created
@@ -90,23 +89,28 @@ def substitute_rd(content: str, slug: str, nnn: str, project_name: str) -> str:
         content
         .replace("<REPLACE: NNN>", nnn)
         .replace("<REPLACE: short title>", slug.replace("_", " "))
+        .replace("<REPLACE: artifact path>", f"purposes/trial_{nnn}_{slug}.py")
         .replace("<REPLACE: project name>", project_name)
     )
 
 
-def substitute_pr(content: str, prereg_id: str, question_id: str,
-                  discriminating: str, slug: str, nnn: str, project_name: str) -> str:
+def substitute_pr(content: str, prereg_id: str | None, question_id: str | None,
+                  discriminating: str | None, slug: str, nnn: str, project_name: str) -> str:
     """Replace <REPLACE: ...> markers in PR trial template that we can fill from args."""
-    return (
+    content = (
         content
         .replace("<REPLACE: NNN>", nnn)
         .replace("<REPLACE: short title>", slug.replace("_", " "))
+        .replace("<REPLACE: artifact path>", f"purposes/trial_{nnn}_{slug}.py")
         .replace("<REPLACE: project name>", project_name)
-        .replace("Q<REPLACE: Q-id>", question_id)
-        .replace("E<REPLACE: id> vs E<REPLACE: id>", discriminating)
-        .replace("prereg/PR_<REPLACE: id>", f"prereg/{prereg_id}")
-        .replace("PR_<REPLACE: id>", prereg_id)
     )
+    if question_id:
+        content = content.replace("<REPLACE: optional ledger row / claim>", question_id)
+    if prereg_id:
+        content = content.replace("<REPLACE: optional prereg reference>", f"prereg/{prereg_id}.md")
+    if discriminating:
+        content = content.replace("<REPLACE: optional discriminating contrast>", discriminating)
+    return content
 
 
 def create_trial(args: argparse.Namespace) -> Path:
@@ -115,12 +119,6 @@ def create_trial(args: argparse.Namespace) -> Path:
         raise FileNotFoundError(f"project not found: {project_dir}")
 
     mode = detect_mode(project_dir)
-
-    if mode != "rd":
-        if not (args.prereg_id and args.question_id and args.discriminating):
-            raise ValueError(
-                "Pure Research project requires --prereg-id, --question-id, --discriminating"
-            )
 
     purposes_dir = project_dir / "purposes"
     n = next_trial_number(purposes_dir)
@@ -156,10 +154,14 @@ def create_trial(args: argparse.Namespace) -> Path:
         else:
             new_row = (
                 f"| trial_{nnn} | pure-research | purposes/trial_{nnn}_{slug}.py | "
-                f"{args.question_id} ({args.prereg_id}; {args.discriminating}) | in-progress | pending |\n"
+                f"none | in-progress | pending |\n"
             )
-        # Append to end (simple approach)
-        index_path.write_text(index.rstrip() + "\n" + new_row, encoding="utf-8")
+        marker = "\n## Artifact-status legend"
+        if marker in index:
+            before, after = index.split(marker, 1)
+            index_path.write_text(before.rstrip() + "\n" + new_row + marker + after, encoding="utf-8")
+        else:
+            index_path.write_text(index.rstrip() + "\n" + new_row, encoding="utf-8")
 
     return out_path
 
@@ -170,10 +172,10 @@ def main() -> None:
     p.add_argument("--slug", required=True, help="trial slug (alphanumeric + _)")
     # R&D trials are protocol-agnostic evidence artifacts; ledger files link
     # them to capability claims during assessment.
-    # Pure Research-specific
-    p.add_argument("--prereg-id", help="(Pure Research) pre-registration ID, e.g. PR_001")
-    p.add_argument("--question-id", help="(Pure Research) question ID, e.g. Q1")
-    p.add_argument("--discriminating", help="(Pure Research) E pair, e.g. 'E1 vs E2'")
+    # Optional protocol links. Evidence artifacts do not require them.
+    p.add_argument("--prereg-id", help="(optional) pre-registration ID, e.g. PR_001")
+    p.add_argument("--question-id", help="(optional) question ID, e.g. Q1")
+    p.add_argument("--discriminating", help="(optional) E pair, e.g. 'E1 vs E2'")
     args = p.parse_args()
 
     try:

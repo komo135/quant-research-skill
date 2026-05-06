@@ -5,16 +5,16 @@ research**. The `quant-research` skill now starts by choosing one of two modes:
 
 - **R&D / technology establishment** — for establishing a technical capability.
   The skill decomposes the target technology into small capabilities, assigns a
-  maturity level, and tests the smallest blocking capability with explicit exit
-  criteria.
+  maturity level, and assesses capability progress by citing neutral evidence
+  artifacts from trials and results.
 - **Pure Research** — for paper-like research and phenomenon understanding.
   The skill prioritizes prior-work review, competing explanations, failed-trial
   analysis, and research-state updates over fast conclusions.
 
 The core rule is: **prefer a precise unresolved state over a shallow
 conclusion**. Hypothesis quality management is intentionally lighter and more
-stateful than the previous protocol. A trial is complete only when it updates
-the research state: active / resolved / rejected / merged / stale / parked.
+stateful than the previous protocol. Evidence artifacts can be complete without
+moving research state; ledgers decide whether an artifact supports a transition.
 
 The separate `experiment-review` skill remains available for promotion moments:
 declaring a claim `supported`, external sharing, deployment recommendation,
@@ -81,10 +81,10 @@ state (`charter.md` + `capability_map.md` for R&D, or `prfaq.md` +
 `explanation_ledger.md` for Pure Research), plus `decisions.md`,
 `literature/`, `purposes/`, `results/`, `configs/`, `src/`, `tests/`, and
 `reproducibility/`. Work begins by choosing R&D or Pure Research and keeping the
-protocol layer separate from project-instance work. R&D advances one capability
-at a time through TRL gates. Pure Research prunes competing explanations through
-pre-registered discriminating trials. Generated reports are snapshots; durable
-state transitions live in the ledger and decision log.
+protocol layer separate from project-instance work. Trials and results are
+evidence artifacts; R&D capability assessment and Pure Research explanation
+assessment cite those artifacts from ledgers. Generated reports are snapshots;
+durable state transitions live in the ledger and decision log.
 
 ## Quality management
 
@@ -95,7 +95,7 @@ Routine quality management is handled by four lightweight gates:
 | Entry | What live question, explanation, or capability does this update? |
 | Design | What does success distinguish, and what does failure distinguish? |
 | Interpretation | What can be said directly, and what competing explanations remain? |
-| State update | What becomes active / resolved / rejected / merged / stale / parked? |
+| State update | Does a ledger assessment cite this artifact, and what transition is warranted? |
 
 Heavy review still exists, but only for promotion moments: supported-claim
 promotion, external sharing, deployment recommendation, research-line closure,
@@ -178,12 +178,13 @@ A typical research session:
    and promotion rules. Concrete symbols, candidates, parameters, data paths,
    implementation, and generated reports stay in project-instance artifacts.
 4. **Orient before testing.** Read prior work and the user's prior decisions.
-5. **Run the smallest discriminating trial.** Keep data splits and sanity checks
-   visible.
+5. **Run the smallest evidence-producing artifact.** Keep data splits and sanity
+   checks visible.
 6. **Analyze misses deeply.** Failed and ambiguous results must weaken, split,
    park, or retire rows rather than trigger a pile of new variants.
-7. **Update state before adding work.** Update `capability_map.md` or
-   `explanation_ledger.md`, then record durable transitions in `decisions.md`.
+7. **Assess evidence before adding work.** If warranted, cite the artifact from
+   `capability_map.md` or `explanation_ledger.md`, then record durable
+   transitions in `decisions.md`.
 8. **Promote only when warranted.** Run robustness / process / conclusion review /
    `experiment-review` when a result will become a supported claim or drive a
    high-impact decision.
@@ -193,8 +194,8 @@ A typical research session:
 | script | purpose |
 |---|---|
 | `new_project.py` | Initialize a research project folder with the standard layout |
-| `new_trial.py` | Generate a numbered trial notebook anchored to a capability or pre-registration |
-| `aggregate_results.py` | Append rows to `results/results.parquet` and query them |
+| `new_trial.py` | Generate a numbered evidence artifact notebook |
+| `aggregate_results.py` | Append queryable evidence records to `results/results.parquet` |
 | `walk_forward.py` | Compute Sharpe distribution over rolling windows |
 | `bootstrap_sharpe.py` | Block-bootstrap CI for per-trade Sharpe |
 | `psr_dsr.py` | Probabilistic / Deflated Sharpe Ratio |
@@ -260,6 +261,9 @@ The skill leans on a small number of well-known references:
   state files.
 - Pure Research scaffolds now create `prereg/PR_001.md` and `new_trial.py`
   no longer falls back to retired `purpose.py.template` assets.
+- R&D and Pure Research trial notebooks are evidence artifacts. Ledger files
+  cite them during capability or explanation assessment instead of embedding
+  protocol contracts in the generated notebook.
 
 ### v1.0.2
 
@@ -325,8 +329,7 @@ What changed:
   segment evaluation, renamed to `rolling_segment_sharpe`),
   `vol_targeted_size` (ATR → std conversion via √(π/2)), `sanity_checks`
   (random-signal benchmark gains a `signal_kind="normal"` option),
-  `aggregate_results` (mode-aware schema with `analysis_tier`,
-  `core_tech_id`, `lifecycle`).
+  `aggregate_results` (queryable evidence schema with `analysis_tier`).
 
 Breaking changes from 0.x:
 
