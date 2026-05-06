@@ -251,7 +251,24 @@ The skill leans on a small number of well-known references:
 <details>
 <summary>Changelog (click to expand)</summary>
 
-### v1.0.3 (current)
+### v1.0.5 (current)
+
+- Decoupled evidence artifacts from research contracts. R&D and Pure Research
+  trial notebooks now produce neutral artifacts, while ledgers cite those
+  artifacts during capability or explanation assessment.
+- `aggregate_results.py` now validates queryable evidence records with the
+  same required fields for both modes; mode-specific protocol identifiers live
+  in ledger assessment entries.
+- `new_trial.py` no longer requires capability, core-technology,
+  pre-registration, question, or explanation identifiers to create an evidence
+  artifact.
+
+### v1.0.4
+
+- Relaxed kill and reproducibility gates so terminal claims require concrete
+  evidence without overclaiming machine-verifiable reproducibility.
+
+### v1.0.3
 
 - Added an explicit protocol-layer / project-instance-layer boundary contract
   to prevent reusable skill instructions from absorbing active research

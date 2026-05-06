@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -26,6 +27,18 @@ def load_module(path: str):
 
 
 class ProjectBoundaryTests(unittest.TestCase):
+    def test_plugin_version_metadata_is_consistent(self) -> None:
+        expected = "1.0.5"
+        codex_plugin = json.loads(read_text(".codex-plugin/plugin.json"))
+        claude_plugin = json.loads(read_text(".claude-plugin/plugin.json"))
+        claude_marketplace = json.loads(read_text(".claude-plugin/marketplace.json"))
+        readme = read_text("README.md")
+
+        self.assertEqual(expected, codex_plugin["version"])
+        self.assertEqual(expected, claude_plugin["version"])
+        self.assertEqual(expected, claude_marketplace["plugins"][0]["version"])
+        self.assertIn(f"### v{expected} (current)", readme)
+
     def test_skill_defines_framework_boundary_contract(self) -> None:
         skill = read_text("skills/quant-research/SKILL.md")
 
