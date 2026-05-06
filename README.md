@@ -247,7 +247,9 @@ The skill leans on a small number of well-known references:
 
 ## Status
 
-- **Version 1.0.6** — single skill, two review axes (process + conclusion).
+- **Version 1.0.7** — optional R&D Program coordination plus explicit
+  Result-to-Question / Result-to-Capability loops, still as a single skill with
+  two review axes (process + conclusion).
 - Two strict disciplines: R&D mode (Heilmeier charter → two-layer
   decomposition → Cooper Stage-Gate per capability) and Pure Research mode
   (PR/FAQ → AEA-style hash-locked pre-registration → explanation-pruning
@@ -260,7 +262,18 @@ The skill leans on a small number of well-known references:
 <details>
 <summary>Changelog (click to expand)</summary>
 
-### v1.0.6 (current)
+### v1.0.7 (current)
+
+- Added an optional R&D Program coordination layer for portfolios that combine
+  R&D capability establishment with Pure Research child projects.
+- Added shared Result-to-Question and Result-to-Capability loops so experiment
+  outcomes promote follow-up questions, capability updates, and stop/continue
+  decisions explicitly.
+- Added right-sized rigor guidance and Program Map boundaries to prevent
+  protocol files from absorbing project-instance facts such as active symbols,
+  tuned parameters, or current PnL.
+
+### v1.0.6
 
 - Added selectable tracking/audit backends so agents can propose MLflow, W&B,
   Neptune, Trackio, TensorBoard, Sacred, DVC, local parquet/SQLite, or an
