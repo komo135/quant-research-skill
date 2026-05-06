@@ -72,6 +72,7 @@ assessment.
 │   ├── results.parquet     # portable default evidence index
 │   ├── figures/
 │   └── intermediate/       # parquet outputs of feature notebooks etc.
+├── tracking/               # optional tracker exports / complete run inventory
 └── reproducibility/
     ├── data_hashes.txt     # sha256 of each data source
     ├── shared_pins.txt     # commit hashes of shared/ infrastructure used
@@ -94,6 +95,8 @@ point:
 - [ ] `decisions.md` has chronological coverage (no gap > 4 weeks
   without explicit "no progress: <reason>" entry)
 - [ ] Tracking backend selection is recorded in `decisions.md`
+- [ ] Complete run inventory/export exists for all load-bearing, failed,
+  sweep, model-selection, and promotion-eligible attempts
 - [ ] Reproducibility 3-tuple is recorded for every promotion-eligible
   trial via `scripts/reproducibility_stamp.py` or an equivalent selected
   tracking backend

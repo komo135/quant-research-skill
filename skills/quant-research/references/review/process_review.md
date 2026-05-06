@@ -2,8 +2,8 @@
 
 Process review — was the discipline followed? This is the first of two
 review axes (the other is `conclusion_review.md` for claim warrant).
-Both must pass before any `matured` (R&D) or `supported` (Pure Research)
-promotion.
+Both must pass before any R&D transition to `matured`, `established`, or
+`promoted`, and before any Pure Research promotion to `supported`.
 
 ## When to read
 
@@ -92,11 +92,22 @@ These checks apply regardless of discipline:
     path, and minimum persisted fields. Acceptable backends include the local
     stamp/parquet default, MLflow, W&B, Neptune, Trackio, TensorBoard, Sacred,
     DVC, or an organizational tracker.
+  - Compatibility: for projects that already had valid local
+    `scripts/reproducibility_stamp.py` records before this requirement,
+    missing pre-trial backend selection is a logged gap, not a promotion
+    blocker. Treat local stamp/parquet as the implicit backend and require an
+    explicit backend decision before the next new load-bearing run.
 - [ ] **External tracker records, if used, satisfy the same audit anchors**
   as the local stamp protocol
-  - Evidence: for each cited trial, reviewer can resolve `trial_id` to
-    tracker run ID, artifact URI, data hash, git commit, env lock hash, seed,
-    params, and headline metrics
+  - Evidence: for each load-bearing or promotion-eligible `trial_id`, reviewer
+    can resolve tracker run ID, artifact URI, data hash, git commit, env lock
+    hash, seed, params, and headline metrics
+- [ ] **Complete run inventory exists** for multiple-testing and selection
+  audit
+  - Evidence: `results/results.parquet` if it is the canonical complete record,
+    or an exported tracker inventory / durable `tracking/` file covering every
+    load-bearing run, failed attempt, parameter-sweep combination,
+    model-selection attempt, and robustness variant that informed the decision
 - [ ] **Frozen artifacts not edited in place**: charter, PR/FAQ,
   pre-registration files have hash matching their `.lock` files
   - Evidence: `git log` + hash comparison
@@ -230,7 +241,7 @@ For Pure Research projects only. Check in this order:
   (`prereg/PR_<id>.md` + `.lock`)
 - [ ] **Pre-registration timestamp predates trial execution timestamp**
   - Evidence: `prereg/PR_<id>.lock` UTC vs trial result timestamp in
-    `results.parquet`
+    `results.parquet`, selected tracker record, or exported run inventory
 - [ ] **≥2 competing explanations + null enumerated** per pre-reg
 - [ ] **Each E has evidence type declared** (causal / correlative /
   null-result) per `references/pure_research/preregistration.md` § 2
@@ -281,8 +292,8 @@ specifically targeting Hypothesizing After Results are Known)
     test in pre-reg, with status (pass / fail / N/A with reason)
 - [ ] **Multiple-testing trial count is honest** — includes prior
   trials in this project, not just the current one
-  - Evidence: pre-reg § 3.5 trial count vs project trial count from
-    `results.parquet`
+  - Evidence: pre-reg § 3.5 trial count vs the complete run inventory/export
+    (`results.parquet` only if it is the canonical complete record)
 - [ ] **No mid-trial competing E addition**: any new candidate E
   identified during analysis is parked for a future pre-registered
   trial, not added to the current trial's discrimination

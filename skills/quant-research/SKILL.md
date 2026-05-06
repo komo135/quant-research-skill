@@ -253,6 +253,16 @@ may store a compact index row with `tracker`, `tracking_uri`, `run_id`, and
 `artifact_uri`, while the tracker owns detailed metrics and artifacts. Ledgers
 still own state transitions; trackers and result tables only provide evidence.
 
+External trackers must also provide a **complete run inventory/export** for
+review. The inventory covers every load-bearing, promotion-eligible, or
+claim-cited run; every failed run that informed the decision; and every
+parameter-sweep or model-selection attempt that counts for multiple-testing
+correction. It is not enough to resolve only the cited winning runs. If the
+tracker cannot export that inventory with stable run IDs, artifact URIs,
+params, metrics, data hashes, git commit, env lock, seeds, and timestamps, use
+the local stamp/parquet default or add a separate durable inventory before
+promotion review.
+
 ## Decomposition Discipline (R&D)
 
 R&D decomposition is a **two-layer** structure. Mixing the layers, or skipping
@@ -318,7 +328,9 @@ duplicate rows; stale rows are kept (not deleted) for historical traceability.
 
 ## Review (run before promotion)
 
-Two-axis review, run both before any promotion to `supported`:
+Two-axis review, run both before any R&D transition to `matured`,
+`established`, or `promoted`, and before any Pure Research promotion to
+`supported`:
 
 - **Process review** (`references/review/process_review.md`) — was the
   discipline followed? Charter / pre-registration / kill criteria / TRL

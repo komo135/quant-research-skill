@@ -21,7 +21,8 @@ supports a transition.
 If the project uses an external tracker, read this file as the minimum
 interchange schema reviewers need. The tracker may store richer params,
 metrics, artifacts, and lineage; the project still needs a durable way to map
-`trial_id` to the tracker run record.
+`trial_id` to the tracker run record and to enumerate every load-bearing run
+that counts for multiple-testing review.
 
 ## Principle
 
@@ -73,6 +74,51 @@ Projects may add optional evidence fields such as:
 }
 ```
 
+These fields are optional only for exploratory rows and for local rows where
+the information is stored in the local stamp files. They become required under
+the conditions below.
+
+## Conditional required fields
+
+When an external tracker is the canonical run store, every load-bearing,
+promotion-eligible, or claim-cited row must include:
+
+```python
+{
+    "tracker": str,
+    "tracking_uri": str,
+    "run_id": str,
+    "artifact_uri": str,
+    "data_hash_sha256": str,
+    "git_commit": str,
+    "env_lock_hash": str,
+    "seed": str,
+}
+```
+
+When local stamp/parquet is the canonical run store, the same anchors may live
+in `reproducibility/data_hashes.txt`, `results/results.parquet`,
+`reproducibility/env_lock_hash.txt`, and `reproducibility/seed.txt`, but the
+row or ledger citation must tell reviewers where to find them.
+
+## Complete run inventory / export
+
+For promotion review and multiple-testing correction, the project needs a
+complete inventory of all load-bearing and promotion-eligible attempts, not
+only the cited successful runs. The inventory may be:
+
+- `results/results.parquet` when it is the canonical complete record.
+- An exported tracker table from MLflow, W&B, Neptune, Trackio, TensorBoard,
+  Sacred, DVC, or an organizational tracker.
+- A durable file under `tracking/` that maps local run notes to the fields
+  above.
+
+The inventory must include failed runs, abandoned parameter combinations,
+model-selection attempts, and robustness variants whenever they informed the
+research decision or count toward trial-count / DSR / Bonferroni / Romano-Wolf
+correction. A compact local index may point to external artifacts, but it must
+not hide uncited or failed attempts.
+
 Mode-specific protocol identifiers, if needed, belong in the ledger
 assessment that cites the row. They are not required columns in the evidence
 record.
@@ -91,6 +137,8 @@ Reason: <why this fits this research and collaboration model>
 Review retrieval: <how a reviewer resolves trial_id -> run record>
 Minimum persisted fields: trial_id, run_id, artifact_uri, data hash,
 git commit, env lock hash, seed, params, headline metrics
+Run inventory/export: <path or tracker query covering all load-bearing,
+promotion-eligible, failed, parameter-sweep, and model-selection attempts>
 ```
 
 Do not write a custom tracker just because this skill includes helper scripts.
