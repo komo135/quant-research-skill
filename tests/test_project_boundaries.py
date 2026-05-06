@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import importlib.util
 from pathlib import Path
 
 
@@ -12,6 +13,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def read_text(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
+
+
+def load_module(path: str):
+    module_path = ROOT / path
+    spec = importlib.util.spec_from_file_location(module_path.stem, module_path)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 class ProjectBoundaryTests(unittest.TestCase):
@@ -24,6 +35,16 @@ class ProjectBoundaryTests(unittest.TestCase):
             "project instance layer",
             "Generated reports are snapshots",
             "Do not embed active candidates",
+        ]:
+            self.assertIn(phrase, skill)
+
+    def test_skill_keeps_research_contracts_out_of_evidence_artifacts(self) -> None:
+        skill = read_text("skills/quant-research/SKILL.md")
+
+        for phrase in [
+            "Evidence artifacts do not own research contracts",
+            "Framework code must not require capability IDs",
+            "capability_map.md is not an implementation API",
         ]:
             self.assertIn(phrase, skill)
 
@@ -91,6 +112,106 @@ class ProjectBoundaryTests(unittest.TestCase):
             self.assertTrue((project / "prereg/PR_001.md").exists())
             content = (project / "prereg/PR_001.md").read_text(encoding="utf-8")
             self.assertIn("Pre-Registration", content)
+
+    def test_rd_trial_scaffold_is_protocol_agnostic_evidence_artifact(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "skills/quant-research/scripts/new_project.py"),
+                    "alpha",
+                    "--mode",
+                    "rd",
+                    "--root",
+                    tmp,
+                ],
+                check=True,
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+
+            project = Path(tmp) / "alpha"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "skills/quant-research/scripts/new_trial.py"),
+                    "--project-dir",
+                    str(project),
+                    "--slug",
+                    "latency_benchmark",
+                ],
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            trial = project / "purposes/trial_001_latency_benchmark.py"
+            self.assertTrue(trial.exists())
+            content = trial.read_text(encoding="utf-8")
+            self.assertIn("Evidence artifact", content)
+            for phrase in [
+                "Capability under test",
+                "Parent core technology",
+                "TRL transition target",
+                "Exit criterion under evaluation",
+                "Kill criterion under evaluation",
+            ]:
+                self.assertNotIn(phrase, content)
+
+    def test_trial_index_tracks_evidence_artifacts_not_ledger_state_updates(self) -> None:
+        index_template = read_text("skills/quant-research/assets/shared/INDEX.md.template")
+
+        self.assertIn("evidence artifact", index_template.lower())
+        self.assertIn("ledger assessment", index_template.lower())
+        for phrase in [
+            "linked capability/explanation",
+            "state row updated",
+            "done only when it changes the project state",
+        ]:
+            self.assertNotIn(phrase, index_template)
+
+    def test_results_rows_are_evidence_records_not_rd_state_records(self) -> None:
+        aggregate_results = load_module("skills/quant-research/scripts/aggregate_results.py")
+        row = {
+            "project": "alpha",
+            "trial_id": "trial_001",
+            "mode": "rd",
+            "run_timestamp": "2026-05-06T00:00:00Z",
+            "verdict": "observed",
+            "notebook_path": "purposes/trial_001_latency_benchmark.py",
+            "analysis_tier": "A2",
+        }
+
+        self.assertEqual([], aggregate_results.validate_row(row))
+
+    def test_results_schema_doc_describes_queryable_evidence_not_state_transitions(self) -> None:
+        schema = read_text("skills/quant-research/references/shared/results_db_schema.md")
+
+        self.assertIn("queryable evidence records", schema.lower())
+        self.assertIn("ledger assessment", schema.lower())
+        for phrase in [
+            "state_row_id",
+            "hypothesis_id",
+            "Append when the result has an interpretation and updates a named research-state row",
+        ]:
+            self.assertNotIn(phrase, schema)
+
+    def test_rd_readme_template_keeps_state_details_in_ledgers(self) -> None:
+        readme_template = read_text("skills/quant-research/assets/rd/README.md.template")
+
+        self.assertIn("evidence artifacts", readme_template.lower())
+        self.assertIn("capability assessment", readme_template.lower())
+        for phrase in [
+            "stage-N-on-Cn",
+            "TRL <current>/<target>",
+            "includes analysis_tier and core_tech_id",
+            "Critical path summary",
+        ]:
+            self.assertNotIn(phrase, readme_template)
 
     def test_project_helpers_do_not_fall_back_to_retired_templates(self) -> None:
         new_project = read_text("skills/quant-research/scripts/new_project.py")

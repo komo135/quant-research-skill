@@ -4,7 +4,7 @@ Replaces the older `new_purpose.py`. Mode-aware: chooses the correct
 template based on whether the project is R&D or Pure Research.
 
 Per CHARTER C1 and the templates:
-- R&D: assets/rd/rd_trial.py.template (capability-anchored)
+- R&D: assets/rd/rd_trial.py.template (protocol-agnostic evidence artifact)
 - Pure Research: assets/pure_research/pr_trial.py.template
   (pre-registration-anchored)
 
@@ -12,8 +12,7 @@ Trial files are named `trial_NNN_<slug>.py` in `<project>/purposes/`.
 
 Usage:
     # R&D
-    python scripts/new_trial.py --project-dir <path> --slug regime_classifier_zeroshot \\
-        --capability-id C1 --core-tech-id K1 --stage de-risk
+    python scripts/new_trial.py --project-dir <path> --slug latency_benchmark
 
     # Pure Research
     python scripts/new_trial.py --project-dir <path> --slug vol_carry_decay_test \\
@@ -85,17 +84,13 @@ def find_template(mode: str) -> Path:
     raise FileNotFoundError(f"trial template not found in any of: {candidates}")
 
 
-def substitute_rd(content: str, capability_id: str, core_tech_id: str,
-                  stage: str, slug: str, nnn: str, project_name: str) -> str:
+def substitute_rd(content: str, slug: str, nnn: str, project_name: str) -> str:
     """Replace <REPLACE: ...> markers in R&D trial template that we can fill from args."""
     return (
         content
         .replace("<REPLACE: NNN>", nnn)
         .replace("<REPLACE: short title>", slug.replace("_", " "))
         .replace("<REPLACE: project name>", project_name)
-        .replace("C<REPLACE: capability id>", capability_id)
-        .replace("K<REPLACE: K-id>", core_tech_id)
-        .replace("<REPLACE: Scoping | De-risk | Build | Validate | Integrate>", stage)
     )
 
 
@@ -121,12 +116,7 @@ def create_trial(args: argparse.Namespace) -> Path:
 
     mode = detect_mode(project_dir)
 
-    if mode == "rd":
-        if not (args.capability_id and args.core_tech_id and args.stage):
-            raise ValueError(
-                "R&D project requires --capability-id, --core-tech-id, --stage"
-            )
-    else:
+    if mode != "rd":
         if not (args.prereg_id and args.question_id and args.discriminating):
             raise ValueError(
                 "Pure Research project requires --prereg-id, --question-id, --discriminating"
@@ -145,8 +135,7 @@ def create_trial(args: argparse.Namespace) -> Path:
 
     if mode == "rd":
         content = substitute_rd(
-            content, args.capability_id, args.core_tech_id, args.stage,
-            slug, nnn, project_dir.name,
+            content, slug, nnn, project_dir.name,
         )
     else:
         content = substitute_pr(
@@ -162,13 +151,12 @@ def create_trial(args: argparse.Namespace) -> Path:
         index = index_path.read_text(encoding="utf-8")
         if mode == "rd":
             new_row = (
-                f"| trial_{nnn} | rd | {args.capability_id} ({args.core_tech_id}) | "
-                f"stage={args.stage} | active | pending |\n"
+                f"| trial_{nnn} | rd | purposes/trial_{nnn}_{slug}.py | none | in-progress | pending |\n"
             )
         else:
             new_row = (
-                f"| trial_{nnn} | pure-research | {args.question_id} ({args.prereg_id}) | "
-                f"discriminating: {args.discriminating} | active | pending |\n"
+                f"| trial_{nnn} | pure-research | purposes/trial_{nnn}_{slug}.py | "
+                f"{args.question_id} ({args.prereg_id}; {args.discriminating}) | in-progress | pending |\n"
             )
         # Append to end (simple approach)
         index_path.write_text(index.rstrip() + "\n" + new_row, encoding="utf-8")
@@ -180,10 +168,8 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     p.add_argument("--project-dir", required=True, type=Path)
     p.add_argument("--slug", required=True, help="trial slug (alphanumeric + _)")
-    # R&D-specific
-    p.add_argument("--capability-id", help="(R&D) capability ID, e.g. C1")
-    p.add_argument("--core-tech-id", help="(R&D) parent core tech ID, e.g. K1")
-    p.add_argument("--stage", help="(R&D) Stage-Gate stage: scoping | de-risk | build | validate | integrate")
+    # R&D trials are protocol-agnostic evidence artifacts; ledger files link
+    # them to capability claims during assessment.
     # Pure Research-specific
     p.add_argument("--prereg-id", help="(Pure Research) pre-registration ID, e.g. PR_001")
     p.add_argument("--question-id", help="(Pure Research) question ID, e.g. Q1")
@@ -206,10 +192,10 @@ def main() -> None:
     print()
     print("Next steps:")
     print(f"  1. Open {out_path} in marimo: marimo edit {out_path}")
-    print("  2. Fill the Trial design header (markdown cells) per the template")
+    print("  2. Fill the evidence artifact header (markdown cells) per the template")
     print("  3. Run sanity checks BEFORE the main test")
     print("  4. After trial, run prereg_diff.py (Pure Research) and fill the 5-field Analysis section")
-    print("  5. Update the relevant ledger row (capability_map.md or explanation_ledger.md)")
+    print("  5. If used for assessment, cite this artifact from the relevant ledger")
 
 
 if __name__ == "__main__":
