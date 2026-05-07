@@ -1,4 +1,4 @@
-# severity_rubric.md
+# experiment_review_severity_rubric.md
 
 Severity tags, the verdict calculation, and the rules for parking findings.
 
@@ -18,9 +18,10 @@ Each finding carries a `blocks_supported` boolean. Read it symmetrically:
   means the supported verdict cannot stand as written until the finding is resolved.
 - For an experiment whose **headline claim is `verdict = "rejected"`**, `blocks_supported = yes`
   means the *rejection itself* is preliminary as written — typically because the
-  rejection's denominator is wrong (e.g. some alphas not actually evaluated), the
-  rejection's scope is mis-stated (e.g. tested on G10 only, claim leaks to "FX"), or
-  the rejection was reached on a contaminated PnL.
+  rejection's denominator is wrong (e.g. some pre-registered candidates not actually
+  evaluated), the rejection's scope is mis-stated (e.g. tested on one cohort only,
+  claim leaks to the broader domain), or the rejection was reached on a contaminated
+  reported metric.
 - For experiments at any other verdict tier (`partial`, `preliminary`), `blocks_supported`
   reads as "would block a future promotion to supported / would force a further narrowing".
 
@@ -42,15 +43,15 @@ matching rule wins.
 
 | Verdict | Conditions | Position |
 |---|---|---|
-| **ready** | 0 high · ≤ 2 medium · any low | Strong enough for internal team review or external sharing. The claim as written is supported by the evidence presented. Equivalent to ≥ 80 % on the quant-research `research_quality_checklist.md`. |
+| **ready** | 0 high · ≤ 2 medium · any low | Strong enough for internal team review or external sharing. The claim as written is supported by the evidence presented. |
 | **partial** | 0 high · 3–6 medium · any low | The technical result is real, but the abstract claim must be narrowed. The author rewrites the abstract to match the demonstrated scope, then re-runs the review. |
 | **partial** | 1 high · ≤ 3 medium · any low | A single high-severity gap. Either fix it, or rewrite the claim so it no longer depends on the gap, then re-run. |
 | **preliminary** | 2+ high, OR 7+ medium | Preliminary screening, not a result. Multiple cycles of work are required before the headline claim can stand. |
-| **not-yet-research** | The notebook fails the trigger eligibility — no claim, no thresholds, no comparison | This skill is not the right tool. Return the user to `quant-research`'s research-design step. |
+| **not-yet-research** | The notebook fails the trigger eligibility — no claim, no thresholds, no comparison | The research review layer is not the right tool. Return the user to `research`'s research-design step. |
 
 The verdict is computed mechanically from the finding counts. Do not soften the verdict
 because the work "feels" close to the next tier — feelings of closeness are exactly the
-bias this skill is designed to neutralize.
+bias the research review layer is designed to neutralize.
 
 ### Reading the verdict for rejection notebooks
 
@@ -62,42 +63,42 @@ headline is `verdict = "rejected"`:
   evidence's scope. Future cycles may overturn the rejection with new evidence; this
   cycle's rejection stands.
 - **`partial`**: the rejection is real but the rejection statement reaches further than
-  the evidence allows (e.g. tested on G10 only but the rejection claim implicitly covers
-  "FX"). Narrow the rejection's scope, then re-run.
+  the evidence allows (e.g. tested on one cohort only but the rejection claim implicitly
+  covers the broader domain). Narrow the rejection's scope, then re-run.
 - **`preliminary`**: the rejection cannot stand as written. Common causes for rejection
-  notebooks include: (a) the denominator is wrong because some pre-registered alphas
-  were not actually evaluated, (b) the PnL the rejection was computed on was buggy or
-  contaminated, (c) the rejection's mechanism-level scope (universe × frequency × cost
-  model) was not the one the headline names, (d) baselines that would give the rejection
+  notebooks include: (a) the denominator is wrong because some pre-registered candidates
+  were not actually evaluated, (b) the reported metric the rejection was computed on was
+  contaminated, (c) the rejection's mechanism-level scope (dataset × measurement cadence
+  × constraint model) was not the one the headline names, (d) baselines that would give the rejection
   comparative force are missing. The rejection may well end up confirmed once these are
   closed, but until then "rejected" is a stronger claim than the evidence makes.
 - **`not-yet-research`**: there is no claim worth rejecting — the work is at orientation
-  stage, return to `quant-research`.
+  stage, return to `research`.
 
 A `preliminary` verdict on a rejection notebook is *not* a vote of confidence in the
 hypothesis. It is a vote of insufficient confidence in the *rejection*. Most often the
 right next step is the smallest set of changes that promotes the rejection from
 `preliminary` to `partial` (typically: fix the denominator, add the missing baseline,
-fix the embargo) rather than relitigating whether the hypothesis is true.
+fix holdout separation) rather than relitigating whether the hypothesis is true.
 
 ## Parking findings
 
 A finding can be *parked* instead of fixed if and only if the author records the
 following — either inline in the review reply, or, optionally, in `decisions.md`
-if the author wants a durable record. The skill itself does not write the
+if the author wants a durable record. The research review layer does not write the
 parking note; the author does:
 
 1. Which finding is being parked (severity, dimension, what)
-2. Why the fix is deferred (e.g. "multi-asset extension is the next cycle")
+2. Why the fix is deferred (e.g. "multi-dataset extension is the next cycle")
 3. What the *narrowed* claim is, in the abstract, so the unfixed gap is acknowledged in
    the conclusion rather than ignored
 
 A parked `high` finding does not unblock `verdict = "supported"`. A parked `high`
 finding only allows the verdict to be set when the abstract has been rewritten to a
-claim that no longer depends on the parked finding. Practical example: a SPY-only
-universe with a `high` finding under `scope` cannot be parked while keeping a "US
-equities" abstract; the abstract is rewritten to "SPY 2015–2024" and the parked finding
-becomes the explicit "Cannot conclude: not tested on other instruments" entry.
+claim that no longer depends on the parked finding. Practical example: a single-dataset
+study with a `high` finding under `scope` cannot be parked while keeping a broad-domain
+abstract; the abstract is rewritten to the tested dataset and period, and the parked finding
+becomes the explicit "Cannot conclude: not tested on other datasets or cohorts" entry.
 
 Parked `medium` and `low` findings are recorded and the verdict still stands as
 computed.
@@ -119,7 +120,7 @@ the spirit; the letter is just an enforcement handle.
 
 A user saying "skip the literature review for this internal cycle" makes it a `low`
 finding logged for record, *if* the work is internal-only and not heading toward a
-`supported` verdict on a portfolio-affecting claim. If it is heading there, the opt-out
+`supported` verdict on an operationally consequential claim. If it is heading there, the opt-out
 is not honored — the literature review is a gate at that level.
 
 ### "The fix is large and the cycle is small"
@@ -134,7 +135,7 @@ in the abstract matches the evidence in the cycle.
   against the *evidence*.
 - It is not a deployment recommendation. A `ready` verdict says the work is
   internally consistent and well-positioned; deployment requires additional
-  considerations (capital availability, capacity, ongoing monitoring) that are out of
+  considerations (resource availability, capacity, ongoing monitoring) that are out of
   scope here.
 - It is not stable across cycles. A `ready` verdict for cycle N can become `partial`
   in cycle N+1 if new evidence narrows the previously-supported claim.
@@ -144,6 +145,6 @@ in the abstract matches the evidence in the cycle.
 | "I want to soften this" | Don't |
 |---|---|
 | "It's just one missing baseline, not a big deal" | A missing upper-bound baseline is the modal cause of unwarranted ML claims. `high` stands. |
-| "The DSR is 0.94 not 0.95, basically the same" | The threshold exists because the deflated-Sharpe distribution at 0.94 vs 0.95 corresponds to a meaningful shift in implied false-discovery rate. `high` stands. |
+| "The selection-adjusted statistic is just below threshold, basically the same" | The threshold exists because small changes near the cutoff can correspond to a meaningful shift in implied false-discovery rate. `high` stands. |
 | "The user has done this kind of work before, they know what they're doing" | Authors are systematically blind to their own missing baselines. `high` stands. |
-| "The numbers are good, surely something must be sound" | Good numbers on a wrong claim are exactly this skill's failure mode to prevent. `high` stands. |
+| "The numbers are good, surely something must be sound" | Good numbers on a wrong claim are exactly the research review layer's failure mode to prevent. `high` stands. |

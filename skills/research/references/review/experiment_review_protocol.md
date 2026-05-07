@@ -1,6 +1,10 @@
-# review_protocol.md
+# experiment_review_protocol.md
 
-Dispatch and aggregation mechanics for the experiment-review skill.
+Dispatch and aggregation mechanics for the research review layer's experiment review.
+This is a focused subprocedure of `conclusion_review.md` for claim-bearing
+notebook artifacts. It does not replace `process_review.md` or create a third
+promotion gate; its findings feed the conclusion-review verdict and must be
+interpreted under the existing two-axis review.
 
 ## Inputs the assistant must gather before dispatch
 
@@ -12,13 +16,13 @@ minimum bundle.
 | Item | Purpose |
 |---|---|
 | Notebook path under review | The primary artifact |
-| Project root path | To find `hypotheses.md`, `decisions.md`, `literature/`, `purposes/INDEX.md` |
+| Project root path | To find the research state ledger, design artifacts, `literature/`, `capability_map.md`, or `explanation_ledger.md` |
 | Design-cell content (extracted) | The pre-registered question, hypothesis, thresholds |
 | Abstract-cell content (extracted) | The claim being evaluated |
 | Conclusion / "Cannot conclude" section content (extracted) | Generality claims to triangulate |
-| Cycle history (`purposes/INDEX.md` summary) | For research-design cycle-honesty checks |
+| Cycle history (`capability_map.md` or `explanation_ledger.md` summary, where applicable) | For research-design cycle-honesty checks |
 | Upstream feature-experiment paths, if any | For research-design feature-hygiene checks |
-| Bug-review entry from `decisions.md`, if present | So evidence-sufficiency knows whether the prerequisite has been satisfied |
+| Relevant domain adapter implementation-check entry, if present | So evidence-sufficiency knows whether prerequisite implementation checks have been satisfied |
 
 If any of these is missing, do not abort. Proceed and let the relevant reviewer
 flag "missing artifact" as a `high`-severity finding. Graceful degradation is
@@ -27,17 +31,17 @@ required; abort only if the notebook itself is missing or unreadable.
 ## Per-reviewer input contract (efficiency-class, F21)
 
 Each reviewer receives only its own grouped scope plus the shared artifacts
-named below. Whole-file `review_dimensions.md` is not delivered to specialists.
+named below. Whole-file `experiment_review_dimensions.md` is not delivered to specialists.
 Pre-extract the scope by section anchor (the `## N. <reviewer-name>` heading)
 before dispatch. Anchor missing means the reviewer flags
 `severity: high, dimension: <name>, what: missing input section §<N>`.
 
 | # | Reviewer | Required scope (extract) | Required shared | NOT-receive |
 |---|---|---|---|---|
-| 1 | research-design | `review_dimensions.md` §1 (anchor `## 1. research-design`, question / scope / method) | `severity_rubric.md`, notebook .py, design-cell extract, `hypotheses.md`, `decisions.md`, `purposes/INDEX.md`, upstream feature notebook .py if named in design cell | `review_dimensions.md` outside §1, `literature/`, narrative refs, `bug_review.md`, other reviewers' findings |
-| 2 | evidence-sufficiency | `review_dimensions.md` §2 (anchor `## 2. evidence-sufficiency`, validation / claim) | `severity_rubric.md`, notebook .py, design-cell extract, abstract-cell extract, conclusion / "Cannot conclude" extract, bug-review entry from `decisions.md` if present | `review_dimensions.md` outside §2, `literature/`, narrative refs, `hypotheses.md`, `bug_review.md` whole, other reviewers' findings |
-| 3 | context-communication | `review_dimensions.md` §3 (anchor `## 3. context-communication`, literature / narrative) | `severity_rubric.md`, notebook .py, `literature/papers.md`, `literature/differentiation.md`, optional local notebook style guide if present | `review_dimensions.md` outside §3, `hypotheses.md`, `decisions.md`, `bug_review.md`, other reviewers' findings |
-| 4 | adversarial (cold-eye) | `review_dimensions.md` §4 (anchor `## 4. adversarial`) — verbatim instruction only | notebook .py, `severity_rubric.md` (for output schema; not bias-inducing) | `review_dimensions.md` outside §4, `hypotheses.md`, `decisions.md`, `purposes/INDEX.md`, `literature/`, narrative refs, the three specialist findings, upstream feature notebooks, chat context |
+| 1 | research-design | `experiment_review_dimensions.md` §1 (anchor `## 1. research-design`, question / scope / method) | `experiment_review_severity_rubric.md`, notebook .py, design-cell extract, research state ledger, design artifact, `capability_map.md` or `explanation_ledger.md`, upstream feature notebook .py if named in design cell | `experiment_review_dimensions.md` outside §1, `literature/`, narrative refs, domain adapter implementation-check details, other reviewers' findings |
+| 2 | evidence-sufficiency | `experiment_review_dimensions.md` §2 (anchor `## 2. evidence-sufficiency`, validation / claim) | `experiment_review_severity_rubric.md`, notebook .py, design-cell extract, abstract-cell extract, conclusion / "Cannot conclude" extract, relevant domain adapter checks if present | `experiment_review_dimensions.md` outside §2, `literature/`, narrative refs, design artifact whole, domain adapter implementation-check details beyond the prerequisite signal, other reviewers' findings |
+| 3 | context-communication | `experiment_review_dimensions.md` §3 (anchor `## 3. context-communication`, literature / narrative) | `experiment_review_severity_rubric.md`, notebook .py, `literature/papers.md`, `literature/differentiation.md`, optional local notebook style guide if present | `experiment_review_dimensions.md` outside §3, design artifact, research state ledger, domain adapter implementation-check details, other reviewers' findings |
+| 4 | adversarial (cold-eye) | `experiment_review_dimensions.md` §4 (anchor `## 4. adversarial`) — verbatim instruction only | notebook .py, `experiment_review_severity_rubric.md` (for output schema; not bias-inducing) | `experiment_review_dimensions.md` outside §4, design artifact, research state ledger, `capability_map.md`, `explanation_ledger.md`, `literature/`, narrative refs, the three specialist findings, upstream feature notebooks, chat context |
 
 **Section anchor as source of truth**: extraction reads the section by heading,
 not by line range. A renamed or removed anchor surfaces a graceful-degradation
@@ -49,19 +53,20 @@ mechanism.
 
 ## Trigger-conditional dispatch on re-verify (efficiency-class, F22)
 
-A typical H verdict='supported' attempt enters the gate multiple times: once on
-initial pass, then again on each re-verify after fix reconciliation. The naive
-contract, "fire all four every time", re-pays for unchanged surfaces. F22 splits
-the dispatch into two cases.
+A typical claim-bearing artifact review can enter the conclusion-review
+subprocedure multiple times: once on initial pass, then again on each re-verify
+after fix reconciliation. The naive contract, "fire all four every time",
+re-pays for unchanged surfaces. F22 splits the dispatch into two cases.
 
 ### Initial pass
 
-First time this H enters the gate, or first time in a new session without a
-recorded clean baseline: **all 4 reviewers fire**.
+First time this claim-bearing artifact enters the conclusion-review subprocedure,
+or first time in a new session without a recorded clean baseline: **all 4
+reviewers fire**.
 
 ### Re-verify pass
 
-Triggered after the parent has applied fixes from a prior experiment-review
+Triggered after the parent has applied fixes from a prior experiment review
 summary. The parent identifies which surface map entries the fixes touched and
 fires only those specialist reviewers, plus adversarial whenever any specialist
 re-fires.
@@ -73,8 +78,8 @@ stands.
 
 | # | Reviewer | Surface (re-fire if any of these changed since last clean review) |
 |---|---|---|
-| 1 | research-design | H falsifiable statement, design cell, thresholds, cycle-hygiene markers, universe declaration, period range, instrument list, regime declaration, cross-section size, model selection cell, baseline cells, feature list, hyperparameter grid, retraining-cadence declaration |
-| 2 | evidence-sufficiency | walk-forward window count, statistical-power claims, embargo-adequacy claims, CPCV setup statements, abstract cell, verdict cell, conclusion / "Cannot conclude" cell, deployment-readiness language |
+| 1 | research-design | Claim falsifiable statement, design cell, thresholds, cycle-hygiene markers, dataset declaration, period range, subject list, context declaration, cross-section size, model selection cell, baseline cells, feature list, hyperparameter grid, retraining-cadence declaration |
+| 2 | evidence-sufficiency | Validation path count, statistical-power claims, holdout-separation claims, domain-specific validation setup statements where applicable, abstract cell, verdict cell, conclusion / "Cannot conclude" cell, deployment-readiness language |
 | 3 | context-communication | `literature/papers.md`, `literature/differentiation.md`, novelty / differentiation-tier claims, any markdown cell, figure plan, per-figure observation cells, prose interpretation cells, helper-function docstrings |
 | 4 | adversarial (cold-eye) | auto-fires whenever any specialist re-fires; no separate surface map because its scope is the full `.py` standalone |
 
@@ -88,8 +93,8 @@ not uncertain work.
 ### Cross-session boundary
 
 The "last clean review" baseline is session-local. A researcher returning to
-the same H next session has no in-context record of which reviewers were
-verified clean, so the new dispatch is an Initial pass.
+the same claim-bearing artifact next session has no in-context record of which
+reviewers were verified clean, so the new dispatch is an Initial pass.
 
 If a prior `decisions.md` entry explicitly states that reviewer set `{X, Y, Z}`
 was verified clean against artifact state S, and the agent verifies the
@@ -116,21 +121,21 @@ with no other inputs.
 Each specialist prompt has this structure:
 
 ```
-You are a specialist reviewer in the experiment-review skill. Your reviewer
+You are a specialist reviewer in the research review layer. Your reviewer
 group is [reviewer name].
 
 Notebook under review (verbatim):
 <verbatim notebook .py file body>
 
 Severity rubric (verbatim):
-<verbatim contents of severity_rubric.md>
+<verbatim contents of experiment_review_severity_rubric.md>
 
-Your scope and checklist (extracted from review_dimensions.md §[N], inline; the
-rest of review_dimensions.md is NOT delivered):
-<verbatim contents of review_dimensions.md §[N], extracted by section anchor>
+Your scope and checklist (extracted from experiment_review_dimensions.md §[N], inline; the
+rest of experiment_review_dimensions.md is NOT delivered):
+<verbatim contents of experiment_review_dimensions.md §[N], extracted by section anchor>
 
 Required shared artifacts for your reviewer group (per input contract, inline):
-<e.g. abstract-cell extract, hypotheses.md content, literature/papers.md, ...>
+<e.g. abstract-cell extract, design artifact content, literature/papers.md, ...>
 
 Apply the checklist for your reviewer group. For each check, decide pass /
 partial / fail with concrete evidence. Return findings only; do not modify any
@@ -172,11 +177,11 @@ but with a different bundle and prompt.
 **Bundle**:
 
 - The `.py` file under review
-- `severity_rubric.md`
-- `review_dimensions.md` §4 only, pre-extracted by section anchor
+- `experiment_review_severity_rubric.md`
+- `experiment_review_dimensions.md` §4 only, pre-extracted by section anchor
 
 NOT in the bundle: the three specialist findings, `literature/`,
-`hypotheses.md`, `decisions.md`, `purposes/INDEX.md`, upstream feature
+design artifact, research state ledger, `capability_map.md`, `explanation_ledger.md`, upstream feature
 notebooks, chat context, prior-cycle discussion, or the parent assistant's
 scratchpad.
 
@@ -191,11 +196,11 @@ Notebook under review (verbatim):
 <verbatim notebook .py file body>
 
 Severity rubric (verbatim):
-<verbatim contents of severity_rubric.md>
+<verbatim contents of experiment_review_severity_rubric.md>
 
-Your scope and the two attack axes (extracted from review_dimensions.md §4,
-inline; the rest of review_dimensions.md is NOT delivered):
-<verbatim contents of review_dimensions.md §4, extracted by section anchor
+Your scope and the two attack axes (extracted from experiment_review_dimensions.md §4,
+inline; the rest of experiment_review_dimensions.md is NOT delivered):
+<verbatim contents of experiment_review_dimensions.md §4, extracted by section anchor
 "## 4. adversarial — cold-eye standalone reading">
 
 Output schema (one entry per finding):
@@ -214,7 +219,7 @@ specialists. That injects parent-assistant priors.
 ## Aggregation
 
 After all selected reviewers return, the assistant aggregates the findings into
-a single structured review delivered inline. The skill does not write a review
+a single structured review delivered inline. The research review layer does not write a review
 report file and does not append to `decisions.md`.
 
 1. Concatenate all findings, preserving severity, dimension, and subdimension
@@ -222,17 +227,17 @@ report file and does not append to `decisions.md`.
 2. Sort high, then medium, then low. Within each tier, group by reviewer order:
    research-design / evidence-sufficiency / context-communication /
    adversarial.
-3. Compute the overall verdict per `severity_rubric.md`.
+3. Compute the overall verdict per `experiment_review_severity_rubric.md`.
 4. Return the aggregated review with verdict, finding counts, and every
    individual finding's full schema entry.
 5. If the user wants a durable record, they can copy the inline review into
-   `decisions.md`; the skill itself stays read-only.
+   `decisions.md`; the research review layer stays read-only.
 
 ## Anti-rationalizations (efficiency-class, F21 / F22)
 
 | Excuse | Why it is wrong |
 |---|---|
-| "Whole-file `review_dimensions.md` is safer." | Each specialist group has a structured scope. Whole-file delivery dilutes attention and collapses the input contract. If another section is genuinely needed, update the contract. |
+| "Whole-file `experiment_review_dimensions.md` is safer." | Each specialist group has a structured scope. Whole-file delivery dilutes attention and collapses the input contract. If another section is genuinely needed, update the contract. |
 | "The adversary should also receive specialist context." | The asymmetry is the mechanism. Giving adversary access to project context makes it another same-prior reviewer, not a cold-eye reader. |
 | "User asked for a comprehensive review, so safer to send whole files." | Comprehensive comes from running all four reviewer groups, not from each reviewer reading every reference whole. |
 | "The fix is small, just re-fire all 4 to be safe." | The surface map exists to skip redundant work. Ambiguous fixes fire candidates plus adversary; clearly local fixes do not need the full set. |
@@ -258,7 +263,7 @@ better than one mixed-scope pass.
 ## When findings disagree
 
 Two reviewers can produce overlapping or contradictory findings. For example,
-research-design may flag a SPY-only-to-US-equities leap as scope overreach while
+research-design may flag a single-dataset-to-whole-domain leap as scope overreach while
 evidence-sufficiency flags the same issue as claim overstatement. Keep both
 findings. Independent vantage points are evidence, not redundancy.
 
@@ -268,15 +273,15 @@ the convenient one.
 
 ## Output location and retention
 
-The review is delivered inline in the assistant's reply. The skill does not
+The review is delivered inline in the assistant's reply. The research review layer does not
 create a `reviews/` folder, write any file, or modify `decisions.md`.
 
 ## What the assistant does not do
 
 - Do not modify the notebook under review during the review pass.
 - Do not run code from the notebook. Reviews are based on reading artifacts.
-  Re-execution belongs in `bug_review`.
-- Do not call this skill recursively on its own report.
+  Re-execution belongs in the relevant domain adapter checks or the project test harness.
+- Do not call the research review layer recursively on its own report.
 
 ## Trigger discipline
 
@@ -287,4 +292,4 @@ A "review" that delivers a narrative without:
 - a clearly visible verdict line and finding counts,
 - the adversarial reviewer running with the minimum bundle,
 
-has not actually run this skill. Do not declare a review verdict from it.
+has not actually run the research review layer. Do not declare a review verdict from it.

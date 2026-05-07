@@ -1,4 +1,4 @@
-# review_dimensions.md
+# experiment_review_dimensions.md
 
 Per-dimension specifications for the three specialist reviewer groups plus the
 adversarial cold-eye reviewer. Each reviewer reads its own section here and
@@ -26,51 +26,51 @@ Each dimension lists:
 
 Whether the question being asked is testable, whether the thresholds for
 acceptance / rejection were genuinely fixed before the result was seen, and whether the
-hypothesis-portfolio history shows honest cycles or post-hoc curation. Does NOT cover
-universe / regime (that is `scope`) or method choice (that is `method`).
+research state history shows honest cycles or post-hoc curation. Does NOT cover
+dataset / context range (that is `scope`) or method choice (that is `method`).
 
 ### Inputs
 
 - The notebook's *Research design* cell
-- `hypotheses.md` and its git history (was the hypothesis edited after results came in?)
-- `decisions.md` (does the time-ordering of decisions corroborate pre-registration?)
-- `purposes/INDEX.md` (the cycle history)
+- The relevant design artifact and its git history (was the claim edited after results came in?)
+- The research state ledger (does the time-ordering of decisions corroborate pre-registration?)
+- `capability_map.md` or `explanation_ledger.md` (the cycle history, where applicable)
 
 ### Checks
 
 | Check | Failure mode | Default severity |
 |---|---|---|
 | Question is a falsifiable comparison statement | "Does X work?" rather than "Does X beat baseline B by metric M with threshold T?" | high |
-| Acceptance condition is a numeric threshold present in the design cell | "supported if Sharpe > X" not "supported if it looks good" | high |
-| Threshold pre-registration corroborated by `hypotheses.md` git history | Threshold was added or changed *after* results were observed | high |
-| `hypotheses.md` and `decisions.md` are git-tracked and committed | Untracked files cannot corroborate pre-registration; a self-asserted date with no commit hash is not an audit trail | high |
-| Hypothesis was not silently rewritten to match the result | The hypothesis in the abstract differs in direction or strength from the original `hypotheses.md` entry | high |
+| Acceptance condition is a numeric threshold present in the design cell | "supported if primary metric > X" not "supported if it looks good" | high |
+| Threshold pre-registration corroborated by the design artifact git history | Threshold was added or changed *after* results were observed | high |
+| Design artifact and research state ledger are git-tracked and committed | Untracked files cannot corroborate pre-registration; a self-asserted date with no commit hash is not an audit trail | high |
+| Claim was not silently rewritten to match the result | The claim in the abstract differs in direction or strength from the original design artifact entry | high |
 | Cycle count is ≥ 3 (minimum) or ≥ 5 (standard) | Single-shot experiment carrying the weight of the claim | medium |
-| Across cycles, the *best* result is not being cherry-picked into the abstract | pur_002 → pur_003 → pur_004 with monotonically improving Sharpe and only the best one declared `supported` is selection bias | medium |
-| Derived hypotheses from prior cycles were classified run-now / next-session / drop, not silently dropped | Untriaged candidate hypotheses sitting in `hypotheses.md` | low |
-| The "we did N hyperparameter trials and 1 of them passed" pattern is acknowledged in DSR trial counting | DSR computed with trial count = 1 | high (but `evidence-sufficiency` owns the DSR computation itself; `research-design` flags the trial-count *honesty*) |
+| Across cycles, the *best* result is not being cherry-picked into the abstract | C1 -> C2 -> C3 with monotonically improving primary metric and only the best one declared `supported` is selection bias | medium |
+| Derived claims from prior cycles were classified run-now / next-session / drop, not silently dropped | Untriaged candidate claims sitting in the research state ledger | low |
+| The "we did N hyperparameter trials and 1 of them passed" pattern is acknowledged in multiple-testing correction | Selection-adjusted statistic computed with trial count = 1 | high (but `evidence-sufficiency` owns the multiple-testing correction itself; `research-design` flags the trial-count *honesty*) |
 
 ### Notes
 
-A monotonically improving sequence of cycle Sharpes is *evidence of selection*, not
+A monotonically improving sequence of cycle primary metrics is *evidence of selection*, not
 *evidence of method working*. The reviewer must explicitly check that the trial count
-fed into DSR includes every cycle and every hyperparameter combination tried, and must
+fed into the multiple-testing correction includes every cycle and every hyperparameter combination tried, and must
 flag if it does not.
 
 ---
 
-### 1B. scope — universe, period, regime, generalization range
+### 1B. scope — dataset, period, context, generalization range
 
 ### Scope
 
 Whether the experiment's empirical scope is large enough that the conclusion in the
-abstract is supportable. Single-instrument experiments concluding about an asset class
+abstract is supportable. Single-subject experiments concluding about a broad population
 are the modal failure here. Does NOT cover validation discipline (that is `validation`)
 or claim wording (that is `claim`).
 
 ### Inputs
 
-- The *Research design* cell (universe, period)
+- The *Research design* cell (dataset, subject, cohort, period)
 - The orientation figure cell (what the data actually looks like)
 - The conclusion cell ("we conclude that X about Y")
 
@@ -78,34 +78,34 @@ or claim wording (that is `claim`).
 
 | Check | Failure mode | Default severity |
 |---|---|---|
-| Universe has ≥ 3 instruments OR a defined cross-section | SPY-only experiment concluding about "equity index returns" | high |
-| Universe diversity covers the claim's stated scope | "US equities" claim tested only on 14 large-cap tech | high |
-| Period covers ≥ 2 distinct regime types relevant to the hypothesis | Bull-only window for a hypothesis that should also work in vol spikes | medium |
-| Period length supports the metric variance | 2 years of daily bars to estimate a monthly-rebalance Sharpe | medium |
+| Dataset has multiple subjects or a defined cross-section when the claim is broad | Single-subject experiment concluding about a broader population | high |
+| Dataset diversity covers the claim's stated scope | Broad population claim tested only on a narrow convenience cohort | high |
+| Period covers ≥ 2 distinct context types relevant to the claim | One-context window for a claim that should also work under different conditions | medium |
+| Period length supports the metric variance | Short observation window used to estimate a noisy primary metric | medium |
 | The "Cannot conclude" section names which dimensions of generality were not tested | Notebook claims generality without listing the untested dimensions | high |
-| Multi-instrument: per-instrument metrics are reported, not just pooled | Sharpe 1.5 pooled but driven by 1 of 14 names | medium |
-| Cross-asset claims tested on multiple asset classes | "VIX-term-structure works for equities" tested only on SPY → no information about QQQ, futures, sector ETFs | high |
-| The instruments chosen are representative of the claim, not the most favorable | Universe = "the 14 names that worked"; non-empty universe-selection bias | high |
+| Multi-subject: per-subject metrics are reported, not just pooled | Pooled effect size looks strong but is driven by 1 of 14 subjects | medium |
+| Cross-domain claims tested on multiple domains | A mechanism claim tested only in one dataset family has no information about other named domains | high |
+| The subjects chosen are representative of the claim, not the most favorable | Dataset = "the subjects that worked"; non-empty dataset-selection bias | high |
 
 ### Effect-size sanity
 
-- For 1-day-horizon equity prediction on liquid US ETFs, hit rate above 56 % across a
-  decade is at the high end of the published literature; flag for additional scrutiny
-  rather than rejection.
-- For stat-arb on US equities at 1 bp costs, net Sharpe ≥ 3 is in the "you have a bug or
-  a leak" range vs. the published frontier (Avellaneda-Lee net Sharpe ~1.0–1.5 on
-  broader, less correlated universes).
-- For equity-factor research on monthly rebalance, IC > 0.10 deserves a flag.
+- If the reported effect size is far above the published frontier for the same task,
+  dataset family, measurement protocol, and cost / noise assumptions, flag for
+  additional scrutiny rather than automatic rejection.
+- If no external frontier is available, require internal lower-bound and upper-bound
+  comparisons that make the effect size interpretable.
+- If the metric's sampling variance is high relative to the observation count, flag
+  any precise headline estimate that lacks an uncertainty interval.
 
 These are guard rails, not verdicts. A pass on effect-size sanity does not vouch for the
-result; a fail flags the result for the bug-review layer (the `quant-research` skill's
-`bug_review.md`) before this skill's review can be considered conclusive.
+result; a fail means relevant domain adapter checks or generic research process and
+conclusion review must clear the plausibility concern before the research review layer
+can be considered conclusive.
 
 ### Frontier-uncovered cells
 
-When the experiment operates in a frequency × asset-class combination for which there
-is no published frontier (e.g. intraday cross-sectional FX, microsecond crypto, daily
-emerging-market sovereign bonds), the absence is itself a finding under `literature`,
+When the experiment operates in a task × dataset combination for which there
+is no published frontier, the absence is itself a finding under `literature`,
 and effect-size sanity here cannot anchor against a prior number. In that case:
 
 - Treat the result with extra skepticism — there is no external comparator to corroborate
@@ -136,21 +136,21 @@ of those choices was correct (that is `validation`).
 
 - The *Method* and *Baselines* sections of the notebook
 - Upstream feature-experiment notebook(s)
-- `references/modeling_approach.md` and `references/feature_construction.md` from the
-  quant-research skill, if available
+- The relevant domain adapter's modeling approach reference, if available
+- The relevant domain adapter's feature or measurement construction reference, if available
 
 ### Checks
 
 | Check | Failure mode | Default severity |
 |---|---|---|
 | Model class choice has a substantive justification | "We used an LSTM because LSTMs are well-known" | medium |
-| Lower-bound baseline reported (B&H / do-nothing / random) | No floor baseline | high |
-| Hand-crafted *upper-bound* baseline reported (linear / logistic / GBT on the same features) | **The single most common gap in submitted experiments.** Without this, the LSTM-vs-momentum comparison cannot tell us whether the LSTM beats *anything but the weakest baseline* | high |
+| Lower-bound baseline reported (do-nothing / random / conventional default) | No floor baseline | high |
+| Hand-crafted *upper-bound* baseline reported (linear / logistic / GBT on the same features, where appropriate) | **The single most common gap in submitted experiments.** Without this, the proposed-method-vs-weak-baseline comparison cannot tell us whether the proposed method beats *anything but the weakest baseline* | high |
 | The proposed method beats both baselines | Proposed beats the floor but not the upper bound | high |
 | Feature construction has its own notebook with leak checks | Feature engineering and model fit in one notebook | medium |
 | Hyperparameter trial count is documented | The trial count is implicit / unstated | medium |
-| In walk-forward, hyperparameter retraining cadence is stated | Hyperparameters fixed on the early val window then frozen across all WF windows ⇒ hyperparameter leakage from early to late windows | medium |
-| Model-selection trial count is fed honestly into DSR | Trial count = 1 reported for an experiment that obviously tried more | high |
+| In sequential or repeated validation, hyperparameter retraining cadence is stated where applicable | Hyperparameters fixed on the early validation path then frozen across later paths, leaking early validation information into later claims | medium |
+| Model-selection trial count is fed honestly into the multiple-testing correction | Trial count = 1 reported for an experiment that obviously tried more | high |
 | Latest version of the model class is used (or older version is justified) | Using a 2015-era LSTM design with no comment when 2024-era equivalents exist | low |
 
 ### Notes
@@ -164,13 +164,14 @@ same feature set as the proposed method.
 
 ## 2. evidence-sufficiency — validation and claim
 
-### 2A. validation — split, embargo, power, discipline
+### 2A. validation — split, separation, power, discipline
 
 ### Scope
 
 Whether the validation procedure is *sufficient*, not whether it is *correct*.
-Correctness is `bug_review`'s territory. Sufficiency means: does the validation produce
-a metric whose statistical power is consistent with the strength of the claim?
+Correctness belongs to domain adapter implementation checks or the project test harness.
+Sufficiency means: does the validation produce a metric whose statistical power is
+consistent with the strength of the claim?
 
 ### Inputs
 
@@ -182,19 +183,19 @@ a metric whose statistical power is consistent with the strength of the claim?
 
 | Check | Failure mode | Default severity |
 |---|---|---|
-| Embargo size is documented and ≥ target horizon | Embargo missing or unstated | high |
-| Walk-forward window count is sufficient for the conclusion strength | 8 windows over 10 years carrying a Sharpe-1.1 claim ⇒ implied SE on the mean is large enough that "1.1" and "0.4" may not be statistically distinguishable | medium |
-| Walk-forward `pct_positive` is reported alongside the mean | Reporting only the mean hides the distribution shape | medium |
-| Bootstrap CI is computed with block bootstrap, not i.i.d. | i.i.d. bootstrap on autocorrelated returns under-states uncertainty | medium |
+| Holdout separation is documented and appropriate for the target dependency structure | Separation missing or unstated | high |
+| Validation path count is sufficient for the conclusion strength | Few validation paths carrying a precise effect-size claim leaves the implied SE too large to distinguish headline and baseline values | medium |
+| Per-path success rate or distribution is reported alongside the mean | Reporting only the mean hides the distribution shape | medium |
+| Bootstrap CI is computed with a dependency-aware method, not i.i.d. where dependence is present | i.i.d. bootstrap on autocorrelated outcome series under-states uncertainty | medium |
 | 2D threshold sensitivity surface present | Single peak instead of a plateau is the most common overfit signature | medium |
-| Regime-conditional Sharpe present | Especially mandatory if the hypothesis is itself a regime claim ("X carries information about volatile periods") | high if hypothesis-implied, otherwise medium |
-| DSR ≥ 0.95 with the *honest* trial count | Reported DSR computed with trial count = 1 when actual trial count is 20+ | high |
-| Test set touched exactly once | Robustness battery + threshold surface + fee sweep all run on the same held-out test | high |
-| Robustness battery run AFTER `bug_review` (the quant-research bug-review layer) | Battery run on a buggy PnL ⇒ all gates green and uniformly contaminated | high |
+| Context-conditional primary metric present | Especially mandatory if the claim is itself condition-specific ("X carries information under condition C") | high if claim-implied, otherwise medium |
+| Selection-adjusted statistic passes the pre-registered threshold with the *honest* trial count | Multiple-testing correction computed with trial count = 1 when actual trial count is 20+ | high |
+| Test set touched exactly once | Robustness battery + threshold surface + robustness variants all run on the same held-out test | high |
+| Robustness battery run after relevant domain adapter implementation checks | Battery run on a contaminated reported metric, making all gates green and uniformly contaminated | high |
 
 ### Notes
 
-A common subtle finding here: the user reports walk-forward over N windows but does not
+A common subtle finding here: the user reports repeated validation over N paths but does not
 state whether *hyperparameters* were re-selected per window or fixed on the first
 window. If fixed, the later windows have hyperparameter information from the early
 window — a soft test-set leak. Ask explicitly.
@@ -221,15 +222,15 @@ systematically blind to their own overstatement.
 
 | Check | Failure mode | Default severity |
 |---|---|---|
-| Abstract sentence's scope matches the universe / period / baseline tested | "Beats momentum on SPY 2015–2024" vs. abstract "consistently beats momentum on US equities" | high |
+| Abstract sentence's scope matches the dataset / period / baseline tested | "Beats baseline B on dataset D during period P" vs. abstract "consistently beats baseline B across the whole domain" | high |
 | "Cannot conclude" section enumerates the untested dimensions | Generality is asserted by silence | high |
-| Deployment recommendation, if present, is supported by the testing scope | "Recommend deploying as overlay" without a logistic-baseline comparison or other-instrument validation | high |
-| Implied portfolio math behind any deployment claim is named | "Overlay" claim without specifying sized to what / netted against what | medium |
+| Deployment recommendation, if present, is supported by the testing scope | "Recommend operational use" without comparison to a strong baseline or validation on other relevant datasets | high |
+| Operational decision logic behind any deployment claim is named | Deployment claim without specifying decision rule, constraints, and monitoring boundary | medium |
 | Effect size in the abstract matches the test-set effect size, not the in-sample | Quoting an in-sample number in the abstract | high |
-| Verdict matches the *honest* DSR | `verdict = "supported"` with DSR < 0.95 after trial-count audit | high |
-| Conclusion does not rebrand a fail as a "novel insight" | "We could not predict returns; this contributes to the literature on weak-form efficiency" without a counter-evidence design | medium |
-| Conclusion does not rebrand a *local replication* (Weak-tier achievement) as a *novel finding* | Abstract says "this work shows that momentum predicts returns in US large-caps 2010-2024" framed as a contribution, when the H's pathway-forecasted tier was Medium and the achieved differentiation against Jegadeesh 1990 / Lehmann 1990 / Carhart 1997 is only the period extension — the work confirmed an established result; the abstract must say so | high |
-| Forward-looking claims separated from backward-looking findings | Mixing "the model achieved Sharpe 1.4" with "we expect Sharpe 1.4 going forward" | medium |
+| Verdict matches the *honest* selection-adjusted statistic | `verdict = "supported"` when the multiple-testing correction fails after trial-count audit | high |
+| Conclusion does not rebrand a fail as a "novel insight" | "We could not predict the outcome; this contributes to the literature on null effects" without a counter-evidence design | medium |
+| Conclusion does not rebrand a *local replication* (Weak-tier achievement) as a *novel finding* | Abstract says "this work shows that method M improves outcome Y on cohort C during period P" framed as a contribution, when the claim's pathway-forecasted tier was Medium and the achieved differentiation against established prior work is only a period or parameter extension — the work confirmed an established result; the abstract must say so | high |
+| Forward-looking claims separated from backward-looking findings | Mixing "the model achieved effect size X" with "we expect effect size X going forward" | medium |
 
 ### Notes
 
@@ -258,10 +259,8 @@ papers); only whether the *coverage and novelty* are sufficient.
 - `literature/papers.md`
 - `literature/differentiation.md`
 - The notebook's introduction / motivation cells
-- The H's pathway declaration in `hypotheses.md` (the `pathway:` field
-  introduced by the `quant-research` skill's `hypothesis_generation.md`
-  Step 1.5) — used to read the *forecasted* tier the H committed to at
-  generation time
+- The pathway declaration in the design artifact or research state ledger, where present
+  — used to read the *forecasted* tier the claim committed to at generation time
 
 ### Coverage checks (did you cite the right prior work?)
 
@@ -269,19 +268,19 @@ papers); only whether the *coverage and novelty* are sufficient.
 |---|---|---|
 | `literature/papers.md` has 5–10 entries with one-paragraph summaries | 4 entries, or 10 entries that are blog posts | high |
 | `literature/differentiation.md` is a *matrix*, not a paragraph | One-sentence differentiation | high |
-| The most relevant adjacent literature is cited, not just the most famous | Variance-risk-premium / VIX-term-structure literature missing for a VIX-features experiment | high |
+| The most relevant adjacent literature is cited, not just the most famous | Mechanism-specific literature missing for a mechanism-specific experiment | high |
 | Prior work that previously refuted the method is acknowledged and addressed | A method previously refuted is revived without new justification | high |
-| The published frontier's effect size on this question is named | The reviewer cannot tell whether reported Sharpe is at, above, or below the published net-of-cost frontier | medium |
+| The published frontier's effect size on this question is named | The reviewer cannot tell whether the reported effect size is at, above, or below the published frontier | medium |
 
 ### Novelty checks (does the conclusion advance knowledge given the cited work?)
 
 | Check | Failure mode | Default severity |
 |---|---|---|
 | Achieved differentiation tier is at least Medium | Achieved tier is Weak (parameter / period changes only on a method documented in the cited papers) — this is a degraded reimplementation, not a research advance | high |
-| Achieved tier matches or exceeds the H's *forecasted* tier from its declared pathway | H declared `pathway: 6-mechanism-driven` (Strong forecast) but the achieved differentiation matrix shows only Medium-tier difference — the pathway's promise was not met; either the achieved tier is the new claim or the H re-runs | high |
+| Achieved tier matches or exceeds the claim's *forecasted* tier from its declared pathway | Claim declared `pathway: 6-mechanism-driven` (Strong forecast) but the achieved differentiation matrix shows only Medium-tier difference — the pathway's promise was not met; either the achieved tier is the new claim or the claim re-runs | high |
 | The "what is new given the cited literature?" question has a one-paragraph answer in the introduction or interpretation cell | The notebook does not state what knowledge it adds that was not already in `literature/papers.md`; novelty is asserted by silence | high |
-| For an H declaring Pathway 1 (Data-driven), the achieved tier is gated on the *achieved* differentiation, not on Pathway 1's "Variable" forecast | Researcher declared Pathway 1 to skirt a Strong-pathway forecast, then claimed novelty in the abstract | high |
-| For an H declaring Pathway 2 (literature-extension), the achieved tier is at least Medium *and* the differentiator named in `differentiation.md` is genuinely different in the cell argued | Pathway-2 H whose only differentiator turns out to be a parameter retune of the cited paper | high |
+| For a claim declaring Pathway 1 (Data-driven), the achieved tier is gated on the *achieved* differentiation, not on Pathway 1's "Variable" forecast | Researcher declared Pathway 1 to skirt a Strong-pathway forecast, then claimed novelty in the abstract | high |
+| For a claim declaring Pathway 2 (literature-extension), the achieved tier is at least Medium *and* the differentiator named in `differentiation.md` is genuinely different in the cell argued | Pathway-2 claim whose only differentiator turns out to be a parameter retune of the cited paper | high |
 
 ### Notes
 
@@ -331,17 +330,17 @@ context, but do not require files that are absent from the project tree.
 
 | Check | Failure mode | Default severity |
 |---|---|---|
-| Abstract cell at the top is filled in (no template residue, no `[fill in last]`, no `{{TITLE}}` / `{{HYP_ID}}` placeholders) | A reader who opens the `.py` file sees template stubs instead of the conclusion | high |
-| Linked hypothesis ID is present and matches `hypotheses.md` | The notebook's claim cannot be located in the project's hypothesis portfolio | high |
+| Abstract cell at the top is filled in (no template residue, no `[fill in last]`, no `{{TITLE}}` / `{{CLAIM_ID}}` placeholders) | A reader who opens the `.py` file sees template stubs instead of the conclusion | high |
+| Linked claim ID is present and matches the design artifact or research state ledger | The notebook's claim cannot be located in the project's research state | high |
 | Each section has a "what & why" markdown cell stating what the section does and why it exists | Code cells only, no narrative — the reader cannot tell what the cell is for without running it | medium |
 | Each headline figure has an *observation* markdown cell underneath stating what the figure shows | An empty observation = the figure is decoration; observation absent = the figure is illegible to a `.py`-only reader | medium |
 | A prose *interpretation* cell exists before the programmatic verdict cell | Verdict is computed without prose explanation of why it is the right verdict | high |
 | Headline figures use plotly / altair (or the project's specified equivalent), full width, height ≥ 450 px | Static matplotlib at default size hides detail and removes interactivity | medium |
 | At least one `mo.ui` widget exists for evidence drill-down (and the widget does NOT select numbers that flow into `results.parquet`) | No drill-down; OR worse, an interactive widget feeds into the persisted result, breaking reproducibility | medium (no widget) / high (widget feeds results) |
 | A "Cannot conclude" section exists and enumerates untested dimensions | Generality is asserted by silence | high |
-| Update-reminders cell at the bottom is present and corresponding artifacts (`hypotheses.md` H{n} status, `decisions.md` entry, `purposes/INDEX.md` one-liner) are actually updated | The notebook says "remember to update X" but X is not updated — the audit trail is broken at the boundary | medium |
+| Update-reminders cell at the bottom is present and corresponding artifacts (research state ledger, `capability_map.md` or `explanation_ledger.md`, and any design artifact) are actually updated | The notebook says "remember to update X" but X is not updated — the audit trail is broken at the boundary | medium |
 | Standalone-readability test: a reader who opens *only* the `.py` file (no marimo runtime, no chat context, no slides) can answer: what was investigated, why, how, and what was concluded | The `.py` file alone is insufficient — the notebook depends on out-of-file context to be understood | high |
-| Cell granularity per `marimo_cell_granularity.md`: one fit / one evaluation per cell | A single cell loops over models × features × targets, hiding which configuration produced which number | medium |
+| Cell granularity follows the project's notebook convention, or the domain adapter's cell-granularity guide if one exists: one fit / one evaluation per cell | A single cell loops over models × features × targets, hiding which configuration produced which number | medium |
 | No unfilled `{{PLACEHOLDER}}` markers, no untouched copy-paste residue from the experiment template | Visible template artifacts indicate the notebook was generated but not curated | medium |
 | Section numbering is consistent and contiguous (no §6 → §8 jumps without intent) | Suggests sections were inserted / removed without re-numbering — a small but corrosive signal of low-care | low |
 | Abstract's headline figure reference (e.g. "see cell §X") points at an existing cell with that role | A pointer to a missing or wrong cell makes the abstract unverifiable | low |
@@ -362,9 +361,9 @@ context, but do not require files that are absent from the project tree.
 
 ### Notes
 
-This dimension exists because the `quant-research` skill *prescribes* notebook quality
-(step 16 + `notebook_narrative.md`) but no other layer *verifies* it. Author self-
-discipline is the modal failure point — abstract cells stay as template placeholders,
+This dimension exists because artifact quality is often prescribed by templates or a
+domain adapter's optional notebook-narrative guide, but no other layer verifies it.
+Author self-discipline is the modal failure point — abstract cells stay as template placeholders,
 "Cannot conclude" sections get deferred to "later", `mo.ui` widgets get planned but not
 implemented. This reviewer is the verification layer.
 
@@ -386,7 +385,7 @@ content*".
 
 An independent reviewer that reads the `.py` file alone, on first sight, and attacks
 along two axes. This reviewer differs from the three specialist groups *not in topic but in
-context bundle*: literature, decisions, hypotheses, the three specialists' findings,
+context bundle*: literature, decisions, design state, the three specialists' findings,
 and even upstream feature notebooks are all withheld. The setup mimics the situation
 "someone hands you this `.py` file and says: evaluate the experiment from this alone".
 
@@ -398,9 +397,9 @@ code yields qualitatively different findings than full-context review (Cross-Con
 Review, arxiv 2603.12123, +4.7 F1 on code review).
 
 This reviewer does NOT replace `context-communication`'s narrative checks. `narrative` checks
-*spec compliance* (abstract cell filled in, observation cells present, etc.) against
-the `quant-research` skill's `notebook_narrative.md`. The adversarial reviewer checks
-*whether spec compliance actually communicates*. A notebook can satisfy every
+artifact-communication compliance (abstract cell filled in, observation cells present,
+etc.) against the research template and any optional domain adapter guide. The adversarial reviewer checks
+*whether that compliance actually communicates*. A notebook can satisfy every
 `narrative` checkpoint and still fail this reviewer's standalone-readability test.
 
 ### Inputs
@@ -411,7 +410,7 @@ the `quant-research` skill's `notebook_narrative.md`. The adversarial reviewer c
 
 - The three specialist reviewers' findings
 - `literature/papers.md`, `literature/differentiation.md`
-- `hypotheses.md`, `decisions.md`, `purposes/INDEX.md`
+- Research state ledger, design artifact, `capability_map.md` or `explanation_ledger.md`
 - Upstream feature notebook `.py` files (even if the design cell names them — the
   reviewer is meant to feel the pain that an external reader feels when handed a
   single-file artifact)
@@ -421,14 +420,14 @@ the `quant-research` skill's `notebook_narrative.md`. The adversarial reviewer c
 
 **Axis 1 — claim warrant**
 
-Does the abstract / verdict / headline numbers (Sharpe, universe, period) hold up on
+Does the abstract / verdict / headline numbers (primary metric, dataset, period) hold up on
 the evidence visible in this `.py` file alone?
 
-- A claim that requires "see also pur_001 / see slides / see the project README" to be
+- A claim that requires "see also trial_001 / see slides / see the project README" to be
   supported is overstatement when the headline is read standalone — `high` finding.
 - A number in the abstract that disagrees with the same number in a results cell —
   internal inconsistency, `high`.
-- A "deployment recommendation" that depends on portfolio math not shown in the file —
+- A "deployment recommendation" that depends on operational decision logic not shown in the file —
   `high`.
 
 **Axis 2 — standalone-readability (cold-read Turing test)**
@@ -449,7 +448,7 @@ how, and what was concluded?
 ### Instruction (give to the reviewer agent verbatim)
 
 > "You are an external cold reader. The `.py` file you are about to read is the only
-> material you are given. Other materials (literature, hypotheses, decisions, prior
+> material you are given. Other materials (literature, design state, decisions, prior
 > cycles, the three specialist reviewers' findings) are intentionally withheld — the
 > goal is to keep you from anchoring on priors that the same model shares with the
 > author or with other reviewers.

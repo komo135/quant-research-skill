@@ -369,6 +369,9 @@ Two-axis review, run both before any R&D transition to `matured`,
   conclusions warranted? Implementation correctness / statistical sufficiency
   / claim discipline / **analysis depth (A4+)** / reproducibility / cold-eye
   check from the artifact alone.
+  For claim-bearing notebook artifacts, the focused four-reviewer procedure in
+  `references/review/experiment_review_protocol.md` may be used as a
+  conclusion-review subprocedure, not as a separate promotion gate.
 
 Both axes are agent-self-executable checklists. Promotion-blocking items and
 state transitions require concrete evidence citation (file:line, hash, numeric
