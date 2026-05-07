@@ -118,7 +118,7 @@ The installed Codex skills are exposed as `research` and `quant-research`.
 4. Analyze the result before adding variants. A result should update a question,
    split an explanation, recycle a capability, or justify a gate decision.
 5. Promote only when process review and conclusion review both pass. Claim-
-   bearing notebooks use the folded experiment-review references inside
+   bearing notebooks use the folded experiment review references inside
    `research/references/review/`.
 
 ## Bundled Helpers

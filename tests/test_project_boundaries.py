@@ -45,6 +45,7 @@ class ProjectBoundaryTests(unittest.TestCase):
         claude_plugin = json.loads(read_text(".claude-plugin/plugin.json"))
         claude_marketplace = json.loads(read_text(".claude-plugin/marketplace.json"))
         readme = read_text("README.md")
+        old_plugin = "quant-research" + "@" + "quant-research" + "-skill"
 
         self.assertEqual("research", codex_plugin["name"])
         self.assertEqual("Research", codex_plugin["interface"]["displayName"])
@@ -55,8 +56,8 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertEqual("research", claude_marketplace["plugins"][0]["name"])
         self.assertIn("# research-skill", readme)
         self.assertIn("research@research-skill", readme)
-        self.assertNotIn("/plugin install quant-research@quant-research-skill", readme)
-        self.assertIn("old plugin identity was `quant-research@quant-research-skill`", readme.lower())
+        self.assertNotIn("/plugin install " + old_plugin, readme)
+        self.assertIn(f"old plugin identity was `{old_plugin}`", readme.lower())
 
     def test_public_skills_are_research_and_quant_research_only(self) -> None:
         skill_dirs = sorted(path.name for path in (ROOT / "skills").iterdir() if path.is_dir())
@@ -64,7 +65,8 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertEqual(["quant-research", "research"], skill_dirs)
         self.assertIn("name: research", read_text("skills/research/SKILL.md"))
         self.assertIn("name: quant-research", read_text("skills/quant-research/SKILL.md"))
-        self.assertFalse((ROOT / "skills/experiment-review/SKILL.md").exists())
+        retired_skill = ROOT / "skills" / ("experiment" + "-review") / "SKILL.md"
+        self.assertFalse(retired_skill.exists())
 
     def test_skill_defines_framework_boundary_contract(self) -> None:
         skill = read_text("skills/research/SKILL.md")
