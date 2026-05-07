@@ -167,7 +167,9 @@ def create_trial(args: argparse.Namespace) -> Path:
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    p = argparse.ArgumentParser(
+        description="Create a numbered research trial evidence artifact.",
+    )
     p.add_argument("--project-dir", required=True, type=Path)
     p.add_argument("--slug", required=True, help="trial slug (letters, numbers, and _)")
     # R&D trials are protocol-agnostic evidence artifacts; ledger files link

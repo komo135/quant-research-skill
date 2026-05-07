@@ -1,4 +1,4 @@
-"""new_project.py — Initialize a new quant-research project folder, mode-aware.
+"""new_project.py - Initialize a research project folder, mode-aware.
 
 Per CHARTER C1 / C2 / C3 / D-2 (`.rebuild/CHARTER.md`): R&D and Pure Research
 are separate disciplines with different primary state objects. This script

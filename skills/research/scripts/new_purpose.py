@@ -86,7 +86,7 @@ def create_purpose(
 
 def main() -> None:
     p = argparse.ArgumentParser(
-        description="Create a numbered quant-research trial notebook.",
+        description="Create a numbered research trial notebook.",
     )
     p.add_argument("--project", required=True, help="project name (notebooks/<name>/)")
     p.add_argument("--slug", required=True, help="trial slug (letters, numbers, and _)")
