@@ -157,14 +157,21 @@ v1.1.0, install `research@research-skill`. The old standalone
 
 ## Status
 
-Version 1.1.0 - project renamed to `research-skill`, plugin identity renamed to
-`research`, and the public skills split into generic `research` plus the
-`quant-research` finance adapter.
+Version 1.1.1 - adds user-facing outcome report requirements with visual or
+tabular evidence for research and quant-research results.
 
 <details>
 <summary>Changelog</summary>
 
-### v1.1.0 (current)
+### v1.1.1 (current)
+
+- Required user-facing outcome reports to include a plain-language decision,
+  intuitive visual or tabular evidence, citations, scope/caveats, and next
+  action.
+- Added finance-specific report evidence examples such as equity/drawdown
+  curves, fee sensitivity, regime performance, and deployment diagnostics.
+
+### v1.1.0
 
 - Renamed the project and plugin identity from the old quant-only package to
   `research-skill` / `research`.
