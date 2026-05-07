@@ -28,7 +28,7 @@ def load_module(path: str):
 
 class ProjectBoundaryTests(unittest.TestCase):
     def test_plugin_version_metadata_is_consistent(self) -> None:
-        expected = "1.0.7"
+        expected = "1.1.0"
         codex_plugin = json.loads(read_text(".codex-plugin/plugin.json"))
         claude_plugin = json.loads(read_text(".claude-plugin/plugin.json"))
         claude_marketplace = json.loads(read_text(".claude-plugin/marketplace.json"))
@@ -38,6 +38,33 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertEqual(expected, claude_plugin["version"])
         self.assertEqual(expected, claude_marketplace["plugins"][0]["version"])
         self.assertIn(f"### v{expected} (current)", readme)
+
+    def test_plugin_identity_is_research_skill(self) -> None:
+        codex_plugin = json.loads(read_text(".codex-plugin/plugin.json"))
+        agents_marketplace = json.loads(read_text(".agents/plugins/marketplace.json"))
+        claude_plugin = json.loads(read_text(".claude-plugin/plugin.json"))
+        claude_marketplace = json.loads(read_text(".claude-plugin/marketplace.json"))
+        readme = read_text("README.md")
+
+        self.assertEqual("research", codex_plugin["name"])
+        self.assertEqual("Research", codex_plugin["interface"]["displayName"])
+        self.assertEqual("research-skill", agents_marketplace["name"])
+        self.assertEqual("research", agents_marketplace["plugins"][0]["name"])
+        self.assertEqual("research", claude_plugin["name"])
+        self.assertEqual("research-skill", claude_marketplace["name"])
+        self.assertEqual("research", claude_marketplace["plugins"][0]["name"])
+        self.assertIn("# research-skill", readme)
+        self.assertIn("research@research-skill", readme)
+        self.assertNotIn("/plugin install quant-research@quant-research-skill", readme)
+        self.assertIn("old plugin identity was `quant-research@quant-research-skill`", readme.lower())
+
+    def test_public_skills_are_research_and_quant_research_only(self) -> None:
+        skill_dirs = sorted(path.name for path in (ROOT / "skills").iterdir() if path.is_dir())
+
+        self.assertEqual(["quant-research", "research"], skill_dirs)
+        self.assertIn("name: research", read_text("skills/research/SKILL.md"))
+        self.assertIn("name: quant-research", read_text("skills/quant-research/SKILL.md"))
+        self.assertFalse((ROOT / "skills/experiment-review/SKILL.md").exists())
 
     def test_skill_defines_framework_boundary_contract(self) -> None:
         skill = read_text("skills/quant-research/SKILL.md")
@@ -408,6 +435,54 @@ class ProjectBoundaryTests(unittest.TestCase):
             "rd_to_research",
         ]:
             self.assertNotIn(forbidden, program)
+
+    def test_research_skill_owns_generic_research_protocol(self) -> None:
+        research = read_text("skills/research/SKILL.md")
+
+        for phrase in [
+            "Use for serious research or R&D projects",
+            "Do not use for ordinary fact lookup",
+            "First Decision: Choose the Discipline",
+            "R&D Program",
+            "Right-Sized Rigor",
+            "Result-to-Question",
+            "Result-to-Capability",
+            "A4 minimum",
+        ]:
+            self.assertIn(phrase, research)
+
+        for forbidden in [
+            "Sharpe",
+            "PnL",
+            "portfolio capacity",
+            "transaction cost",
+            "walk-forward validation",
+        ]:
+            self.assertNotIn(forbidden, research)
+
+    def test_quant_research_is_finance_adapter_not_protocol_owner(self) -> None:
+        quant = read_text("skills/quant-research/SKILL.md")
+
+        for phrase in [
+            "finance adapter",
+            "Use research first",
+            "financial machine learning",
+            "backtest",
+            "walk-forward",
+            "leakage",
+            "Sharpe",
+            "PnL",
+            "transaction cost",
+            "portfolio",
+        ]:
+            self.assertIn(phrase, quant)
+
+        for forbidden in [
+            "any empirical research where conclusions must survive replication",
+            "First Decision: Choose the Discipline",
+            "coordination layer, not a third discipline",
+        ]:
+            self.assertNotIn(forbidden, quant)
 
     def test_right_sized_rigor_preserves_promotion_requirements(self) -> None:
         skill = read_text("skills/quant-research/SKILL.md")
