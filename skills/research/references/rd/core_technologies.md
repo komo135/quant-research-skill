@@ -5,7 +5,7 @@ that require research investment to establish for the target capability.
 
 ## When to read
 
-- Immediately after the charter is written down, before any capability is written
+- Immediately after the charter is reviewed, before any capability is written
 - Before adding a new candidate K-row to `capability_map.md`
 - When a sibling K is split, merged, or marked stale
 
@@ -261,7 +261,7 @@ Layer 1 is **closed-for-work** when:
    dependency column or sub-section.
 
 After closure, capability writing (Layer 2) may begin. Adding a new K
-after closure requires a dated deviation entry in `decisions.md`.
+after closure requires a deviation entry in `decisions.md`.
 
 ## When to split a capability into its own K
 

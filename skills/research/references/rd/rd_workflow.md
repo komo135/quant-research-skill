@@ -34,7 +34,7 @@ R&D first day **prohibits**:
   is OK to scope, but no de-risk test)
 - Any analysis whose conclusions enter the ledger
 
-Why: kill criteria are written down at charter close. Code written before kill
+Why: kill criteria are ready at charter close. Code written before kill
 criteria exist accumulates sunk cost that biases later kill decisions.
 A project that writes code on day 1 and discovers the charter is wrong on
 day 5 will resist redefining the charter (sunk cost), or worse, redefine
@@ -92,7 +92,7 @@ A project terminates when one of:
 ### Promotion (success path)
 
 All critical-path capabilities are `matured`, all upstream exits fired
-before integration test (timestamp verified), all kill criteria un-fired
+before integration test (ordering verified), all kill criteria un-fired
 with A4 evidence, project meets charter H8 final exam criteria, and
 (if any K is `継続改善型`) the maintenance plan is filed.
 
@@ -189,8 +189,7 @@ git commit** of `shared/`, recorded in the project's
 `reproducibility/data_versions.txt` (or a similar file `shared_pins.txt`).
 
 When a project starts a new trial, the pin is part of the reproducibility
-3-tuple stamped via the selected tracking backend or
-a selected tracker or local run note.
+3-tuple recorded via the selected tracking backend or local run note.
 
 ### Updating shared infrastructure
 
@@ -275,7 +274,7 @@ another agent without requiring every exploratory session to enter
 
 | Failure | Symptom | Fix |
 |---|---|---|
-| Day 1 implementation | Code committed before charter written down | Block; require charter write down first |
+| Day 1 implementation | Code committed before charter readiness | Block; require reviewed charter first |
 | Durable state change not recorded | Capability promoted or killed with no ledger / decision entry | File the missing transition with evidence |
 | Project drifts | Stale `capability_map.md` | Decide Promotion / Kill / Park / Pivot / Resume before new claim-bearing work |
 | Shared infra forked into project | Duplicate copies of data pipeline | Move back to `shared/`, pin from project |
@@ -289,6 +288,6 @@ another agent without requiring every exploratory session to enter
   (Promotion path) and the kill / park / pivot patterns embedded in
   `SKILL.md` and `decisions.md` template.
 - Shared infrastructure governance is parallel to the version pinning done by
-  the selected tracking backend or a selected tracker or local run note.
+  the selected tracking backend or local run note.
 - Pivot protocol is defined in `SKILL.md` § First Decision; this file
   covers the code-reuse follow-up.

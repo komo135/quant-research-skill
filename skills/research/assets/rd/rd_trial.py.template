@@ -34,7 +34,7 @@ def _(mo):
 
     - **Project**: <REPLACE: project name>
     - **Mode**: R&D
-    - **Charter reference (written down)**: <REPLACE: from decisions.md charter entry>
+    - **Charter**: <REPLACE: charter.md status / relevant H section>
 
     ## Artifact design
 
@@ -47,12 +47,12 @@ def _(mo):
 
     ## Reproducibility
 
-    - Tracking note/backend: <REPLACE: lightweight run note, results row, or selected tracker>
+    - Tracking/backend: <REPLACE: lightweight run note, results row, or tracker>
     - Selection/sweep record: <REPLACE: only if this artifact is used for model selection, multiple-testing correction, or promotion>
     - Run ID / artifact URI: <REPLACE: if external tracker is used>
-    - Data version: <REPLACE: from run note or selected tracker>
-    - Git commit: <REPLACE: from run note or selected tracker>
-    - Environment pin reference: <REPLACE: from run note or selected tracker>
+    - Data version: <REPLACE: from run note, results row, or tracker>
+    - Git commit: <REPLACE: from run note, results row, or tracker>
+    - Environment pin: <REPLACE: from run note, results row, or tracker>
     - Random seed: <REPLACE>
     """
     )
@@ -73,7 +73,7 @@ def _(mo):
 def _(pd):
     # data = pd.read_parquet("<REPLACE: data path>")
     # Record the data version before any computation using the selected
-    # tracking backend or selected tracker or local run note.
+    # tracking backend or local run note.
     pass
     return
 

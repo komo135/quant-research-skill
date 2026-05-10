@@ -94,8 +94,8 @@ Right-sized rigor is not a relaxation path. These requirements are
 non-relaxed:
 
 - A4+ for `supported`, `matured`, `established`, or `promoted`.
-- Pre-written pre-registration for Pure Research trials that can support a claim.
-- Written charter and kill criteria before R&D evidence-producing work can fire
+- Reviewed pre-registration for Pure Research trials that can support a claim.
+- Reviewed charter and kill criteria before R&D evidence-producing work can fire
   a kill or promotion-relevant decision.
 - Reproducibility records for every promotion-eligible or claim-cited trial.
 - Focused process review and conclusion review before promotion or externally
@@ -200,7 +200,7 @@ reference before executing the step:
 7. **Promotion** (`references/rd/rd_promotion_gate.md`) — promote a target
    only when every core technology is `established` (all child capabilities
    matured to TRL-6 with kill criteria un-fired and analysis at A4+),
-   integration test ran AFTER all upstream exits fired (timestamp verified),
+   integration test ran AFTER all upstream exits fired (ordering verified),
    and — if any core technology is `継続改善型` — a maintenance plan is on
    file in `decisions.md`.
 
@@ -219,9 +219,9 @@ each linked reference before executing the step:
    notebooks and decisions. Stop when competing explanations are clear and
    prior failure modes are documented.
 3. **Pre-registration** (`references/pure_research/preregistration.md`) —
-   write down question, competing explanations (≥2), test design, and expected
+   state the question, competing explanations (≥2), test design, and expected
    contrast under each explanation before the trial. After the trial,
-   compare actual analysis against the recorded plan and note any deviations.
+   compare actual analysis against the planned design and note any deviations.
 4. **Explanation ledger**
    (`references/pure_research/explanation_ledger_schema.md`) — single state
    object. Claim-cited or promotion-relevant results update explanation rows;
@@ -437,14 +437,14 @@ the final report must carry enough intuitive evidence for human judgment.
 - **Initial-day prohibitions**.
   - R&D first day: no implementation, charter and capability map (with
     core technologies) only. *Why*: kill criteria (Heilmeier H6) must be
-    written down before a trial can fire one. Code written before kill criteria
+    ready before a trial can fire one. Code written before kill criteria
     exist accumulates sunk cost that biases future kill decisions.
     Typical time investment: 1-2 hours of charter writing prevents weeks
     of effort on a misframed target.
   - Pure Research first day: no trial execution, PR/FAQ + targeted
     literature + pre-registration only. *Why*: a pre-registered test
     survives the garden of forking paths. A trial run before the
-    pre-registration is recorded is a shopping trip — once you have seen the
+    pre-registration is ready is a shopping trip — once you have seen the
     data, "pre-registration" is theater. Typical time investment: 30-60
     minutes of PR/FAQ writing prevents months of post-hoc rationalization
     on weak findings.
@@ -462,7 +462,7 @@ the final report must carry enough intuitive evidence for human judgment.
     a capability while its parent K, declared dependencies, or integration
     path have incomplete Layer 1 fields.** Unrelated sibling K rows do not
     globally block the branch. If a Stage gate surfaces a new upstream K,
-    suspend the affected branch, file the deviation, re-scope the dependency
+    suspend the affected branch, document the deviation, re-scope the dependency
     path, then resume.
   - Any rollback to an earlier step requires a dated deviation entry in
     `decisions.md` citing the blocker. State-change logging alone does
@@ -483,10 +483,9 @@ the final report must carry enough intuitive evidence for human judgment.
   debugging runs may use lightweight run notes. If later needed for promotion,
   rerun under the promotion-eligible protocol; do not retroactively relabel
   exploratory output as if it had been captured at trial time.
-- **Written down artifacts**. Charter, pre-registration, and kill-criteria fire log
-  have a clearly dated recorded version before they become load-bearing.
-  physically impossible; any load-bearing amendment requires an explicit
-  deviation entry in `decisions.md` or a new written down artifact.
+- **Planning artifacts**. Charter, pre-registration, and kill criteria must be
+  reviewed before they become load-bearing. Any load-bearing amendment requires
+  an explicit deviation entry in `decisions.md` or a new planning artifact.
 - **No placeholders in deliverables**. Templates produce real content; any
   remaining `TBD`, `TODO`, `XXX`, `???`, or `{{...}}` blocks the deliverable.
 
@@ -511,7 +510,7 @@ tracking/                        # optional local tracker config / exported run 
 R&D adds:
 
 ```
-charter.md                       # recorded charter (Heilmeier 8 Q)
+charter.md                       # reviewed charter (Heilmeier 8 Q)
 capability_map.md                # primary state object
                                  #   Section 1: Core Technologies (intellectual layer)
                                  #   Section 2: Capabilities (operational layer, with core_tech_id)
@@ -521,7 +520,7 @@ Pure Research adds:
 
 ```
 prfaq.md                         # working-backwards entry document
-prereg/PR_<id>.md                # pre-registration, one per trial
+prereg/PR_<id>.md                # reviewed pre-registration, one per trial
 explanation_ledger.md            # primary state object
 imrad_draft.md                   # paper-shaped deliverable, started early
 ```
@@ -565,7 +564,7 @@ sequence.
 | `new_project.py --mode rd|pure-research` | Initialize a project with the discipline-specific layout |
 | `new_trial.py` | Generate a numbered trial notebook (mode-aware template) |
 | `aggregate_results.py` | Append interpreted trial rows (mode-aware schema, includes `analysis_tier`) |
-| ledger consistency helper | Lint capability_map / explanation_ledger / prereg / analysis-section consistency |
+| ledger consistency helper | Lint capability_map / explanation_ledger / analysis-section consistency |
 | `render_capability_dag.py` | Mermaid DAG of the R&D capability dependency graph |
 | `render_explanation_dag.py` | Mermaid DAG of the explanation hierarchy |
 | `charter_interview.py` | Interactive Heilmeier 8-question elicitation |

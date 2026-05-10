@@ -204,23 +204,23 @@ The trial can be re-run.
 
 - [ ] **3-tuple recorded** for promotion-eligible or claim-cited trial(s) per
   `references/shared/reproducibility.md`:
-  - Data version, git commit, and environment pin reference in local run notes
+  - Data version, git commit, and environment pin in local run notes
     (`reproducibility/data_versions.txt`, `results.parquet`,
-    `reproducibility/env_lock_ref.txt`) OR selected tracker record / exported
+    `reproducibility/env_lock_ref.txt`) OR tracker record / exported
     run record
   - Evidence: file existence + content, or stable tracker run ID + artifact URI
     resolving to those anchors
 - [ ] **Random seed recorded** and (for stochastic algorithms)
   multiple seeds reported
-  - Evidence: `reproducibility/seed.txt` or selected tracker record + per-seed
+  - Evidence: `reproducibility/seed.txt` or tracker record + per-seed
     result mean ± std (for DL / RL)
 - [ ] **Shared infrastructure pins** recorded if `shared/` is used
   - Evidence: `reproducibility/shared_pins.txt` or selected tracker/export
     record
 - [ ] **Working tree was clean** at trial time (no uncommitted
   changes)
-  - Evidence: selected tracker or local run note exit 0 logged in `decisions.md`,
-    or selected tracker run record shows clean git state / no dirty-tree flag
+  - Evidence: local run note or tracker record shows clean git state /
+    no dirty-tree flag
 - [ ] **No hardcoded paths** that would break on a different machine
   - Evidence: code review note
 

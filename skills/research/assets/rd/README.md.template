@@ -6,7 +6,7 @@ TRL-tracked capability map, and Cooper Stage-Gate per capability.
 ## Status
 
 - **Current state**: <REPLACE: drafting | active | assessment | promoted | killed | parked | pivoted>
-- **Charter**: [`charter.md`](charter.md) (written down at <REPLACE: timestamp>, reference <REPLACE: decision note or tracker note>)
+- **Charter**: [`charter.md`](charter.md) (status: <REPLACE: DRAFT | READY>)
 - **Capability map**: [`capability_map.md`](capability_map.md)
 - **Decisions log**: [`decisions.md`](decisions.md)
 - **Pending stop-condition decision**: <REPLACE: none | promote | kill | park | pivot>
@@ -54,14 +54,14 @@ assessment.
 ```
 <project_name>/
 ├── README.md               # this file
-├── charter.md              # written down Heilmeier 8 Q
+├── charter.md              # reviewed Heilmeier 8 Q
 ├── capability_map.md       # Section 1 (Layer 1) + Section 2 (Layer 2)
 ├── decisions.md            # state transitions, deviation entries, session summaries
 ├── configs/                # concrete experiment configs and parameter grids
 ├── src/                    # project-specific implementation, if needed
 ├── tests/                  # verification for project-specific implementation
 ├── prereg/
-│   └── charter note        # dated note reference + UTC timestamp from review
+│   └── charter note        # optional project note
 ├── literature/
 │   ├── papers.md           # prior work, indexed by K
 │   └── differentiation.md  # how this project differs from prior work
@@ -74,7 +74,7 @@ assessment.
 │   └── intermediate/       # parquet outputs of feature notebooks etc.
 ├── tracking/               # optional tracker exports / lightweight run notes
 └── reproducibility/
-    ├── data_versions.txt     # dated_note of each data source
+    ├── data_versions.txt     # version/extraction note for each data source
     ├── shared_pins.txt     # commit references of shared/ infrastructure used
     ├── uv.lock             # python environment pin
     └── seed.txt            # random seed(s)
@@ -85,7 +85,7 @@ assessment.
 For an agent or user to verify the project is in good shape at any
 point:
 
-- [ ] `charter.md` is written down (`decisions.md charter entry` exists, record matches)
+- [ ] `charter.md` is reviewed and status is READY
 - [ ] `capability_map.md` Section 1 is closed-for-work (per
   `references/rd/core_technologies.md` § Layer 1 closure)
 - [ ] Evidence artifacts used for capability assessment are linked from
@@ -99,7 +99,7 @@ point:
 - [ ] Selection, sweep, and failed-run records exist when they affect a
   multiple-testing or promotion judgment
 - [ ] Reproducibility 3-tuple is recorded for every promotion-eligible
-  trial via a selected tracker or local run note or an equivalent selected
+  trial via a local run note, results row, or equivalent tracker record
   tracking backend
 
 ## Promotion intent

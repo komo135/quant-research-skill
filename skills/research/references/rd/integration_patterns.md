@@ -410,7 +410,7 @@ Skeleton is replaced piece by piece as K's mature.
 |---|---|---|
 | No pattern declared in charter | Implicit Pattern 2 default; "no working version yet" complaint | Charter H8 must declare pattern + reason |
 | Pattern 1 with stub baselines | "v0 runs but does nothing" | Use real (if naive) baseline implementations |
-| Pattern 3 skeleton written down as framework | Skeleton is months old, K's constrained by it | Time-box skeleton; treat as throwaway |
+| Pattern 3 skeleton treated as framework | Skeleton is months old, K's constrained by it | Time-box skeleton; treat as throwaway |
 | Pattern 2 with stakeholder pressure | "Demo wrappers" being built that don't advance K's | Switch to Pattern 1 or 3 |
 | Pattern switch without deviation | Silent shift mid-project | File deviation in decisions.md naming trigger |
 

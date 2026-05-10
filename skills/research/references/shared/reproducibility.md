@@ -42,7 +42,7 @@ reproducibility/
 ├── data_versions.txt      # data files or tables used, with dated snapshot notes
 ├── shared_pins.txt        # shared modules and the commit refs used
 ├── uv.lock                # environment pin file, if Python
-├── env_lock_ref.txt       # note reference or summary for the env pin used
+├── env_lock_ref.txt       # environment pin used by the trial
 └── seed.txt               # random seeds, if relevant
 ```
 

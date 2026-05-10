@@ -15,10 +15,9 @@ file, evidence-producing R&D work is forbidden: no Stage gate and no
 promotion-cited trial. Setup, scaffolding, and exploratory design notes may
 continue when clearly labeled as non-evidence-producing.
 
-The charter is a **review anchor** — once committed, load-bearing amendments
-require a dated deviation entry in `decisions.md`. Write down via
-a dated `decisions.md` note (the same mechanism used for Pure Research
-pre-registration).
+The charter is a planning anchor. Once it has `Status: READY`, do not silently
+rewrite load-bearing scope, kill criteria, cost, final exam, consumer, or
+promotion language. Material changes belong in `decisions.md` as deviations.
 
 ## The 8 questions
 
@@ -92,8 +91,8 @@ List the top 3-5 risks. For each, name **specific observable evidence**
 that would cause the project to be killed. These evidence statements become
 the project's binding kill criteria.
 
-The kill criteria written here are **written down as decision anchors** at charter
-close. They are not a prison: discovering mid-project that a test, threshold,
+The kill criteria written here are **decision anchors** once the charter is
+ready. They are not a prison: discovering mid-project that a test, threshold,
 or data source was wrong is a reason to file a deviation entry and either
 re-scope the criterion for future evidence or start a new charter. It is not a
 reason to silently reinterpret the original criterion after seeing results.
@@ -222,8 +221,7 @@ Structure:
 ```markdown
 # Charter — <project name>
 
-Written down: <YYYY-MM-DD HH:MM:SS UTC>
-Note reference: <dated decision entry, tracker note, or reviewed file path>
+Status: READY
 
 ## H1. What capability should exist?
 [Answer.]
@@ -236,32 +234,24 @@ Note reference: <dated decision entry, tracker note, or reviewed file path>
 ## Approval
 - Drafted by: <agent / user>
 - Reviewed by: <user>
-- Written down at: <timestamp>
 ```
 
-## Freezing the charter
+## Reviewing the charter
 
 After H1-H8 are filled and reviewed:
 
-```bash
-python a dated decisions note --type charter --path charter.md
-```
+Change `Status: DRAFT` to `Status: READY`.
 
-This:
-1. Computes dated note of the file content
-2. Writes `decisions.md charter entry` with reference + UTC timestamp + path
-3. Records the write down in `decisions.md` as a state transition
-
-After freezing, **do not edit `charter.md` in place for load-bearing changes**.
+After review, **do not silently rewrite `charter.md` for load-bearing changes**.
 Minor typo or formatting fixes may be noted normally. Any change that affects
 scope, kill criteria, cost, final exam, consumer, or promotion language
-requires a dated deviation entry in `decisions.md` naming the H-number that
+requires a deviation entry in `decisions.md` naming the H-number that
 changed and the trigger evidence. Frequent load-bearing deviations mean the
 charter was under-specified; next time, spend more time on this step.
 
 ## Why the charter blocks downstream work
 
-Without a written down charter:
+Without a reviewed charter:
 
 - **Kill criteria do not exist**. Any "kill" decision later in the project
   would be based on shifting goalposts. Sunk cost will bias the agent
@@ -291,7 +281,7 @@ writing pays for itself within the first week of decomposition.
 
 ## Relationship to other references
 
-- After charter is written down → read `references/rd/core_technologies.md` to
+- After charter is ready → read `references/rd/core_technologies.md` to
   define Layer 1 (intellectual decomposition).
 - The novelty axis (`既存` / `発展的` / `新規`) lives in H3, not on
   individual core technologies.

@@ -138,7 +138,7 @@ Storage: <local path, tracking URI, remote project, or registry>
 Reason: <why this fits this research and collaboration model>
 Review retrieval: <how a reviewer resolves trial_id -> run record>
 Minimum persisted fields: trial_id, run_id, artifact_uri, data version,
-git commit, environment pin reference, seed, params, headline metrics
+git commit, environment pin, seed, params, headline metrics
 Decision-relevant run set/export: <path or tracker query covering cited runs
 and failed/sweep/model-selection attempts that affect this claim>
 ```

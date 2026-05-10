@@ -170,7 +170,7 @@ an explicit deviation entry.
 
 ## Schema validation
 
-`scripts/ledger consistency review` enforces:
+The schema checker enforces:
 
 - Every capability has `core_tech_id` set and the K exists in Section 1
 - Every `core_tech_id = integration` capability has at least 2
@@ -215,7 +215,7 @@ Notes from this example:
   zero-shot baseline.
 - C6 is `integration`, with multi-cap dependency. It is `blocked` until
   C1, C3, C4, C5 all mature. The integration test cannot run earlier;
-  the promotion gate will verify the timestamp.
+  the promotion gate checks that dependency ordering.
 - Each `kill_criteria` is concrete (numeric or behavioral) and would
   itself require A4 analysis to fire (e.g., low IC after fine-tuning
   sweep — but C3 might fail because of bad hyperparameter range, not

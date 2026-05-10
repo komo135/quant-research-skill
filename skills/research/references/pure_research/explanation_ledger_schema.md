@@ -112,7 +112,7 @@ parked → active
 ```
 
 `rejected` is not strictly terminal — a rejected E can still be cited
-as part of project history, but it should not be revived without a
+as part of the project record, but it should not be revived without a
 fresh pre-registration that explicitly addresses the contradiction.
 
 ## Required ledger sections
@@ -167,7 +167,7 @@ transition.
 An explanation reaches `supported` only when **all** of:
 
 - The Q's discriminating test against ≥1 serious alternative has been
-  run under a written down pre-registration
+  run under a reviewed pre-registration
 - `deviation review` exit code is 0 or 2 (no major deviations)
 - Multiple testing correction is honest and applied per
   project-specific multiple-testing plan
@@ -224,7 +224,7 @@ delete them.
 
 ## Relationship to other references
 
-- Schema validated by `scripts/ledger consistency review`
+- Schema checked by the ledger consistency helper
 - Pre-registration drives explanation status changes — see
   `references/pure_research/preregistration.md`
 - Promotion gate operates on this ledger — see

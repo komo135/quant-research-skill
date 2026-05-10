@@ -199,7 +199,7 @@ def main() -> None:
     print("  2. Fill the evidence artifact header (markdown cells) per the template")
     print("  3. Run verification checks BEFORE the main test")
     print("  4. After trial, write a deviation review note or a deviation note if the run drifted")
-    print("  5. If used for assessment, cite this artifact and the relevant note reference from the ledger")
+    print("  5. If used for assessment, cite this artifact from the relevant ledger row")
 
 
 if __name__ == "__main__":

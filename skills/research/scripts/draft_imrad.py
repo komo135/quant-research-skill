@@ -9,7 +9,7 @@ must:
 - Add narrative paragraphs the script cannot generate from structured data
 - Reconcile any inconsistencies between artifacts
 - Write the limitations and future-work sections
-- Verify the prereg note references and reproducibility notes
+- Verify that planned methods and reproducibility notes are complete
 
 Usage:
     python scripts/draft_imrad.py --project-dir <path>
@@ -101,17 +101,6 @@ def extract_field(text: str, label: str) -> str:
     return match.group(1).strip() if match else ""
 
 
-def format_reference(note_reference: str, written_down_at: str, fallback_path: str) -> str:
-    parts: list[str] = []
-    if note_reference:
-        parts.append(f"note reference {note_reference}")
-    if written_down_at:
-        parts.append(f"written down at {written_down_at}")
-    if not parts:
-        return fallback_path
-    return ", ".join(parts)
-
-
 # ---------------------------------------------------------------------------
 # Artifact loaders
 # ---------------------------------------------------------------------------
@@ -121,8 +110,6 @@ def format_reference(note_reference: str, written_down_at: str, fallback_path: s
 class ProjectArtifacts:
     project_dir: Path
     prfaq_text: str = ""
-    prfaq_note_reference: str = ""
-    prfaq_written_down_at: str = ""
     prereg_files: list[Path] = None
     prereg_notes: dict[str, dict[str, str]] = None
     ledger_q: list[dict] = None
@@ -145,8 +132,6 @@ def load_artifacts(project_dir: Path) -> ProjectArtifacts:
     prfaq = project_dir / "prfaq.md"
     if prfaq.exists():
         art.prfaq_text = prfaq.read_text(encoding="utf-8")
-        art.prfaq_note_reference = extract_field(art.prfaq_text, "note reference")
-        art.prfaq_written_down_at = extract_field(art.prfaq_text, "written down at")
 
     prereg_dir = project_dir / "prereg"
     if prereg_dir.exists():
@@ -154,9 +139,7 @@ def load_artifacts(project_dir: Path) -> ProjectArtifacts:
             art.prereg_files.append(md)
             prereg_text = md.read_text(encoding="utf-8")
             art.prereg_notes[md.stem] = {
-                "note_reference": extract_field(prereg_text, "note reference"),
-                "written_down_at": extract_field(prereg_text, "written down at"),
-                "prfaq_reference": extract_field(prereg_text, "PR/FAQ reference"),
+                "path": f"prereg/{md.name}",
             }
 
     ledger = project_dir / "explanation_ledger.md"
@@ -202,16 +185,15 @@ def section_introduction(art: ProjectArtifacts, supported_e: str) -> str:
         "",
         "> " + pr_part.replace("\n", "\n> "),
         "",
-        "This study was pre-registered. "
-        + f"PR/FAQ reference: {format_reference(art.prfaq_note_reference, art.prfaq_written_down_at, 'prfaq.md')}. "
-        + "Pre-registration references: "
+        "The planned question and methods are documented in "
+        + "`prfaq.md` and the project pre-registration file(s): "
         + (
             ", ".join(
-                f"{stem} ({format_reference(info.get('note_reference', ''), info.get('written_down_at', ''), f'prereg/{stem}.md')})"
+                f"`{info.get('path', f'prereg/{stem}.md')}`"
                 for stem, info in art.prereg_notes.items()
             )
             if art.prereg_notes
-            else "<REPLACE: cite the planning note for each pre-registration>"
+            else "<REPLACE: add pre-registration file path>"
         )
         + ".",
         "",
@@ -237,7 +219,7 @@ def section_methods(art: ProjectArtifacts, supported_e: str) -> str:
 
         methods.extend([
             f"#### Pre-reg `{stem}`",
-            f"- Reference: {format_reference(note_info.get('note_reference', ''), note_info.get('written_down_at', ''), f'prereg/{stem}.md')}",
+            f"- Source: `{note_info.get('path', f'prereg/{stem}.md')}`",
             "- Question:",
             f"  > {question[:300]}{'...' if len(question) > 300 else ''}",
             "- Competing explanations (≥2 + null):",
@@ -248,7 +230,7 @@ def section_methods(art: ProjectArtifacts, supported_e: str) -> str:
     methods.extend([
         "",
         "### 2.2 Data",
-        "<REPLACE: source, period, frequency, note reference from `reproducibility/data_versions.txt`>",
+        "<REPLACE: source, period, frequency, and data version from `reproducibility/data_versions.txt`>",
         "",
         "### 2.3 Sample / split",
         "<REPLACE: split methodology, N per split>",
@@ -391,18 +373,17 @@ def section_discussion(art: ProjectArtifacts, supported_e: str) -> str:
     return "\n".join(discussion)
 
 
-def appendix_prereg_log(art: ProjectArtifacts) -> str:
+def appendix_trial_planning_summary(art: ProjectArtifacts) -> str:
     lines = [
-        "## Appendix B: Pre-registration log",
+        "## Appendix B: Trial Planning Summary",
         "",
-        "| PR ID | note reference | written down at | Source file |",
-        "|---|---|---|---|",
+        "| Trial plan | Source file |",
+        "|---|---|",
     ]
     for stem in sorted(art.prereg_notes):
         info = art.prereg_notes[stem]
         lines.append(
-            f"| {stem} | {info.get('note_reference', '<REPLACE>')} | "
-            f"{info.get('written_down_at', '<REPLACE>')} | `prereg/{stem}.md` |"
+            f"| {stem} | `{info.get('path', f'prereg/{stem}.md')}` |"
         )
     return "\n".join(lines)
 
@@ -418,12 +399,12 @@ def render_imrad(art: ProjectArtifacts, supported_e: str) -> str:
         "",
         f"Status: <REPLACE: draft | revising | promotion-ready | promoted>",
         "",
-        f"Pre-registration references:",
-        f"- PR/FAQ: {format_reference(art.prfaq_note_reference, art.prfaq_written_down_at, 'prfaq.md')}",
+        f"Planning files:",
+        f"- PR/FAQ: `prfaq.md`",
         (
             f"- Pre-reg files: "
             + ", ".join(
-                f"{stem} ({info.get('note_reference', 'note reference missing')})"
+                f"{stem} (`{info.get('path', f'prereg/{stem}.md')}`)"
                 for stem, info in art.prereg_notes.items()
             )
         ) if art.prereg_notes else "(none)",
@@ -441,7 +422,7 @@ def render_imrad(art: ProjectArtifacts, supported_e: str) -> str:
         "",
         "<REPLACE: extract bibliography from literature/papers.md, filtered to references actually cited in Sections 1-4>",
         "",
-        appendix_prereg_log(art),
+        appendix_trial_planning_summary(art),
     ]
     return "\n".join(parts)
 

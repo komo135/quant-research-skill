@@ -3,7 +3,7 @@
 R&D decomposition: Layer 1 (Core Technologies, intellectual) +
 Layer 2 (Capabilities, operational).
 
-Pre-condition: charter written down. See `charter.md`.
+Pre-condition: charter reviewed. See `charter.md`.
 
 ---
 
@@ -75,4 +75,4 @@ Example:
 ## Updates log
 
 Use `decisions.md` for state transitions. This file is the current state;
-git history is the review trail.
+the capability map and decisions log explain the current state.

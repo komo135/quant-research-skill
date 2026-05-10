@@ -1,10 +1,8 @@
 # Pre-Registration — PR_<REPLACE: id, e.g., 001>
 
-Status: DRAFT (replace with `written down at <YYYY-MM-DD HH:MM:SS UTC>` after
-running `python a dated decisions note --type prereg --id PR_<id> --path prereg/PR_<id>.md`)
-Note reference: <REPLACE: dated decision entry, tracker note, or reviewed file path>
+Status: DRAFT (change to READY after review, before trial execution)
 
-PR/FAQ reference: <REPLACE: path to written down prfaq.md + note reference>
+PR/FAQ: <REPLACE: path to prfaq.md section that scopes this trial>
 
 ---
 
@@ -34,7 +32,7 @@ null-result) and (if correlative) the gap to causation. See
 - **Frequency**: <REPLACE: e.g., daily, 5-min>
 - **Universe**: <REPLACE: instruments included>
 - **Planned data identity**: <REPLACE: path / vendor version / expected
-  snapshot date. Final content reference is stamped at trial time.>
+  snapshot date. Fill the actual data version in the trial note.>
 
 ### 3.2 Sample / split
 
@@ -82,22 +80,18 @@ this, trials drift.>
 
 - Random seed(s): <REPLACE>
 - Code commit (planned at trial run): <fill at trial time>
-- Environment pin reference (planned at trial run): <fill at trial time>
+- Environment pin (planned at trial run): <fill at trial time>
 - Tracking note/backend (planned): <run note, results row, or selected tracker>
 - Decision-relevant run set (planned): <only if selection, multiple-testing correction, or promotion will depend on multiple attempts>
 - Data version (final, trial-time): <fill from run note or selected tracker>
 
 ---
 
-## Approval
-
 - Drafted by: <REPLACE: agent and/or user>
 - Reviewed by: <REPLACE: user>
-- Written down at: <fill after review runs>
-- Written down note reference: <fill after review>
 
 ---
 
-After freezing this pre-registration, the trial may run. Post-trial,
-run `scripts/deviation review --id PR_<id>` and apply the deviation
-severity matrix in `references/pure_research/pr_workflow.md`.
+After this pre-registration is reviewed, the trial may run. Post-trial,
+compare the trial against `PR_<id>` and apply the deviation severity matrix in
+`references/pure_research/pr_workflow.md`.

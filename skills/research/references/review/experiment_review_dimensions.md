@@ -25,15 +25,15 @@ Each dimension lists:
 ### Scope
 
 Whether the question being asked is testable, whether the thresholds for
-acceptance / rejection were genuinely fixed before the result was seen, and whether the
-research state history shows honest cycles or post-hoc curation. Does NOT cover
+acceptance / rejection are stated before interpreting the result, and whether
+the research state shows honest cycles rather than post-hoc curation. Does NOT cover
 dataset / context range (that is `scope`) or method choice (that is `method`).
 
 ### Inputs
 
 - The notebook's *Research design* cell
-- The relevant design artifact and its git history (was the claim edited after results came in?)
-- The research state ledger (does the time-ordering of decisions corroborate pre-registration?)
+- The relevant design artifact
+- The research state ledger
 - `capability_map.md` or `explanation_ledger.md` (the cycle history, where applicable)
 
 ### Checks
@@ -42,8 +42,8 @@ dataset / context range (that is `scope`) or method choice (that is `method`).
 |---|---|---|
 | Question is a falsifiable comparison statement | "Does X work?" rather than "Does X beat baseline B by metric M with threshold T?" | high |
 | Acceptance condition is a numeric threshold present in the design cell | "supported if primary metric > X" not "supported if it looks good" | high |
-| Threshold pre-registration corroborated by the design artifact git history | Threshold was added or changed *after* results were observed | high |
-| Design artifact and research state ledger are git-tracked and committed | Untracked files cannot corroborate pre-registration; a self-asserted date with no commit reference is not an review trail | high |
+| Threshold stated before interpretation | Threshold is absent until after the result is discussed | high |
+| Design artifact and research state ledger are present and readable | The reviewer cannot locate the stated design or state rows | high |
 | Claim was not silently rewritten to match the result | The claim in the abstract differs in direction or strength from the original design artifact entry | high |
 | Cycle count is ≥ 3 (minimum) or ≥ 5 (standard) | Single-shot experiment carrying the weight of the claim | medium |
 | Across cycles, the *best* result is not being cherry-picked into the abstract | C1 -> C2 -> C3 with monotonically improving primary metric and only the best one declared `supported` is selection bias | medium |
@@ -149,7 +149,7 @@ of those choices was correct (that is `validation`).
 | The proposed method beats both baselines | Proposed beats the floor but not the upper bound | high |
 | Feature construction has its own notebook with leak checks | Feature engineering and model fit in one notebook | medium |
 | Hyperparameter trial count is documented | The trial count is implicit / unstated | medium |
-| In sequential or repeated validation, hyperparameter retraining cadence is stated where applicable | Hyperparameters fixed on the early validation path then written down across later paths, leaking early validation information into later claims | medium |
+| In sequential or repeated validation, hyperparameter retraining cadence is stated where applicable | Hyperparameters fixed on the early validation path then reused across later paths, leaking early validation information into later claims | medium |
 | Model-selection trial count is fed honestly into the multiple-testing correction | Trial count = 1 reported for an experiment that obviously tried more | high |
 | Latest version of the model class is used (or older version is justified) | Using a 2015-era LSTM design with no comment when 2024-era equivalents exist | low |
 

@@ -3,7 +3,7 @@
 Replaced by the Pure Research mode references:
 
 - `references/pure_research/prfaq.md` — Amazon Working Backwards (PR/FAQ
-  entry document, written down)
+  entry document, reviewed)
 - `references/pure_research/preregistration.md` — AEA-style PAP with
   evidence_type column and deviation-review guidance
 - `references/pure_research/explanation_ledger_schema.md` — Q-rows + E-rows
@@ -17,7 +17,7 @@ Replaced by the Pure Research mode references:
   checklist + cold-eye check
 
 The original "deliberately slow research" principle is preserved across
-these new files; the structure is more rigorous (written down pre-reg,
+these new files; the structure is more rigorous (reviewed pre-reg,
 deviation matrix, IMRAD as the deliverable).
 
 Do not consult this file for current protocol.

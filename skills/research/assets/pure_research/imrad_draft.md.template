@@ -8,9 +8,9 @@ paragraphs and the limitations section require human / agent revision.
 
 Status: <REPLACE: draft | revising | promotion-ready | promoted>
 
-Pre-reg reference citations:
-- PR/FAQ: <REPLACE: dated note>
-- Trial(s) cited: PR_<id1> reference <REPLACE>, PR_<id2> reference <REPLACE>
+Planning files:
+- PR/FAQ: `prfaq.md`
+- Trial(s) cited: `prereg/PR_<id1>.md`, `prereg/PR_<id2>.md`
 
 ---
 
@@ -33,10 +33,9 @@ References cited:
 
 ### 1.3 This study's contribution
 
-<REPLACE: state the contribution in 1 sentence. Reference the
-pre-registration: "We pre-registered this study at reference <X> on
-<date>, prior to data inspection." The contribution should match the
-PR/FAQ Part 1 headline.>
+<REPLACE: state the contribution in 1 sentence. Mention the planned question,
+alternatives, metric, threshold, and stop condition. Do not add proof
+artifacts.>
 
 ---
 
@@ -52,7 +51,7 @@ The trial(s) backing this manuscript were pre-registered:
 - Expected diff per E: <REPLACE: copy from pre-reg § 4>
 
 Pre-registration files:
-- `prereg/PR_<id>.md` (reference <REPLACE>, written down at <REPLACE>)
+- `prereg/PR_<id>.md`
 
 ### 2.2 Data
 
@@ -60,7 +59,7 @@ Pre-registration files:
 - Period: <REPLACE>
 - Frequency: <REPLACE>
 - Universe: <REPLACE>
-- Reference: <REPLACE: from `reproducibility/data_versions.txt`>
+- Data version: <REPLACE: from `reproducibility/data_versions.txt`>
 
 ### 2.3 Sample / split
 
@@ -78,9 +77,9 @@ boundaries. Sample size N per split.>
 
 ### 2.5 Deviations from pre-registration
 
-<REPLACE: list from `deviation review` output. For each, severity
-(minor) and rationale. If no deviations, state "No deviations from
-pre-registration.">
+<REPLACE: list material deviations from the trial note or decisions.md. For
+each, include severity and rationale. If no deviations, state "No deviations
+from pre-registration.">
 
 | Deviation | Severity | Rationale |
 |---|---|---|
@@ -89,7 +88,7 @@ pre-registration.">
 
 - Data version: <REPLACE>
 - Code commit: <REPLACE>
-- Environment pin reference: <REPLACE: uv.lock dated note>
+- Environment pin: <REPLACE: `uv.lock` or equivalent environment description>
 - Random seed(s): <REPLACE>
 - Shared infrastructure pins: <REPLACE: from
   `reproducibility/shared_pins.txt`>
@@ -185,10 +184,10 @@ filtered to references actually cited in Sections 1-4.)
 
 ---
 
-## Appendix B: Pre-registration log
+## Appendix B: Trial Planning Summary
 
-(Auto-generated from `prereg/` and `decisions.md`.)
+(Summarize only the cited trial plans and deviation status.)
 
-| PR ID | Note reference | Written down at | Trial timestamp | Deviation status | Major deviation? |
-|---|---|---|---|---|---|
-| <REPLACE> | <REPLACE> | <REPLACE> | <REPLACE> | 0 / 2 | no |
+| PR ID | Source file | Deviation status | Major deviation? |
+|---|---|---|---|
+| <REPLACE> | `prereg/PR_<id>.md` | no material deviation | no |

@@ -192,7 +192,7 @@ class ProjectBoundaryTests(unittest.TestCase):
                     [
                         "Question under test",
                         "E-pair being discriminated",
-                        "Trial design (copied from written down pre-reg)",
+                        "Trial design (copied from reviewed pre-reg)",
                         "State updates (explanation_ledger.md)",
                     ],
                 ),
@@ -414,7 +414,7 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertIn("Decision-relevant run set exists", process_review)
         self.assertIn("missing early backend selection is a logged gap", process_review)
         self.assertIn("complete export of", process_review.lower())
-        self.assertIn("selected tracker record / exported", conclusion_review)
+        self.assertIn("tracker record / exported", conclusion_review)
         self.assertIn("run record", conclusion_review)
         self.assertNotIn("project trial count from\n    `results.parquet`", process_review)
 
@@ -547,8 +547,8 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertIn("Rigor is sized to the research state being changed", skill)
         for phrase in [
             "A4+ for `supported`, `matured`, `established`, or `promoted`",
-            "Pre-written pre-registration",
-            "Written charter and kill criteria",
+            "Reviewed pre-registration",
+            "Reviewed charter and kill criteria",
             "Reproducibility records",
             "Maintenance plan requirements",
         ]:
@@ -634,7 +634,7 @@ class ProjectBoundaryTests(unittest.TestCase):
     def test_exploratory_runs_must_rerun_before_promotion_citation(self) -> None:
         skill = read_text("skills/research/SKILL.md")
 
-        self.assertNotIn("retroactively stamp", skill)
+        self.assertNotIn("retroactively relabel exploratory output as complete", skill)
         self.assertIn("rerun under the promotion-eligible protocol", skill)
 
     def test_removed_reproducibility_scripts_are_not_referenced(self) -> None:
@@ -648,6 +648,34 @@ class ProjectBoundaryTests(unittest.TestCase):
             "plan-vs-actual " + "helper",
             "planning-record " + "helper",
             "rerun" + "-anchor " + "helper",
+        ]:
+            self.assertNotIn(phrase, research_tree)
+
+    def test_registration_proof_artifacts_are_not_reintroduced(self) -> None:
+        research_tree = read_tree_text("skills/research")
+
+        for phrase in [
+            "note " + "reference",
+            "dated " + "note",
+            "record " + "matches",
+            "written " + "down at",
+            "pre-reg " + "reference",
+            "pre-registration " + "record",
+            "env " + "reference",
+            "environment pin " + "reference",
+            "record " + "timestamp",
+            "byte-" + "for-byte",
+            "reference " + "b9",
+            "reference on " + "file",
+            "selected tracker " + "record",
+            "git " + "history",
+            "git " + "log",
+            "commit " + "timestamp",
+            "ledger consistency " + "review",
+            "planning " + "note",
+            "pre-registration " + "log",
+            "project " + "history",
+            "trial notes " + "identify",
         ]:
             self.assertNotIn(phrase, research_tree)
 

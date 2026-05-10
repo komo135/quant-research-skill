@@ -1,32 +1,32 @@
 # preregistration.md
 
-AEA-style Pre-Analysis Plan (PAP) — the written down design write down that
+AEA-style Pre-Analysis Plan (PAP) — the planned design document that
 the trial must follow. Pre-registration is the single most effective
 intervention against p-hacking and post-hoc rationalization. In this skill it
 is mandatory for Pure Research trials that may support a claim, promote an
 explanation to `supported`, or be shared externally as load-bearing evidence.
-Exploratory probes may remain lightweight, but must be rerun under a written down
+Exploratory probes may remain lightweight, but must be rerun under a reviewed
 pre-registration before they become claim-cited.
 
 ## When to read
 
-- Designing a Pure Research trial (after PR/FAQ is written down and targeted
+- Designing a Pure Research trial (after PR/FAQ is ready and targeted
   literature is done)
 - Reviewing whether a deviation from pre-registration is acceptable
-- Operating a dated `decisions.md` note or `scripts/deviation review`
+- Running post-trial deviation review
 
 ## Purpose
 
-Pre-registration records the **question, competing explanations, test
-design, and expected outcomes** before any data is inspected. After the
-trial, the actual analysis is diffed against the written down pre-registration;
-deviations are categorized by severity and either accepted (with
-documentation) or trigger a fresh trial.
+Pre-registration states the **question, competing explanations, test design,
+and expected outcomes** before any data is inspected. After the trial, compare
+the actual analysis against the pre-registration and record material
+deviations. Minor deviations can be carried forward; major deviations require a
+fresh trial before the result can support a claim.
 
-The mechanism: HARKing (Hypothesizing After Results are Known) and the
-garden of forking paths are eliminated when the design is committed
-before the data is touched. Without pre-registration, finding-driven
-narrative shifts are undetectable.
+The mechanism: HARKing (Hypothesizing After Results are Known) and the garden
+of forking paths are reduced when the design is written before the data is
+touched. Without pre-registration, finding-driven narrative shifts are too easy
+to rationalize.
 
 AEA requires pre-registration for all field experiments submitted to its
 journals since 2018. This skill applies the same standard to all Pure
@@ -146,19 +146,18 @@ trials drift into "let's try one more thing" territory.
 > insufficient to discriminate (sample size in 2020-2024 too small,
 > CFTC data unavailable for the period).
 
-## Freezing the pre-registration
+## Reviewing the pre-registration
 
 After the document is complete and reviewed:
 
-Record it plainly:
+1. Change `Status: DRAFT` to `Status: READY`.
+2. Run the trial under that PR ID.
+3. Do not silently change the plan after seeing data.
 
-1. Computes dated note of the file content
-2. Records in `decisions.md` when that plan became active
-3. Gives later reviewers a dated checkpoint for comparison
-
-After it is written down, the document **cannot be edited in place**. Any change
-goes through the deviation severity matrix in
-`references/pure_research/pr_workflow.md`.
+If a load-bearing change is needed after data inspection, record it as a
+deviation and apply the severity matrix in
+`references/pure_research/pr_workflow.md`. Major deviations require a new
+pre-registration and a new trial.
 
 ## Post-trial comparison
 
@@ -184,13 +183,13 @@ Pre-registration is enforcement, not a suggestion. The following
 patterns are explicitly prohibited:
 
 - **Post-hoc pre-registration**: writing a pre-registration after the
-  trial has run, claiming it was the plan all along. This is caught by
-  comparing the dated pre-registration note with the first data inspection
-  and trial timestamps.
+  trial has run, claiming it was the plan all along. Treat that trial as
+  exploratory; it cannot be claim-cited without a fresh trial under a reviewed
+  pre-registration.
 - **Multiple pre-registrations**: writing several pre-registrations
-  with different test designs and only "registering" the one that
-  the data supports. Detected by `ledger consistency review` (any prereg
-  not used by a trial that ran is flagged for review).
+  with different test designs and only using the one that the data supports.
+  Treat unused alternatives as drafts or future-trial plans; do not use them to
+  justify the completed trial.
 - **Trial-and-retry**: running a trial, ignoring the result, modifying
   the test design, and re-running. Each rerun is a new trial under a
   new pre-registration. The original trial's result is part of the
@@ -218,20 +217,20 @@ trial is invalidated and a new pre-registration is required.
 | No expected diff predictions | "We'll compute primary metric and see" | Each E must have an ex ante predicted observation |
 | Multiple testing under-reporting | "We tested one hypothesis" when 3 sub-strategies were swept | Honest trial count for selection-adjusted statistic / Bonferroni |
 | No stop condition | Trial drifts indefinitely | Specific observable condition for trial end |
-| Pre-reg post-trial | pre-registration date falls after trial timestamp | Treat the trial as exploratory; rerun under a valid pre-registration before citing it |
+| Pre-reg post-trial | pre-registration was written after the result was known | Treat the trial as exploratory; rerun under a valid pre-registration before citing it |
 
 ## Relationship to other references
 
 - Pre-conditions for pre-registration: `references/pure_research/prfaq.md`
-  (PR/FAQ written down first) and `references/shared/literature_review.md`
+  (PR/FAQ ready first) and `references/shared/literature_review.md`
   (targeted literature complete)
-- After pre-registration write down: trial may run. Post-trial,
+- After pre-registration review: trial may run. Post-trial,
   `references/pure_research/pr_workflow.md` § Deviation severity matrix
   decides what counts as minor vs major deviation.
 - The promotion gate
   (`references/pure_research/pr_promotion_gate.md`) requires:
-  - the cited pre-registration predates the trial
+  - the cited pre-registration was ready before the trial
   - deviations are classified and major deviations are not used as claim-cited evidence
-  - Deviation log on file
+  - deviations are documented
 - project-specific multiple-testing plan for trial-count discipline
   (Romano-Wolf, Harvey t > 3.0, Bonferroni, selection-adjusted statistic).

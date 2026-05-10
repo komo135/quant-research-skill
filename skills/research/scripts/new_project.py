@@ -19,7 +19,7 @@ What gets created:
         configs/                           (project-instance experiment configs)
         src/                               (project-instance implementation)
         tests/                             (project-instance verification)
-        prereg/                            (empty; planning notes live here)
+        prereg/                            (pre-registration drafts live here)
         results/figures/                   (empty)
         results/intermediate/              (empty)
         tracking/                          (optional tracker exports / run notes)
@@ -154,7 +154,7 @@ def init_project(name: str, root: Path, mode: str) -> Path:
 
     # Reproducibility scaffolding
     (project_dir / "reproducibility" / "data_versions.txt").write_text(
-        "# format: <data source or table> | <snapshot date> | <note reference or path>\n",
+        "# format: <data source or table> | <version/date/path used>\n",
         encoding="utf-8",
     )
     (project_dir / "reproducibility" / "shared_pins.txt").write_text(
@@ -162,7 +162,7 @@ def init_project(name: str, root: Path, mode: str) -> Path:
         encoding="utf-8",
     )
     (project_dir / "reproducibility" / "env_lock_ref.txt").write_text(
-        "# format: <environment pin source> | <note reference or tracker record>\n",
+        "# format: <environment pin source> | <version/path used>\n",
         encoding="utf-8",
     )
     (project_dir / "reproducibility" / "seed.txt").write_text(
@@ -179,8 +179,7 @@ def print_next_steps(project_dir: Path, mode: str) -> None:
     if mode == "rd":
         print(f"  1. Edit {project_dir}/charter.md — answer Heilmeier 8 questions")
         print(f"     OR run: python scripts/charter_interview.py --output {project_dir}/charter.md")
-        print(f"  2. When the charter is ready, mark it as written down and add the note reference")
-        print(f"     Use a planning note or review record before citing the charter in decisions")
+        print(f"  2. When the charter is ready, change its status to READY")
         print(f"  3. Choose a lightweight tracking path before the first load-bearing claim")
         print(f"     Record the review path and decision note in {project_dir}/decisions.md")
         print(f"  4. Edit {project_dir}/capability_map.md — Layer 1 (Core Technologies)")
@@ -188,13 +187,12 @@ def print_next_steps(project_dir: Path, mode: str) -> None:
         print(f"  5. Verify Layer 1 closure in review, then add Layer 2 capabilities")
     else:
         print(f"  1. Edit {project_dir}/prfaq.md — write the press release + ≥10 FAQ entries")
-        print(f"  2. When PR/FAQ is ready, mark it as written down and add the note reference")
-        print(f"     Use a planning note before the first trial cites it")
+        print(f"  2. When PR/FAQ is ready, change its status to READY")
         print(f"  3. Run targeted literature: python scripts/lit_fetch.py --project-dir {project_dir} --query '<your query>'")
         print(f"  4. Choose a lightweight tracking path before the first load-bearing claim")
         print(f"     Record the review path and decision note in {project_dir}/decisions.md")
         print(f"  5. Edit {project_dir}/prereg/PR_001.md — pre-register first trial")
-        print(f"  6. Mark PR_001 as written down with its note reference before execution")
+        print(f"  6. Review PR_001 before execution")
         print(f"  7. Edit {project_dir}/explanation_ledger.md — add Q1 + ≥2 competing E + null")
         print(f"  8. Run: python scripts/new_trial.py --project-dir {project_dir} --slug <trial_slug> --prereg-id PR_001 --question-id Q1 --discriminating 'E1 vs E2'")
     print()
