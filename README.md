@@ -160,14 +160,23 @@ v1.1.0, install `research@research-skill`. The old standalone
 
 ## Status
 
-Version 1.1.2 - relaxes tracking requirements while keeping
-stronger anchors for promotion-eligible, externally shared, or claim-cited
-results.
+Version 1.1.3 - removes registration-proof mechanisms while keeping
+plain planning documents, deviation notes, and lightweight tracking for
+promotion-eligible, externally shared, or claim-cited results.
 
 <details>
 <summary>Changelog</summary>
 
-### v1.1.2 (current)
+### v1.1.3 (current)
+
+- Removed registration-proof mechanisms: no hashes, frozen records, dated note
+  references, registration logs, or history/timestamp comparisons for proving
+  planning order.
+- Kept the useful parts: reviewed planning documents, material deviation notes,
+  and rerun guidance for promotion-eligible or claim-cited results.
+- Added regression coverage to block reintroducing proof-artifact language.
+
+### v1.1.2
 
 - Relaxed tracking requirements: ordinary exploration may use
   lightweight run notes, tracker runs, notebook notes, or results rows.
