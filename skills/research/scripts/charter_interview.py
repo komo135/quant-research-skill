@@ -5,8 +5,8 @@ questions per `references/rd/rd_charter.md`. Validates each answer against
 the discipline (concrete kill criteria, one-time vs recurring cost split,
 integration pattern declaration). Outputs charter.md.
 
-Does NOT auto-freeze. After the user reviews charter.md, run
-`scripts/prereg_freeze.py --type charter --path charter.md`.
+Does NOT auto-record. After the user reviews charter.md, mark it as written
+down and attach the planning-note reference.
 
 Usage:
     python scripts/charter_interview.py --output <path-to-charter.md>
@@ -204,8 +204,8 @@ def render_charter(answers: list[Answer], project_name: str = "<REPLACE: project
     parts = [
         f"# Charter — {project_name}",
         "",
-        "Status: DRAFT (run `python scripts/prereg_freeze.py --type charter --path charter.md` to freeze)",
-        "Hash: <fill after prereg_freeze.py runs>",
+        "Status: DRAFT (replace with `written down at <YYYY-MM-DD HH:MM:SS UTC>` after review)",
+        "note reference: <REPLACE: stable note identifier from planning-record helper output>",
         "",
         "---",
         "",
@@ -220,10 +220,10 @@ def render_charter(answers: list[Answer], project_name: str = "<REPLACE: project
     parts.append("## Approval")
     parts.append("- Drafted by: agent (charter_interview.py)")
     parts.append("- Reviewed by: <REPLACE: user>")
-    parts.append("- Frozen at: <fill after prereg_freeze.py>")
-    parts.append("- Frozen hash: <fill after prereg_freeze.py>")
+    parts.append("- written down at: <fill after planning note is recorded>")
+    parts.append("- written down note reference: <fill after planning note is recorded>")
     parts.append("")
-    parts.append("After freezing, proceed to `references/rd/core_technologies.md` to define Layer 1.")
+    parts.append("After the charter is written down, proceed to `references/rd/core_technologies.md` to define Layer 1.")
     return "\n".join(parts)
 
 
@@ -300,8 +300,8 @@ def main() -> None:
     print()
     print("Next steps:")
     print(f"  1. Review {args.output} — fill any <REPLACE> markers")
-    print(f"  2. Run: python scripts/prereg_freeze.py --type charter --path {args.output}")
-    print("  3. Append a freeze entry to decisions.md")
+    print("  2. Mark the charter as written down and fill the note reference fields")
+    print("  3. Append a decision note pointing to that written record in decisions.md")
 
 
 if __name__ == "__main__":
