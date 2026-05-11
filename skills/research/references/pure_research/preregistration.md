@@ -32,6 +32,23 @@ AEA requires pre-registration for all field experiments submitted to its
 journals since 2018. This skill applies the same standard to all Pure
 Research trials.
 
+Pre-registration is not a freeze on the hypothesis. It separates
+**目的・確認したいこと・初期アプローチ**:
+
+- **確認対象**: the question, competing explanations, scope, primary metric,
+  thresholds, and interpretation rules that determine what the trial can
+  claim.
+- **初期アプローチ**: the planned analysis method, estimator, data-acquisition
+  route, implementation path, and operational choices used to answer the
+  confirmation target.
+
+初期アプローチは、確認対象そのものではない。 Evidence, data availability,
+or implementation constraints may justify changing the initial approach, as
+long as the change does not alter the confirmation target, threshold, scope,
+or interpretation. Such changes must be documented in the trial note or
+deviation review, but they are not automatically hypothesis failure, major
+deviation, or grounds for a new PR.
+
 ## Required content
 
 A pre-registration document (`prereg/PR_<id>.md`) must contain all of:
@@ -105,6 +122,12 @@ Multiple testing: <how many distinct hypotheses or sub-strategies are
                    (Bonferroni / Romano-Wolf / domain-appropriate selection correction)>
 ```
 
+Also state which parts are the **確認対象** and which are the
+**初期アプローチ**. The confirmation target includes the metric, threshold,
+scope, and interpretation rules. The initial approach includes estimator,
+analysis method, implementation route, data-fetch method, and operational
+choices that can be updated if the confirmation target is preserved.
+
 > Example:
 > - Data: public benchmark review records, period 2010-01 through 2024-12,
 >   data version a3f8...
@@ -159,6 +182,10 @@ deviation and apply the severity matrix in
 `references/pure_research/pr_workflow.md`. Major deviations require a new
 pre-registration and a new trial.
 
+確認対象・閾値・スコープ・解釈を変えない初期アプローチ変更は、major deviation ではない。
+Document the reason and continue under the same PR; 新PRは必須ではない, and
+the change is 仮説失敗扱いにしない.
+
 ## Post-trial comparison
 
 After the trial, compare the actual trial artifact against the written
@@ -176,6 +203,12 @@ Classify deviations with `references/pure_research/pr_workflow.md`. Minor
 deviations can be documented and carried forward. Major deviations invalidate
 the claim-cited use of that trial; use a new pre-registration for the changed
 question or design.
+
+threshold miss は逸脱ではなく結果解釈: if the observed value misses the
+pre-registered threshold, do not relabel that miss as a deviation or create a
+new PR merely to rescue the result. Interpret it under the pre-registered
+rules. A new PR is needed only for a future trial with a changed confirmation
+target, threshold, scope, or interpretation.
 
 ## HARKing prevention discipline
 
@@ -207,6 +240,9 @@ The structural defense: anything that requires changing the
 pre-registration after seeing the data is a deviation that must be
 documented; if the deviation is "major" per the severity matrix, the
 trial is invalidated and a new pre-registration is required.
+This does not prohibit documented updates to the initial approach when the
+confirmation target stays fixed. It does prohibit 閾値やスコープを結果を見て変える
+behavior, post-hoc interpretation changes, and other goalpost shift patterns.
 
 ## Common failure modes
 

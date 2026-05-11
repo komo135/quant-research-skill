@@ -608,6 +608,36 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertIn("goalpost shifting", rd_stages)
         self.assertIn("prospective re-scope", rd_stages)
 
+    def test_pure_research_preregistration_separates_target_from_initial_approach(self) -> None:
+        preregistration = read_text("skills/research/references/pure_research/preregistration.md")
+        pr_workflow = read_text("skills/research/references/pure_research/pr_workflow.md")
+        preregistration_template = read_text("skills/research/assets/pure_research/preregistration.md.template")
+        combined = "\n".join([preregistration, pr_workflow, preregistration_template])
+
+        for phrase in [
+            "確認対象",
+            "初期アプローチ",
+            "初期アプローチは、確認対象そのものではない",
+            "目的・確認したいこと・初期アプローチ",
+        ]:
+            self.assertIn(phrase, combined)
+
+        for phrase in [
+            "確認対象・閾値・スコープ・解釈を変えない初期アプローチ変更は、major deviation ではない",
+            "新PRは必須ではない",
+            "仮説失敗扱いにしない",
+            "threshold miss は逸脱ではなく結果解釈",
+        ]:
+            self.assertIn(phrase, combined)
+
+        for phrase in [
+            "閾値やスコープを結果を見て変える",
+            "HARKing",
+            "goalpost shift",
+            "major",
+        ]:
+            self.assertIn(phrase, combined)
+
     def test_program_metadata_stays_out_of_evidence_artifacts_and_framework_apis(self) -> None:
         combined_templates = "\n".join(
             [

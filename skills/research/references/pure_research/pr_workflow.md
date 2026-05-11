@@ -120,21 +120,35 @@ data without analyzing existing observations is not.
 After a trial runs, `deviation review` compares actual analysis vs the
 pre-registration. Deviations are classified per the matrix below:
 
+The review first separates **確認対象** from **初期アプローチ**.
+確認対象 is the thing being tested: question, competing explanations, scope,
+primary metric, thresholds, and interpretation rules. 初期アプローチ is the
+planned way to answer it: analysis method, estimator, period-fetch mechanics,
+data-acquisition route, implementation path, and operational choices.
+初期アプローチは、確認対象そのものではない。
+
+確認対象・閾値・スコープ・解釈を変えない初期アプローチ変更は、major deviation ではない。
+Record the rationale and continue; 新PRは必須ではない, and the change is
+仮説失敗扱いにしない. If the change alters the confirmation target,
+threshold, scope, interpretation, or multiple-testing family, classify it with
+the major-deviation rows below.
+
 | Deviation | Severity | Action |
 |---|---|---|
 | Parameter within ±10% of pre-reg (e.g., bandwidth slightly different) | minor | Record in `decisions.md` + continue trial |
 | Sample size differs by < 5% (e.g., a few rows dropped due to data quality) | minor | Record in `decisions.md` + continue trial |
 | Imputation method specified differently (e.g., median vs mean) but methodologically equivalent | minor | Record + continue |
 | Test statistic logic adjusted within the same family (e.g., Pearson → robust Pearson under same hypothesis) | minor | Record + continue |
-| **Population period shifted by > 1 year** (e.g., 2015-2024 → 2018-2024) | **major** | **Treat the trial as exploratory. Required: new pre-registration with new period.** |
+| Initial approach changed while confirmation target, threshold, scope, interpretation, and multiple-testing family are unchanged | minor | Record rationale + continue under the same PR |
+| **Population/scope period shifted by > 1 year** (e.g., confirmation target changes from 2015-2024 to 2018-2024) | **major** | **Treat the trial as exploratory. Required: new pre-registration with new scope period.** |
 | **Sample size differs by > 10%** | **major** | Document + new pre-reg |
-| **Test statistic changed across families** (e.g., Pearson → Spearman, t-test → bootstrap) | **major** | Document + new pre-reg |
+| **Test statistic or estimator changed across families in a way that changes the primary metric, threshold meaning, or interpretation** (e.g., Pearson threshold reinterpreted as Spearman threshold after seeing data) | **major** | Document + new pre-reg |
 | **Competing explanation added post-hoc** | **major** | Document + new pre-reg |
 | **Threshold changed after seeing data** (e.g., kill threshold relaxed) | **major** | Document + new pre-reg |
 | **Multiple-testing trial count under-reported** | **major** | Re-compute correction with honest count; if claim no longer holds, mark E `weakened` |
 | **Imputation method changed in a way that affects test power** (e.g., dropping vs imputing missing) | **major** | Document + new pre-reg |
-| **Hypothesis threshold near-miss**: primary metric within 10% of pre-reg threshold band (e.g., pre-reg said r > 0.6, observed r = 0.58) | **minor** | Document in `decisions.md` as "near-miss"; the explanation does not get the predicted support, treat as `weakened` rather than `supported`/`rejected` |
-| **Hypothesis threshold large miss**: primary metric > 10% from pre-reg threshold (e.g., pre-reg said r > 0.6, observed r = 0.30) | **major** | Document + new pre-reg if you want to test the boundary behavior; otherwise treat the explanation as `rejected` cleanly |
+| **Hypothesis threshold near-miss**: primary metric within 10% of pre-reg threshold band (e.g., pre-reg said r > 0.6, observed r = 0.58) | result interpretation | threshold miss は逸脱ではなく結果解釈. Document the observed miss; the explanation does not get the predicted support, treat as `weakened` rather than `supported`/`rejected`. New PR is not required unless a future trial changes threshold, scope, or interpretation. |
+| **Hypothesis threshold large miss**: primary metric > 10% from pre-reg threshold (e.g., pre-reg said r > 0.6, observed r = 0.30) | result interpretation | threshold miss は逸脱ではなく結果解釈. Interpret under the pre-registered rule, usually `rejected` or strongly `weakened`; do not create a new PR merely because the threshold was missed. |
 
 **Major deviations invalidate the trial for claim-cited use**. Record the
 major deviation in `decisions.md`, create a new pre-registration for the
@@ -144,6 +158,11 @@ exploratory result and cannot be cited as support for the claim.
 This is non-negotiable. The matrix exists because "minor" vs "major" is
 ambiguous in practice; without an explicit rubric, agents and humans
 both default to "this is minor" and the discipline collapses.
+
+HARKing and goalpost shifting remain blocking: 閾値やスコープを結果を見て変える,
+changing interpretation after seeing data, or adding a favorable explanation
+post-hoc is still major. The allowed flexibility applies only to initial
+approach improvements that preserve what was being checked.
 
 ## State-change logging
 
