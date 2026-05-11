@@ -21,7 +21,8 @@ Pure Research first day permits **only** the following:
 - PR/FAQ (`references/pure_research/prfaq.md`)
 - Targeted literature review (`references/shared/literature_review.md`)
   scoped by the PR/FAQ
-- 探索的研究の計画、現状把握、仮説候補 / 説明候補、初期アプローチ探索
+- Exploratory research planning, current-state assessment, hypothesis or
+  explanation candidates, and initial-approach search
 - Pre-registration of a confirmatory trial
   (`references/pure_research/preregistration.md`) when a confirmation target
   is ready
@@ -43,7 +44,7 @@ planned independently. A claim-bearing confirmation trial run before the
 pre-registration is ready is a shopping trip; once you have seen the outcome,
 "pre-registration" written afterwards is theater.
 
-## 探索的研究のループ
+## Exploratory Research Loop
 
 Use this loop when the goal is to understand the current situation, generate
 candidate explanations, test data feasibility, or find a workable initial
@@ -61,16 +62,18 @@ approach. Exploratory work may inspect data and iterate. Its outputs are
 5. Record observations, assumptions tested, and approach changes in run notes,
    tracker rows, notebook notes, or result rows.
 6. Label conclusions explicitly as exploratory / diagnostic.
-7. Decide next: continue exploring, park/stop, or move to 確認的研究 if a
+7. Decide next: continue exploring, park/stop, or move to confirmatory
+   research if a
    specific finding needs higher reliability.
 ```
 
-探索的研究の後に確認的研究を必ず行うわけではない。Exploration can end with
-a map, a negative diagnostic result, a parked question, or a decision that no
-claim is worth confirming. If the result will become a `supported / external
-claim / high reliability claim`, move to 確認的研究へ進む.
+Exploratory research does not have to be followed by confirmatory research.
+Exploration can end with a map, a negative diagnostic result, a parked
+question, or a decision that no claim is worth confirming. If the result will
+become a `supported / external claim / high reliability claim`, move to
+confirmatory research.
 
-## 確認的研究のループ
+## Confirmatory Research Loop
 
 Use this loop when an exploratory result, literature-derived prediction, or
 explicit research question is ready for a reliability-raising test. This is
@@ -80,12 +83,15 @@ where pre-registration belongs.
 1. Identify the question to advance (which Q-row in explanation_ledger)
 2. Identify which E pair to discriminate (or test against null)
 3. Write or select the pre-registration (`prereg/PR_<id>.md`, `Status: READY`)
-4. Before execution, compare `PR_<id>` と現状: current question, exploratory
-   result, data availability, assumptions, implementation constraints, and
-   analyst/data exposure. pre-reg と現状を比較する目的は、pre-reg を守るためだけ
-   でなく、現状が PR の前提を壊していないかを見るため。
+4. Before execution, compare `PR_<id>` against the current state: current
+   question, exploratory result, data availability, assumptions,
+   implementation constraints, and analyst/data exposure. The purpose of
+   comparing the pre-reg against the current state is not only to follow the
+   pre-reg, but also to verify that the current state has not broken the PR's
+   assumptions.
 5. If the PR no longer matches the current situation, do not force it. Return
-   to 探索的研究, write transparent changes, or create a new confirmatory PR.
+   to exploratory research, write transparent changes, or create a new
+   confirmatory PR.
 6. Run the confirmatory trial (data fetch, computation, verification checks)
 7. Deviation review against the pre-registration
 8. Analysis section: observation, decomposition, evidence weighing,
@@ -157,18 +163,20 @@ data without analyzing existing observations is not.
 After a trial runs, `deviation review` compares actual analysis vs the
 pre-registration. Deviations are classified per the matrix below:
 
-The review first separates **確認対象** from **初期アプローチ**.
-確認対象 is the thing being tested: question, competing explanations, scope,
-primary metric, thresholds, and interpretation rules. 初期アプローチ is the
-planned way to answer it: analysis method, estimator, period-fetch mechanics,
-data-acquisition route, implementation path, and operational choices.
-初期アプローチは、確認対象そのものではない。
+The review first separates **confirmation target** from **initial approach**.
+The confirmation target is the thing being tested: question, competing
+explanations, scope, primary metric, thresholds, and interpretation rules. The
+initial approach is the planned way to answer it: analysis method, estimator,
+period-fetch mechanics, data-acquisition route, implementation path, and
+operational choices.
+The initial approach is not the confirmation target itself.
 
-確認対象・閾値・スコープ・解釈を変えない初期アプローチ変更は、major deviation ではない。
-Record the rationale and continue; 新PRは必須ではない, and the change is
-仮説失敗扱いにしない. If the change alters the confirmation target,
-threshold, scope, interpretation, or multiple-testing family, classify it with
-the major-deviation rows below.
+An initial-approach change that preserves the confirmation target, threshold,
+scope, and interpretation is not a major deviation. Record the rationale and
+continue; a new PR is not required, and do not treat the change as hypothesis
+failure. If the change alters the confirmation target, threshold, scope,
+interpretation, or multiple-testing family, classify it with the
+major-deviation rows below.
 
 | Deviation | Severity | Action |
 |---|---|---|
@@ -184,8 +192,8 @@ the major-deviation rows below.
 | **Threshold changed after seeing data** (e.g., kill threshold relaxed) | **major** | Document + new pre-reg |
 | **Multiple-testing trial count under-reported** | **major** | Re-compute correction with honest count; if claim no longer holds, mark E `weakened` |
 | **Imputation method changed in a way that affects test power** (e.g., dropping vs imputing missing) | **major** | Document + new pre-reg |
-| **Hypothesis threshold near-miss**: primary metric within 10% of pre-reg threshold band (e.g., pre-reg said r > 0.6, observed r = 0.58) | result interpretation | threshold miss は逸脱ではなく結果解釈. Document the observed miss; the explanation does not get the predicted support, treat as `weakened` rather than `supported`/`rejected`. New PR is not required unless a future trial changes threshold, scope, or interpretation. |
-| **Hypothesis threshold large miss**: primary metric > 10% from pre-reg threshold (e.g., pre-reg said r > 0.6, observed r = 0.30) | result interpretation | threshold miss は逸脱ではなく結果解釈. Interpret under the pre-registered rule, usually `rejected` or strongly `weakened`; do not create a new PR merely because the threshold was missed. |
+| **Hypothesis threshold near-miss**: primary metric within 10% of pre-reg threshold band (e.g., pre-reg said r > 0.6, observed r = 0.58) | result interpretation | Threshold miss is result interpretation, not deviation. Document the observed miss; the explanation does not get the predicted support, treat as `weakened` rather than `supported`/`rejected`. New PR is not required unless a future trial changes threshold, scope, or interpretation. |
+| **Hypothesis threshold large miss**: primary metric > 10% from pre-reg threshold (e.g., pre-reg said r > 0.6, observed r = 0.30) | result interpretation | Threshold miss is result interpretation, not deviation. Interpret under the pre-registered rule, usually `rejected` or strongly `weakened`; do not create a new PR merely because the threshold was missed. |
 
 **Major deviations invalidate the trial for claim-cited use**. Record the
 major deviation in `decisions.md`, create a new pre-registration for the
@@ -196,10 +204,10 @@ This is non-negotiable. The matrix exists because "minor" vs "major" is
 ambiguous in practice; without an explicit rubric, agents and humans
 both default to "this is minor" and the discipline collapses.
 
-HARKing and goalpost shifting remain blocking: 閾値やスコープを結果を見て変える,
-changing interpretation after seeing data, or adding a favorable explanation
-post-hoc is still major. The allowed flexibility applies only to initial
-approach improvements that preserve what was being checked.
+HARKing and goalpost shifting remain blocking: changing thresholds or scope
+after seeing results, changing interpretation after seeing data, or adding a
+favorable explanation post-hoc is still major. The allowed flexibility applies
+only to initial-approach improvements that preserve what was being checked.
 
 ## State-change logging
 

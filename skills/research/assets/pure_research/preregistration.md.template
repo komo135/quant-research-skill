@@ -13,17 +13,20 @@ question. Frame as an unknown to reduce.>
 
 ## 1.1 Confirmation target and initial approach
 
-- **確認対象**: <REPLACE: what this PR is trying to confirm or discriminate:
+- **confirmation target**: <REPLACE: what this PR is trying to confirm or discriminate:
   question, E-pair/null, scope, primary metric, threshold, and interpretation
   rule>
-- **初期アプローチ**: <REPLACE: planned analysis method, estimator,
+- **initial approach**: <REPLACE: planned analysis method, estimator,
   data-acquisition route, implementation path, period-fetch mechanics, and
   operational choices>
 
-初期アプローチは、確認対象そのものではない。確認対象・閾値・スコープ・解釈を変えない初期アプローチ変更は、major deviation ではない。
+The initial approach is not the confirmation target itself. An
+initial-approach change that preserves the confirmation target, threshold,
+scope, and interpretation is not a major deviation.
 If evidence, data access, or implementation constraints require an approach
 change while the confirmation target remains fixed, document the rationale and
-continue under this PR; 新PRは必須ではない and the change is 仮説失敗扱いにしない.
+continue under this PR; a new PR is not required and do not treat the change
+as hypothesis failure.
 
 ## 2. Competing explanations (≥2 required, including null/artifact)
 
@@ -67,10 +70,10 @@ Train / val / test? Sample size per split?>
 - **Support E_null if**: <REPLACE: observable threshold>
 - **Ambiguous if**: <REPLACE: condition where no E clearly wins>
 
-threshold miss は逸脱ではなく結果解釈. If the observed result misses a
-pre-registered threshold, interpret it under the rules above; do not change
-the threshold after seeing data and do not open a new PR solely because the
-threshold was missed.
+Threshold miss is result interpretation, not deviation. If the observed result
+misses a pre-registered threshold, interpret it under the rules above; do not
+change the threshold after seeing data and do not open a new PR solely because
+the threshold was missed.
 
 ### 3.5 Multiple testing correction
 

@@ -1,20 +1,24 @@
 # preregistration.md
 
 AEA-style Pre-Analysis Plan (PAP) — the planned design document that
-a confirmatory trial must follow. Pure Research は探索的研究と確認的研究を明確に分ける。
-探索的研究は、目的、現状把握、仮説候補 / 説明候補、初期アプローチ探索、
-観察を扱い、成果は `exploratory` / `diagnostic` として残す。確認的研究は、
-探索的研究の成果を信頼性をもって確認するためのもの。
+a confirmatory trial must follow. Pure Research clearly separates exploratory
+research from confirmatory research. Exploratory research handles purpose,
+current-state assessment, hypothesis or explanation candidates,
+initial-approach search, and observations; its outputs remain `exploratory` /
+`diagnostic`. Confirmatory research exists to confirm exploratory findings
+with higher reliability.
 
-pre-registration は確認的研究の道具であり、探索的研究そのものではない。It is the
+Pre-registration is a confirmatory-research tool, not exploratory research
+itself. It is the
 mechanism for distinguishing planned confirmatory work from unplanned
 exploratory work. Both are legitimate. The problem is mixing them and then
 reporting a data-dependent discovery as if it had been planned in advance.
 
-探索的研究の後に確認的研究を必ず行うわけではない。If the output is a
+Exploratory research does not have to be followed by confirmatory research. If
+the output is a
 diagnostic map, candidate explanations, or a stop/park decision, exploratory
 work may be sufficient. If the output will become a `supported / external
-claim / high reliability claim`, 確認的研究へ進む. In this skill
+claim / high reliability claim`, move to confirmatory research. In this skill
 pre-registration is mandatory for Pure Research trials that may support a
 claim, promote an explanation to `supported`, or be shared externally as
 load-bearing evidence. Exploratory probes may remain lightweight, but must be
@@ -33,10 +37,12 @@ explicit confirmatory design before they become claim-cited.
 
 Pre-registration states the **question, competing explanations, test design,
 conditional decision tree, and expected outcomes** before the confirmatory
-analysis is run. 確認的研究では、実行前に
-`PR_<id>` と現状（探索結果、データ可用性、前提、実装制約、現在の問い）を比較し、
-PR が現状に合っているか確認する。pre-reg と現状を比較する目的は、
-pre-reg を守るためだけでなく、現状が PR の前提を壊していないかを見るため。
+analysis is run. In confirmatory research, before execution, compare
+`PR_<id>` against the current state: exploratory result, data availability,
+assumptions, implementation constraints, and current question. The purpose of
+comparing the pre-reg against the current state is not only to follow the
+pre-reg, but also to verify that the current state has not broken the PR's
+assumptions.
 If the PR no longer matches the current situation, return to exploratory
 research or create a new confirmatory PR before running the trial.
 
@@ -58,16 +64,16 @@ It does not make exploratory probes illegal; it requires that they be labeled
 as exploratory and confirmed before they support a high-reliability claim.
 
 Pre-registration is not a freeze on the hypothesis. It separates
-**目的・確認したいこと・初期アプローチ**:
+**purpose, question to resolve, and initial approach**:
 
-- **確認対象**: the question, competing explanations, scope, primary metric,
+- **confirmation target**: the question, competing explanations, scope, primary metric,
   thresholds, and interpretation rules that determine what the trial can
   claim.
-- **初期アプローチ**: the planned analysis method, estimator, data-acquisition
+- **initial approach**: the planned analysis method, estimator, data-acquisition
   route, implementation path, and operational choices used to answer the
   confirmation target.
 
-初期アプローチは、確認対象そのものではない。 Evidence, data availability,
+The initial approach is not the confirmation target itself. Evidence, data availability,
 or implementation constraints may justify changing the initial approach, as
 long as the change does not alter the confirmation target, threshold, scope,
 or interpretation. Such changes must be documented in the trial note or
@@ -147,8 +153,8 @@ Multiple testing: <how many distinct hypotheses or sub-strategies are
                    (Bonferroni / Romano-Wolf / domain-appropriate selection correction)>
 ```
 
-Also state which parts are the **確認対象** and which are the
-**初期アプローチ**. The confirmation target includes the metric, threshold,
+Also state which parts are the **confirmation target** and which are the
+**initial approach**. The confirmation target includes the metric, threshold,
 scope, and interpretation rules. The initial approach includes estimator,
 analysis method, implementation route, data-fetch method, and operational
 choices that can be updated if the confirmation target is preserved.
@@ -207,9 +213,10 @@ deviation and apply the severity matrix in
 `references/pure_research/pr_workflow.md`. Major deviations require a new
 pre-registration and a new trial.
 
-確認対象・閾値・スコープ・解釈を変えない初期アプローチ変更は、major deviation ではない。
-Document the reason and continue under the same PR; 新PRは必須ではない, and
-the change is 仮説失敗扱いにしない.
+An initial-approach change that preserves the confirmation target, threshold,
+scope, and interpretation is not a major deviation. Document the reason and
+continue under the same PR; a new PR is not required, and do not treat the
+change as hypothesis failure.
 
 ## Post-trial comparison
 
@@ -229,11 +236,11 @@ deviations can be documented and carried forward. Major deviations invalidate
 the claim-cited use of that trial; use a new pre-registration for the changed
 question or design.
 
-threshold miss は逸脱ではなく結果解釈: if the observed value misses the
-pre-registered threshold, do not relabel that miss as a deviation or create a
-new PR merely to rescue the result. Interpret it under the pre-registered
-rules. A new PR is needed only for a future trial with a changed confirmation
-target, threshold, scope, or interpretation.
+Threshold miss is result interpretation, not deviation: if the observed value
+misses the pre-registered threshold, do not relabel that miss as a deviation or
+create a new PR merely to rescue the result. Interpret it under the
+pre-registered rules. A new PR is needed only for a future trial with a changed
+confirmation target, threshold, scope, or interpretation.
 
 ## HARKing prevention discipline
 
@@ -266,8 +273,9 @@ pre-registration after seeing the data is a deviation that must be
 documented; if the deviation is "major" per the severity matrix, the
 trial is invalidated and a new pre-registration is required.
 This does not prohibit documented updates to the initial approach when the
-confirmation target stays fixed. It does prohibit 閾値やスコープを結果を見て変える
-behavior, post-hoc interpretation changes, and other goalpost shift patterns.
+confirmation target stays fixed. It does prohibit changing thresholds or scope
+after seeing results, post-hoc interpretation changes, and other goalpost shift
+patterns.
 
 ## Common failure modes
 

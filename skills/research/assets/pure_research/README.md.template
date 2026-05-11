@@ -1,10 +1,10 @@
 # <REPLACE: project name>
 
 Pure Research project — reduces ignorance about a phenomenon through
-探索的研究 and, when higher reliability is needed, 確認的研究. The project
-keeps PR/FAQ, explanation candidates, exploratory / diagnostic notes,
-reviewed pre-registrations for confirmatory trials, and an IMRAD-shaped
-manuscript draft.
+exploratory research and, when higher reliability is needed, confirmatory
+research. The project keeps PR/FAQ, explanation candidates, exploratory /
+diagnostic notes, reviewed pre-registrations for confirmatory trials, and an
+IMRAD-shaped manuscript draft.
 
 ## Status
 
@@ -93,12 +93,13 @@ For an agent or user to verify the project is in good shape at any
 point:
 
 - [ ] `prfaq.md` is reviewed and status is READY
-- [ ] 探索的研究 and 確認的研究 are labeled separately in run notes,
-  tracker rows, notebooks, or result rows
+- [ ] Exploratory research and confirmatory research are labeled separately in
+  run notes, tracker rows, notebooks, or result rows
 - [ ] Every claim-cited, promotion-eligible, externally shared, or
   high-reliability trial has a reviewed pre-registration (`prereg/PR_<id>.md`
   status is READY before confirmatory execution)
-- [ ] Before each confirmatory execution, `PR_<id>` と現状 were compared:
+- [ ] Before each confirmatory execution, `PR_<id>` was compared against the
+  current state:
   exploratory result, data availability, assumptions, implementation
   constraints, and current question still match the PR
 - [ ] `explanation_ledger.md` has at least 2 competing explanations

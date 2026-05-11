@@ -6,10 +6,12 @@ import tempfile
 import unittest
 import importlib.util
 import json
+import re
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+CJK_RE = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
 
 
 def read_text(path: str) -> str:
@@ -34,6 +36,10 @@ def read_tree_text(path: str) -> str:
             parts.append(f"\n--- {file.relative_to(ROOT)} ---\n")
             parts.append(file.read_text(encoding="utf-8"))
     return "\n".join(parts)
+
+
+def normalize_for_assertion(text: str) -> str:
+    return " ".join(text.lower().split())
 
 
 class ProjectBoundaryTests(unittest.TestCase):
@@ -614,29 +620,38 @@ class ProjectBoundaryTests(unittest.TestCase):
         preregistration_template = read_text("skills/research/assets/pure_research/preregistration.md.template")
         combined = "\n".join([preregistration, pr_workflow, preregistration_template])
 
-        for phrase in [
-            "確認対象",
-            "初期アプローチ",
-            "初期アプローチは、確認対象そのものではない",
-            "目的・確認したいこと・初期アプローチ",
-        ]:
-            self.assertIn(phrase, combined)
+        for document in [preregistration, pr_workflow, preregistration_template]:
+            normalized = normalize_for_assertion(document)
+            for phrase in [
+                "confirmation target",
+                "initial approach",
+                "not the confirmation target itself",
+                "not a major deviation",
+                "new pr is not required",
+                "hypothesis failure",
+                "threshold miss",
+                "result interpretation",
+                "not deviation",
+            ]:
+                self.assertIn(phrase, normalized)
 
-        for phrase in [
-            "確認対象・閾値・スコープ・解釈を変えない初期アプローチ変更は、major deviation ではない",
-            "新PRは必須ではない",
-            "仮説失敗扱いにしない",
-            "threshold miss は逸脱ではなく結果解釈",
-        ]:
-            self.assertIn(phrase, combined)
+        self.assertIn(
+            "purpose, question to resolve, and initial approach",
+            normalize_for_assertion(preregistration),
+        )
 
-        for phrase in [
-            "閾値やスコープを結果を見て変える",
-            "HARKing",
-            "goalpost shift",
-            "major",
-        ]:
-            self.assertIn(phrase, combined)
+        for document in [preregistration, pr_workflow]:
+            normalized = normalize_for_assertion(document)
+            for phrase in [
+                "harking",
+                "goalpost",
+                "changing thresholds",
+                "after seeing results",
+                "major",
+            ]:
+                self.assertIn(phrase, normalized)
+
+        self.assertIsNone(CJK_RE.search(combined))
 
     def test_pure_research_separates_exploratory_and_confirmatory_research(self) -> None:
         skill = read_text("skills/research/SKILL.md")
@@ -663,24 +678,54 @@ class ProjectBoundaryTests(unittest.TestCase):
         )
         normalized = " ".join(combined.split())
 
-        for phrase in [
-            "探索的研究",
-            "確認的研究",
-            "探索的研究と確認的研究を明確に分ける",
-            "pre-registration は確認的研究の道具",
-            "探索的研究の成果を信頼性をもって確認するため",
-            "探索的研究の後に確認的研究を必ず行うわけではない",
-            "supported / external claim / high reliability claim",
-            "確認的研究へ進む",
-            "`PR_<id>` と現状",
-            "pre-reg と現状を比較する",
-        ]:
-            self.assertIn(phrase, combined)
+        for document in [skill, preregistration, pr_workflow, project_readme_template, prfaq_template]:
+            normalized_document = normalize_for_assertion(document)
+            self.assertIn("exploratory research", normalized_document)
+            self.assertIn("confirmatory research", normalized_document)
 
-        self.assertIn("探索的研究のループ", combined)
-        self.assertIn("確認的研究のループ", combined)
+        for document in [skill, preregistration]:
+            normalized_document = normalize_for_assertion(document)
+            for phrase in [
+                "clearly separates exploratory research from confirmatory research",
+                "pre-registration is a confirmatory-research tool",
+                "not exploratory research itself",
+                "higher reliability",
+                "does not have to be followed by confirmatory research",
+                "supported / external claim / high reliability claim",
+                "move to confirmatory research",
+            ]:
+                self.assertIn(phrase, normalized_document)
+
+        for document, phrases in [
+            (
+                skill,
+                ["before execution", "`pr_<id>`", "current state", "comparing the pre-reg"],
+            ),
+            (
+                preregistration,
+                ["before execution", "`pr_<id>`", "current state", "comparing the pre-reg"],
+            ),
+            (
+                pr_workflow,
+                ["before execution", "`pr_<id>`", "current state", "comparing the pre-reg"],
+            ),
+            (
+                project_readme_template,
+                ["before each confirmatory execution", "`pr_<id>`", "current state"],
+            ),
+            (
+                prfaq_template,
+                ["before execution", "`pr_<id>`", "current state"],
+            ),
+        ]:
+            normalized_document = normalize_for_assertion(document)
+            for phrase in phrases:
+                self.assertIn(phrase, normalized_document)
+
+        self.assertIn("Exploratory Research Loop", combined)
+        self.assertIn("Confirmatory Research Loop", combined)
         self.assertIn(
-            "確認的研究では、実行前に `PR_<id>` と現状",
+            "In confirmatory research, before execution, compare `PR_<id>` against the current state",
             normalized,
         )
         self.assertIn("claim-bearing confirmation trial", combined)
@@ -688,14 +733,19 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertIn("Every claim-cited, promotion-eligible, externally shared, or", project_readme_template)
         self.assertIn("high-reliability trial has a reviewed pre-registration", project_readme_template)
         self.assertIn("Then choose the next path", prfaq_template)
-        self.assertIn("探索的研究", prfaq_template)
-        self.assertIn("確認的研究", prfaq_template)
+        self.assertIn("Exploratory research", prfaq_template)
+        self.assertIn("Confirmatory research", prfaq_template)
         self.assertNotIn("Every active or completed trial has a reviewed pre-registration", project_readme_template)
         self.assertNotIn("pre-registration of trial 1", project_readme_template)
         self.assertNotIn("then pre-registration per", prfaq_template)
         self.assertNotIn("same standard to all Pure Research trials", preregistration)
         self.assertNotIn("pre-register first trial", combined)
         self.assertNotIn("no implementation / trial evidence-producing runs on day 1", combined)
+        self.assertIsNone(CJK_RE.search(preregistration))
+        self.assertIsNone(CJK_RE.search(pr_workflow))
+        self.assertIsNone(CJK_RE.search(project_readme_template))
+        self.assertIsNone(CJK_RE.search(prfaq_template))
+        self.assertIsNone(CJK_RE.search(preregistration_template))
 
     def test_program_metadata_stays_out_of_evidence_artifacts_and_framework_apis(self) -> None:
         combined_templates = "\n".join(

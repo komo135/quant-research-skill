@@ -103,11 +103,12 @@ After this PR/FAQ is reviewed, proceed to targeted literature review per
 `references/shared/literature_review.md` (now scoped by the PR/FAQ).
 Then choose the next path:
 
-- **探索的研究**: use this when the current state, explanation candidates,
+- **Exploratory research**: use this when the current state, explanation candidates,
   data behavior, or initial approach is still unclear. Label outputs
   `exploratory` / `diagnostic`.
-- **確認的研究**: use this when a specific finding should become
+- **Confirmatory research**: use this when a specific finding should become
   `supported / external claim / high reliability claim`. Write or update
-  `prereg/PR_<id>.md`, then compare `PR_<id>` と現状 before execution:
+  `prereg/PR_<id>.md`, then compare `PR_<id>` against the current state
+  before execution:
   exploratory result, data availability, assumptions, implementation
   constraints, and current question must still match the PR.
