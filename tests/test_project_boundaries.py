@@ -638,6 +638,65 @@ class ProjectBoundaryTests(unittest.TestCase):
         ]:
             self.assertIn(phrase, combined)
 
+    def test_pure_research_separates_exploratory_and_confirmatory_research(self) -> None:
+        skill = read_text("skills/research/SKILL.md")
+        preregistration = read_text("skills/research/references/pure_research/preregistration.md")
+        pr_workflow = read_text("skills/research/references/pure_research/pr_workflow.md")
+        process_review = read_text("skills/research/references/review/process_review.md")
+        promotion_gate = read_text("skills/research/references/pure_research/pr_promotion_gate.md")
+        project_readme_template = read_text("skills/research/assets/pure_research/README.md.template")
+        prfaq_template = read_text("skills/research/assets/pure_research/prfaq.md.template")
+        preregistration_template = read_text("skills/research/assets/pure_research/preregistration.md.template")
+        new_project = read_text("skills/research/scripts/new_project.py")
+        combined = "\n".join(
+            [
+                skill,
+                preregistration,
+                pr_workflow,
+                process_review,
+                promotion_gate,
+                project_readme_template,
+                prfaq_template,
+                preregistration_template,
+                new_project,
+            ]
+        )
+        normalized = " ".join(combined.split())
+
+        for phrase in [
+            "探索的研究",
+            "確認的研究",
+            "探索的研究と確認的研究を明確に分ける",
+            "pre-registration は確認的研究の道具",
+            "探索的研究の成果を信頼性をもって確認するため",
+            "探索的研究の後に確認的研究を必ず行うわけではない",
+            "supported / external claim / high reliability claim",
+            "確認的研究へ進む",
+            "`PR_<id>` と現状",
+            "pre-reg と現状を比較する",
+        ]:
+            self.assertIn(phrase, combined)
+
+        self.assertIn("探索的研究のループ", combined)
+        self.assertIn("確認的研究のループ", combined)
+        self.assertIn(
+            "確認的研究では、実行前に `PR_<id>` と現状",
+            normalized,
+        )
+        self.assertIn("claim-bearing confirmation trial", combined)
+        self.assertIn("invalidated confirmatory use under the original PR", combined)
+        self.assertIn("Every claim-cited, promotion-eligible, externally shared, or", project_readme_template)
+        self.assertIn("high-reliability trial has a reviewed pre-registration", project_readme_template)
+        self.assertIn("Then choose the next path", prfaq_template)
+        self.assertIn("探索的研究", prfaq_template)
+        self.assertIn("確認的研究", prfaq_template)
+        self.assertNotIn("Every active or completed trial has a reviewed pre-registration", project_readme_template)
+        self.assertNotIn("pre-registration of trial 1", project_readme_template)
+        self.assertNotIn("then pre-registration per", prfaq_template)
+        self.assertNotIn("same standard to all Pure Research trials", preregistration)
+        self.assertNotIn("pre-register first trial", combined)
+        self.assertNotIn("no implementation / trial evidence-producing runs on day 1", combined)
+
     def test_program_metadata_stays_out_of_evidence_artifacts_and_framework_apis(self) -> None:
         combined_templates = "\n".join(
             [

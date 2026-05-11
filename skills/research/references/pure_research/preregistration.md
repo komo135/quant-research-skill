@@ -1,36 +1,61 @@
 # preregistration.md
 
 AEA-style Pre-Analysis Plan (PAP) — the planned design document that
-the trial must follow. Pre-registration is the single most effective
-intervention against p-hacking and post-hoc rationalization. In this skill it
-is mandatory for Pure Research trials that may support a claim, promote an
-explanation to `supported`, or be shared externally as load-bearing evidence.
-Exploratory probes may remain lightweight, but must be rerun under a reviewed
-pre-registration before they become claim-cited.
+a confirmatory trial must follow. Pure Research は探索的研究と確認的研究を明確に分ける。
+探索的研究は、目的、現状把握、仮説候補 / 説明候補、初期アプローチ探索、
+観察を扱い、成果は `exploratory` / `diagnostic` として残す。確認的研究は、
+探索的研究の成果を信頼性をもって確認するためのもの。
+
+pre-registration は確認的研究の道具であり、探索的研究そのものではない。It is the
+mechanism for distinguishing planned confirmatory work from unplanned
+exploratory work. Both are legitimate. The problem is mixing them and then
+reporting a data-dependent discovery as if it had been planned in advance.
+
+探索的研究の後に確認的研究を必ず行うわけではない。If the output is a
+diagnostic map, candidate explanations, or a stop/park decision, exploratory
+work may be sufficient. If the output will become a `supported / external
+claim / high reliability claim`, 確認的研究へ進む. In this skill
+pre-registration is mandatory for Pure Research trials that may support a
+claim, promote an explanation to `supported`, or be shared externally as
+load-bearing evidence. Exploratory probes may remain lightweight, but must be
+confirmed under a reviewed pre-registration, holdout/new data, or another
+explicit confirmatory design before they become claim-cited.
 
 ## When to read
 
 - Designing a Pure Research trial (after PR/FAQ is ready and targeted
   literature is done)
+- Deciding whether a result is exploratory or confirmatory
 - Reviewing whether a deviation from pre-registration is acceptable
 - Running post-trial deviation review
 
 ## Purpose
 
 Pre-registration states the **question, competing explanations, test design,
-and expected outcomes** before any data is inspected. After the trial, compare
-the actual analysis against the pre-registration and record material
-deviations. Minor deviations can be carried forward; major deviations require a
-fresh trial before the result can support a claim.
+conditional decision tree, and expected outcomes** before the confirmatory
+analysis is run. 確認的研究では、実行前に
+`PR_<id>` と現状（探索結果、データ可用性、前提、実装制約、現在の問い）を比較し、
+PR が現状に合っているか確認する。pre-reg と現状を比較する目的は、
+pre-reg を守るためだけでなく、現状が PR の前提を壊していないかを見るため。
+If the PR no longer matches the current situation, return to exploratory
+research or create a new confirmatory PR before running the trial.
+
+After the trial, compare the actual analysis against the pre-registration and
+record material differences. Pre-registration is a plan, not a prison: changes
+do not make the work worthless, but they must be labeled. Planned analyses
+remain confirmatory; unplanned analyses are exploratory or require transparent
+changes / a new confirmatory design before supporting a claim.
 
 The mechanism: HARKing (Hypothesizing After Results are Known) and the garden
-of forking paths are reduced when the design is written before the data is
-touched. Without pre-registration, finding-driven narrative shifts are too easy
-to rationalize.
+of forking paths are reduced when planned and unplanned work are separated.
+Without that separation, finding-driven narrative shifts are too easy to
+rationalize.
 
 AEA requires pre-registration for all field experiments submitted to its
-journals since 2018. This skill applies the same standard to all Pure
-Research trials.
+journals since 2018. This skill applies that standard to confirmatory,
+promotion-eligible, claim-cited, or externally shared Pure Research trials.
+It does not make exploratory probes illegal; it requires that they be labeled
+as exploratory and confirmed before they support a high-reliability claim.
 
 Pre-registration is not a freeze on the hypothesis. It separates
 **目的・確認したいこと・初期アプローチ**:

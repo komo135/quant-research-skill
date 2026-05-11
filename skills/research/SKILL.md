@@ -39,7 +39,7 @@ into two projects with separate ledgers.
 | Discipline | Use when | Entry document | Primary state object | Deliverable |
 |---|---|---|---|---|
 | **R&D** | The goal is to make a technical capability exist | `references/rd/rd_charter.md` (Heilmeier 8 questions) | `capability_map.md` (TRL + kill criteria) | TRL-6 demonstrated capability with A4+ analysis |
-| **Pure Research** | The goal is to understand a phenomenon | `references/pure_research/prfaq.md` + `references/pure_research/preregistration.md` | `explanation_ledger.md` (questions + competing explanations) | IMRAD-shaped manuscript draft with A4+ analysis |
+| **Pure Research** | The goal is to understand a phenomenon | `references/pure_research/prfaq.md`, then exploratory or confirmatory path | `explanation_ledger.md` (questions + competing explanations) | IMRAD-shaped manuscript draft with A4+ analysis |
 
 If the discipline shifts mid-trial, never silently switch. Use the **pivot
 protocol**:
@@ -218,20 +218,33 @@ each linked reference before executing the step:
    survey prior work scoped by the PR/FAQ, including the user's own past
    notebooks and decisions. Stop when competing explanations are clear and
    prior failure modes are documented.
-3. **Pre-registration** (`references/pure_research/preregistration.md`) —
+3. **探索的研究 / 確認的研究の選択** — Pure Research は探索的研究と確認的研究を明確に分ける。
+   探索的研究は目的、現状把握、仮説候補 / 説明候補、初期アプローチ探索、
+   観察を扱い、成果は `exploratory` / `diagnostic` として残す。確認的研究は、
+   探索的研究の成果を信頼性をもって確認するためのもの。探索的研究の後に確認的研究を必ず行うわけではない。
+   If the outcome is a map of observations, candidate explanations, or a
+   stop/park decision, exploratory work may be sufficient. If the result will
+   become a `supported / external claim / high reliability claim`, then
+   確認的研究へ進む。
+4. **Pre-registration** (`references/pure_research/preregistration.md`) —
+   pre-registration は確認的研究の道具であり、探索的研究そのものではない。
    state the question, competing explanations (≥2), test design, and expected
-   contrast under each explanation before the trial. After the trial,
-   compare actual analysis against the planned design and note any deviations.
-4. **Explanation ledger**
+   contrast under each explanation before the trial. 確認的研究では、実行前に
+   `PR_<id>` と現状（探索結果、データ可用性、前提、実装制約、現在の問い）を比較し、
+   PR が現状に合っているか確認する。pre-reg と現状を比較する目的は、
+   pre-reg を守るためだけでなく、現状が PR の前提を壊していないかを見るため。
+   After the trial, compare actual analysis against the planned design and
+   note any deviations.
+5. **Explanation ledger**
    (`references/pure_research/explanation_ledger_schema.md`) — single state
    object. Claim-cited or promotion-relevant results update explanation rows;
    exploratory observations may stay in run notes until they become
    load-bearing.
-5. **Workflow** (`references/pure_research/pr_workflow.md`) — discriminating
-   trial loop, deviation handling (deviation severity rubric is enforced
-   here), state-change logging, stop conditions. Push analysis depth on the
-   current trial before designing a new trial.
-6. **Promotion** (`references/pure_research/pr_promotion_gate.md`) — promote a
+6. **Workflow** (`references/pure_research/pr_workflow.md`) — 探索的研究のループ
+   and 確認的研究のループ, deviation handling, state-change logging, stop
+   conditions. Push analysis depth on the current result before collecting
+   more data or designing a confirmatory trial.
+7. **Promotion** (`references/pure_research/pr_promotion_gate.md`) — promote a
    claim only when a discriminating test against ≥1 serious alternative
    passed, multiple-testing correction is honest, analysis depth reaches
    A4+, and an IMRAD draft (`references/pure_research/imrad_draft.md`) is
@@ -441,13 +454,15 @@ the final report must carry enough intuitive evidence for human judgment.
     exist accumulates sunk cost that biases future kill decisions.
     Typical time investment: 1-2 hours of charter writing prevents weeks
     of effort on a misframed target.
-  - Pure Research first day: no trial execution, PR/FAQ + targeted
-    literature + pre-registration only. *Why*: a pre-registered test
-    survives the garden of forking paths. A trial run before the
-    pre-registration is ready is a shopping trip — once you have seen the
-    data, "pre-registration" is theater. Typical time investment: 30-60
-    minutes of PR/FAQ writing prevents months of post-hoc rationalization
-    on weak findings.
+  - Pure Research first day: do not run a claim-bearing confirmation trial.
+    PR/FAQ, targeted literature, exploratory planning, explanation
+    candidates, lightweight exploratory probes, scaffold setup, and — when a
+    claim will need high reliability — pre-registration are allowed. *Why*:
+    exploratory research may map the problem before a confirmation target
+    exists, but a claim-bearing confirmatory trial must survive the garden of
+    forking paths. A confirmation trial run before the pre-registration is
+    ready is a shopping trip — once you have seen the data,
+    "pre-registration" is theater.
   - **What IS allowed on day 1**: data infrastructure setup, environment
     pinning (`uv.lock`), data version recording, raw data sourcing, scaffold
     file creation. The prohibition targets evidence-producing work
