@@ -178,13 +178,22 @@ v1.1.0, install `research@research-skill`. The old standalone
 
 ## Status
 
-Version 1.1.7 - keeps A4 rigor for load-bearing claims while allowing faster
-exploratory go / no-go, park, deprioritize, and reject-for-now decisions.
+Version 1.1.8 - adds general preregistration planning, Transparent Changes,
+and outcome report packages.
 
 <details>
 <summary>Changelog</summary>
 
-### v1.1.7 (current)
+### v1.1.8 (current)
+
+- Reworked pre-registration as a general planning and reporting discipline
+  with explicit `confirmatory` and `exploratory` types.
+- Added outcome report package guidance with `report.md`, `report.pdf`,
+  figures, tables, attachments, Plan-to-Result tables, and Transparent Changes.
+- Updated scaffolds and IMRAD generation for `PR_<id>_<slug>` /
+  `RPT_<id>_<slug>` naming and report-package Transparent Changes extraction.
+
+### v1.1.7
 
 - Reserved A4+ for supported, matured, established, promoted, external-claim,
   deployment-recommendation, and terminal-kill decisions.
