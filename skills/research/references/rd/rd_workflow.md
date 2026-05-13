@@ -18,6 +18,18 @@ handoff to other workstreams.
 
 ## Entry guardrails
 
+Before selecting a Capability / Technology Research workstream, current-state
+assessment is orientation, not an R&D category. It may summarize the present
+system, prior work, constraints, unknowns, and candidate next questions without
+creating a capability state claim. Hypothesis validation is a cross-cutting
+evidence discipline, not an R&D category, so it does not by itself select this
+workflow.
+
+Technical decomposition is not required before current-state assessment.
+Core Technologies, Capability Map, TRL, and Stage-Gate are escalation
+protocols, not default prerequisites. Heavy technical decomposition is only
+for durable capability or technology state transition claims.
+
 Before a Capability / Technology Research workstream has a reviewed charter
 and kill criteria, only these activities are allowed:
 
@@ -28,6 +40,8 @@ and kill criteria, only these activities are allowed:
   C row contents
 - Tracking path setup — choose local notes or tracker location, create empty
   run-note directories, and record where later evidence will be stored
+- Non-load-bearing orientation notes that do not run experiments, produce
+  metrics, move ledger rows, or support external claims
 
 Before the charter and kill criteria exist, do not run or cite:
 

@@ -45,6 +45,15 @@ current research state. The first question is not "which discipline is this
 project?" It is "which uncertainty is blocking progress, and which state will
 this work update?"
 
+Use the general R&D categories as compatibility language, not as startup
+ceremony: **basic research**, **applied research**, and **experimental
+development**. Current-state assessment is orientation, not an R&D category.
+Hypothesis validation is a cross-cutting evidence discipline, not an R&D
+category. Technical decomposition is not required before current-state
+assessment. Core Technologies, Capability Map, TRL, and Stage-Gate are
+escalation protocols, not default prerequisites. Heavy technical decomposition
+is only for durable capability or technology state transition claims.
+
 A project can contain multiple workstreams. The project itself is not Pure
 Research or R&D, and it must not be locked into an exclusive mode at startup.
 The project owns the final intent, decision context, uncertainty list,
@@ -233,8 +242,18 @@ analysis-depth axis.
 
 Capability / Technology Research establishes the knowledge needed for a
 technical capability to work under stated conditions. R&D is retained as a
-compatibility label for this workstream type. Required sequence — read each
-linked reference before executing the step:
+compatibility label for this workstream type.
+
+The sequence below is an escalation protocol for durable capability or
+technology state transitions. It is required before claiming `matured`,
+`established`, `promoted`, terminal kill, external capability support, or any
+TRL movement. It is not a prerequisite for current-state assessment,
+prior-art triage, exploratory diagnostics, design notes, or non-load-bearing
+scaffold work that does not move a ledger row and does not support an external
+claim.
+
+Escalation sequence — read each linked reference before executing the
+claim-bearing step:
 
 1. **Charter** (`references/rd/rd_charter.md`) — answer the 8 Heilmeier
    questions, including kill criteria (H6: what evidence would kill this

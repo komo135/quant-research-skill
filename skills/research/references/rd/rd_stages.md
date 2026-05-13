@@ -15,10 +15,16 @@ work when the design is wrong.
 
 ## Pre-condition: integration pattern declared
 
-Before applying the 5 stages, the project must have declared its
-integration pattern in the charter (Heilmeier H8, see
+Before applying the 5 stages to a capability state transition, the workstream
+must have declared its integration pattern in the charter (Heilmeier H8, see
 `references/rd/integration_patterns.md`). The Stage-Gate ordering and
 the meaning of Stage 5 (Integrate) differ per pattern:
+
+Stage-Gate is an escalation protocol, not a default prerequisite for
+current-state assessment, prior-art triage, exploratory diagnostics, design
+notes, or non-load-bearing scaffold work. It becomes mandatory when evidence
+is used to move TRL, mark `matured`, mark `established`, promote, fire terminal
+kill, or support an external capability claim.
 
 - **Pattern 1 (vertical slice)**: framework + baselines built before any
   K Stage-Gate. Per K, Stage 5 (Integrate) = baseline replacement +

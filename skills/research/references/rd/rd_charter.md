@@ -4,9 +4,12 @@ DARPA Heilmeier Catechism — the 8-question entry document for any Capability /
 
 ## When to read
 
-- The very first step of any Capability / Technology Research workstream, before decomposition or implementation
+- The first escalation step of any claim-bearing Capability / Technology
+  Research workstream, before decomposition or implementation that could move
+  capability state
 - When a sub-agent is asked to elicit a charter from the user
-- Before any other R&D reference is consulted
+- Before other R&D references are used to justify TRL movement, terminal kill,
+  promotion, or external capability claims
 
 ## Purpose
 
@@ -14,6 +17,10 @@ The charter answers 8 questions in **one page**. Without a complete charter on
 file, evidence-producing R&D work is forbidden: no Stage gate and no
 promotion-cited trial. Setup, scaffolding, and exploratory design notes may
 continue when clearly labeled as non-evidence-producing.
+
+The charter is not required for current-state assessment, prior-art triage, or
+non-load-bearing design notes. Those activities orient the work; they do not
+create a capability state claim.
 
 The charter is a planning anchor. Once it has `Status: READY`, do not silently
 rewrite load-bearing scope, kill criteria, cost, final exam, consumer, or
