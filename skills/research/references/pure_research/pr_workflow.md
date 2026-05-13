@@ -32,6 +32,19 @@ Phenomenon / Mechanism Research first day permits **only** the following:
 - Data infrastructure setup, environment pinning (`uv.lock`), data version
   recording, raw data sourcing, scaffold file creation
 
+The preregistered flow is plan -> execute -> compare -> report:
+
+- Plan: write or select the pre-registration before work starts.
+- Execute: run the work against the written plan.
+- Compare: compare actual execution and results against the pre-registration.
+- Report: publish the plan-to-result table, transparent changes, evidence, and limitations.
+
+Pre-registration is a plan, not a prison. A midstream pre-registration governs
+future work or explicit reruns only; prior work is prior or exploratory
+evidence. Report contracts apply to report packages and presented evidence,
+not to research or experiments. Evidence integrity checks are a reporting-side
+requirement, not a continuous research tracking contract.
+
 Phenomenon / Mechanism Research first day **prohibits**:
 
 - Claim-bearing confirmation trial execution before a reviewed

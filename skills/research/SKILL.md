@@ -327,6 +327,13 @@ linked reference before executing the step:
    scope, allowed transformations / procedures, selection or follow-up
    criteria, and expected outputs. After execution, compare actual work against
    the plan and publish the Transparent Changes Policy in the report.
+   Plan -> execute -> compare -> report: Plan: write or select the
+   pre-registration before work starts; Execute: run the work against the
+   written plan; Compare: compare actual execution and results against the
+   pre-registration; Report: publish the plan-to-result table, transparent
+   changes, evidence, and limitations. Pre-registration is a plan, not a
+   prison. A midstream pre-registration governs future work or explicit reruns
+   only; prior work is prior or exploratory evidence.
 5. **Explanation ledger**
    (`references/pure_research/explanation_ledger_schema.md`) — single state
    object. Claim-cited or promotion-relevant results update explanation rows;
@@ -507,37 +514,95 @@ answer or as a linked report artifact. The user should not have to inspect raw
 notebooks, ledgers, or tracker exports to understand what happened and what
 decision remains.
 
-The report must include:
+### Short outcome summary
 
-- The plain-language decision: what changed, what did not change, and whether
-  the result is `supported`, `preliminary`, blocked, killed, parked, or still
-  observation-only.
+The normal final answer or short outcome summary has a minimum shape:
+decision, evidence, limitation, and next action. Use one decision label when
+applicable: `supported`, `not supported`, `inconclusive`,
+`decision deferred`, `exploratory only`, or `blocked`.
+
+Short summaries may cite file:line, artifact URI, run ID, reference, numeric
+output, or ledger row when the point is load-bearing. They do not require
+Preregistration Reference, Plan-to-Result Table, Evidence Integrity Checks, or
+Reproducibility Capsule unless the answer is presenting a formal report
+package or making the report itself the claim-carrying artifact.
+
+### Formal report package contract
+
+Use the formal report package contract only for a preregistered or
+claim-bearing report package. It is also appropriate for state-promotion,
+terminal-decision, externally shared, or deployment-recommendation report
+packages. Report contracts apply to report packages and presented evidence,
+not to research or experiments. Claim-to-artifact checks are a reporting-side
+requirement, not a continuous research tracking contract.
+
+Report quality contract: a reader can identify the decision, evidence, plan
+comparison, limitations, and next action without opening notebooks or ledgers.
+
+The formal report package must include:
+
+- Executive Decision: the plain-language decision, what changed, what did not
+  change, and whether the result is `supported`, `not supported`,
+  `inconclusive`, `decision deferred`, `exploratory only`, or `blocked`.
+- Research Stage and Claim Boundary.
+- Preregistration Reference when the package reports preregistered work; state
+  `N/A` only when no preregistration applies.
+- Plan-to-Result Table for preregistered or plan-based work.
 - At least one piece of visual or tabular evidence that makes the result
   intuitive: a figure, chart, DAG, timeline, comparison table, confusion/error
   table, before/after table, or compact metric table. Choose the form that
   best exposes the key uncertainty, not the form that flatters the result.
+- Evidence Integrity Checks for claims presented in the report.
 - Evidence citations for every load-bearing claim, linking each visual or table
   back to file:line, artifact URI, run ID, reference, numeric output, or ledger row.
-- A scope and caveat note: what conditions the result covers, what alternatives
-  remain plausible, and what evidence would change the decision.
-- The next decision or action requested from the user, if any.
+- Transparent Changes for preregistered or plan-based work.
+- Reproducibility Capsule for claim-bearing report packages.
+- Scope / Limitations / Alternative Explanations: what conditions the result
+  covers, what alternatives remain plausible, and what evidence would change
+  the decision.
+- Next Action requested from the user, if any.
 
-Preregistered work that produces a report uses the package shape from
+Preregistered or claim-bearing work that produces a report uses the package
+shape from
 `references/shared/outcome_reports.md`:
 
 ```text
 results/reports/
   RPT_<id>_<slug>/
+    # Required core files
     report.md
-    report.pdf
+    report.html
     figures/
     tables/
     attachments/
+    # Optional / situation-specific files
+    report.pdf
+    provenance/
+      manifest.json
+      integrity_checks.md
+      rerun.md
 ```
+
+The required core files: `report.md`, `report.html`, `figures/`, `tables/`,
+and `attachments/`. Here, `figures/`, `tables/`, and `attachments/` are
+directories, and required core directories may be empty. `report.html` is the
+primary readable artifact for L2/L3 reports; `report.md` is editable source;
+report.pdf is optional snapshot/export. Use `provenance/` only for
+claim-bearing or L2/L3 reports, with `manifest.json`, `integrity_checks.md`,
+and `rerun.md` under it. L2/L3 reports means claim-bearing reports and
+state-promotion or terminal-decision report packages; it is report package
+level, not analysis tier.
 
 External tracker run IDs are optional for these reports. Evidence should point
 to figures, tables, appendices, local source artifacts, artifact URI, run ID,
 or ledger row only when that source actually exists and helps a reviewer.
+
+For each key numeric, boolean, categorical, and count claim presented in the
+report, include a claim-to-artifact check row with `claim_id`,
+`reported_value`, `cited_artifact_path`, `commit_or_hash`,
+`extraction_method`, `observed_source_value`, `comparison_status`, and
+`generating_command_or_entrypoint`. Failed, missing, or not run cannot be
+treated as supported.
 
 Visuals and tables are explanatory snapshots, not state owners. The ledger and
 review gates still decide support, maturity, promotion, kill, and pivot. If no

@@ -86,10 +86,15 @@ configs, trial reports, or decision entries.
 │   ├── reports/
 │   │   └── RPT_<id>_<slug>/    # example package, created when report is produced
 │   │       ├── report.md
-│   │       ├── report.pdf
+│   │       ├── report.html
 │   │       ├── figures/
 │   │       ├── tables/
-│   │       └── attachments/
+│   │       ├── attachments/
+│   │       ├── report.pdf      # optional snapshot/export
+│   │       ├── provenance/     # optional for claim-bearing or L2/L3 reports
+│   │       │   ├── manifest.json
+│   │       │   ├── integrity_checks.md
+│   │       │   └── rerun.md
 │   ├── figures/
 │   └── intermediate/
 ├── tracking/                   # optional tracker exports / lightweight run notes
@@ -116,8 +121,18 @@ point:
   exploratory result, data availability, assumptions, implementation
   constraints, and current question still match the PR
 - [ ] Preregistered outcome reports, when produced, use
-  `../../results/reports/RPT_<id>_<slug>/` with `report.md`, `report.pdf`,
-  `figures/`, `tables/`, and `attachments/`
+  `../../results/reports/RPT_<id>_<slug>/`. Required core files:
+  `report.md`, `report.html`, `figures/`, `tables/`, and `attachments/`.
+  Required core directories may be empty. Optional / situation-specific files:
+  `report.pdf` and `provenance/` with `manifest.json`,
+  `integrity_checks.md`, and `rerun.md`. `report.html` is the primary
+  readable artifact for L2/L3 reports; `report.md` is editable source;
+  `report.pdf` is optional snapshot/export. Use provenance/ for
+  claim-bearing or L2/L3 reports. L2/L3 reports means claim-bearing reports
+  and state-promotion or terminal-decision report packages; it is report
+  package level, not analysis tier. In plain terms, report.html is the primary
+  readable artifact for L2/L3 reports; report.md is editable source;
+  report.pdf is optional snapshot/export.
 - [ ] `explanation_ledger.md` has at least 2 competing explanations
   per active question (≥1 should be a null / artifact explanation)
 - [ ] Every trial in `purposes/` has a complete Analysis section (5

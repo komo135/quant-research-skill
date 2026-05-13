@@ -43,6 +43,12 @@ def normalize_for_assertion(text: str) -> str:
     return " ".join(text.lower().split())
 
 
+def assert_phrases_present(testcase: unittest.TestCase, document: str, phrases: list[str]) -> None:
+    normalized = normalize_for_assertion(document)
+    missing = [phrase for phrase in phrases if normalize_for_assertion(phrase) not in normalized]
+    testcase.assertEqual([], missing)
+
+
 class ProjectBoundaryTests(unittest.TestCase):
     def test_plugin_version_metadata_is_consistent(self) -> None:
         expected = "1.1.9"
@@ -1278,6 +1284,147 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertIn("goalpost shifting", rd_stages)
         self.assertIn("prospective re-scope", rd_stages)
 
+    def test_rd_flow_names_lightweight_research_lanes_before_decomposition(self) -> None:
+        skill = read_text("skills/research/SKILL.md")
+        rd_workflow = read_text("skills/research/references/rd/rd_workflow.md")
+        expected_phrases = [
+            "basic research",
+            "applied research",
+            "experimental development",
+            "current-state assessment is orientation, not an r&d category",
+            "hypothesis validation is a cross-cutting evidence discipline, not an r&d category",
+            "technical decomposition is not required before current-state assessment",
+            "core technologies, capability map, trl, and stage-gate are escalation protocols, not default prerequisites",
+            "heavy technical decomposition is only for durable capability or technology state transition claims",
+        ]
+
+        assert_phrases_present(self, skill, expected_phrases)
+        assert_phrases_present(
+            self,
+            rd_workflow,
+            [
+                "current-state assessment is orientation, not an r&d category",
+                "hypothesis validation is a cross-cutting evidence discipline, not an r&d category",
+                "technical decomposition is not required before current-state assessment",
+                "core technologies, capability map, trl, and stage-gate are escalation protocols, not default prerequisites",
+                "heavy technical decomposition is only for durable capability or technology state transition claims",
+            ],
+        )
+
+        skill_normalized = normalize_for_assertion(skill)
+        rd_normalized = normalize_for_assertion(rd_workflow)
+        for phrase in ["lightweight", "default", "escalation"]:
+            self.assertIn(phrase, skill_normalized)
+        for phrase in ["ordinary exploration", "default", "escalation"]:
+            self.assertIn(phrase, rd_normalized)
+
+        for document in [skill, rd_workflow]:
+            self.assertNotIn(
+                "required sequence for all capability / technology research work",
+                normalize_for_assertion(document),
+            )
+
+    def test_preregistration_docs_define_plan_execution_comparison_report_flow(self) -> None:
+        skill = read_text("skills/research/SKILL.md")
+        preregistration = read_text("skills/research/references/pure_research/preregistration.md")
+        preregistration_template = read_text("skills/research/assets/pure_research/preregistration.md.template")
+
+        flow_phrases = [
+            "plan -> execute -> compare -> report",
+            "plan: write or select the pre-registration before work starts",
+            "execute: run the work against the written plan",
+            "compare: compare actual execution and results against the pre-registration",
+            "report: publish the plan-to-result table, transparent changes, evidence, and limitations",
+            "pre-registration is a plan, not a prison",
+            "midstream pre-registration governs future work or explicit reruns only",
+            "prior work is prior or exploratory evidence",
+        ]
+        field_phrases = [
+            "question / objective",
+            "scope",
+            "data / input plan",
+            "variables / measures or inspection targets",
+            "planned procedure",
+            "expected outputs",
+            "decision / follow-up criteria",
+            "non-claim-bearing condition",
+            "what would prevent outputs from being used as claim-bearing evidence",
+            "future preregistered rerun or narrower report claim",
+        ]
+        contract_phrases = [
+            "report contracts apply to report packages and presented evidence, not to research or experiments",
+            "reporting-side requirement, not a continuous research tracking contract",
+        ]
+
+        assert_phrases_present(self, preregistration, flow_phrases + field_phrases + contract_phrases)
+        assert_phrases_present(self, preregistration_template, flow_phrases + field_phrases + contract_phrases)
+        assert_phrases_present(
+            self,
+            skill,
+            [
+                "Pre-registration is a general planning and reporting discipline",
+                "Plan -> execute -> compare -> report",
+                "report contracts apply to report packages and presented evidence, not to research or experiments",
+            ],
+        )
+
+    def test_outcome_reports_define_reader_quality_contract(self) -> None:
+        skill = read_text("skills/research/SKILL.md")
+        outcome_report = read_text("skills/research/references/shared/outcome_reports.md")
+        outcome_report_template = read_text("skills/research/assets/shared/outcome_report.md.template")
+
+        quality_phrases = [
+            "report quality contract",
+            "a reader can identify the decision, evidence, plan comparison, limitations, and next action without opening notebooks or ledgers",
+            "supported",
+            "not supported",
+            "inconclusive",
+            "decision deferred",
+            "exploratory only",
+            "blocked",
+        ]
+        section_phrases = [
+            "Executive Decision",
+            "Research Stage and Claim Boundary",
+            "Preregistration Reference",
+            "Plan-to-Result Table",
+            "Key Evidence",
+            "Evidence Integrity Checks",
+            "Transparent Changes",
+            "Reproducibility Capsule",
+            "Scope / Limitations / Alternative Explanations",
+            "Next Action",
+        ]
+        claim_row_phrases = [
+            "claim-to-artifact check row",
+            "claim_id",
+            "reported_value",
+            "cited_artifact_path",
+            "commit_or_hash",
+            "extraction_method",
+            "observed_source_value",
+            "comparison_status",
+            "generating_command_or_entrypoint",
+            "numeric, boolean, categorical, and count claim",
+            "failed, missing, or not run cannot be treated as supported",
+        ]
+
+        for document in [outcome_report, outcome_report_template]:
+            assert_phrases_present(self, document, quality_phrases + section_phrases + claim_row_phrases)
+
+        assert_phrases_present(
+            self,
+            skill,
+            [
+                "Short outcome summary",
+                "decision, evidence, limitation, and next action",
+                "Formal report package contract",
+                "preregistered or claim-bearing report package",
+                "claim-to-artifact checks",
+                "reproducibility capsule",
+            ],
+        )
+
     def test_rd_stages_no_longer_skips_derisk_trl_two(self) -> None:
         rd_stages = read_text("skills/research/references/rd/rd_stages.md")
         normalized = normalize_for_assertion(rd_stages)
@@ -1831,24 +1978,56 @@ class ProjectBoundaryTests(unittest.TestCase):
         skill = read_text("skills/research/SKILL.md")
         outcome_report = read_text("skills/research/references/shared/outcome_reports.md")
         outcome_report_template = read_text("skills/research/assets/shared/outcome_report.md.template")
-        new_project = read_text("skills/research/scripts/new_project.py")
-        combined = "\n".join([skill, outcome_report, outcome_report_template, new_project])
+        readme_template = read_text("skills/research/assets/pure_research/README.md.template")
+        combined = "\n".join([skill, outcome_report, outcome_report_template, readme_template])
         normalized = normalize_for_assertion(combined)
 
-        for phrase in [
+        core_shape_phrases = [
+            "Required core files",
             "results/reports/",
             "RPT_<id>_<slug>",
             "report.md",
-            "report.pdf",
+            "report.html",
             "figures/",
             "tables/",
             "attachments/",
-            "Plan-to-Result Table",
-            "Transparent Changes",
-            "Scope / Limitations",
-            "planned_item | executed_as_planned | result_summary | evidence | notes",
-        ]:
-            self.assertIn(normalize_for_assertion(phrase), normalized)
+            "required core directories may be empty",
+        ]
+        optional_shape_phrases = [
+            "Optional / situation-specific files",
+            "report.pdf is optional snapshot/export",
+            "provenance/ for claim-bearing or L2/L3 reports",
+            "manifest.json",
+            "integrity_checks.md",
+            "rerun.md",
+            "L2/L3 reports means claim-bearing reports and state-promotion or terminal-decision report packages",
+            "report package level, not analysis tier",
+            "report.html is the primary readable artifact for l2/l3 reports",
+            "report.md is editable source",
+        ]
+
+        assert_phrases_present(self, outcome_report, core_shape_phrases + optional_shape_phrases)
+        assert_phrases_present(self, outcome_report_template, core_shape_phrases + optional_shape_phrases)
+        assert_phrases_present(self, readme_template, core_shape_phrases + optional_shape_phrases)
+        assert_phrases_present(
+            self,
+            skill,
+            [
+                "required core files: `report.md`, `report.html`, `figures/`, `tables/`, and `attachments/`",
+                "report.pdf is optional snapshot/export",
+                "provenance/` only for claim-bearing or L2/L3 reports",
+            ],
+        )
+        assert_phrases_present(
+            self,
+            combined,
+            [
+                "Plan-to-Result Table",
+                "Transparent Changes",
+                "Scope / Limitations",
+                "planned_item | executed_as_planned | result_summary | evidence | notes",
+            ],
+        )
 
         for phrase in [
             "Description of change",
@@ -1861,6 +2040,11 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertIn("External tracker run IDs are optional", combined)
         self.assertIn("External tracker run ID: <omit unless a tracker was actually used>", combined)
         self.assertNotIn("external tracker run id is required", normalized)
+        for forbidden in [
+            "report.pdf is the provided report artifact",
+            "with report.md, report.pdf",
+        ]:
+            self.assertNotIn(normalize_for_assertion(forbidden), normalized)
 
     def test_program_metadata_stays_out_of_evidence_artifacts_and_framework_apis(self) -> None:
         combined_templates = "\n".join(
