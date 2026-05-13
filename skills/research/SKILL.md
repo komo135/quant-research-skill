@@ -222,8 +222,8 @@ interchangeable; conflating them invalidates promotion review.
 | Term | Scope | Meaning | Gate it controls |
 |---|---|---|---|
 | **matured** | Capability (Layer 2) | Reached its target TRL (≤ TRL-6 for ship), kill criteria un-fired | End of capability's trial loop |
-| **established** | Core technology (Layer 1) | All child capabilities matured, kill criteria un-fired, analysis at A4+ | Core tech ready for upstream consumption |
-| **promoted** | Project (target) | All core techs established, integration test ran AFTER upstream exits, and (if any core tech is `継続改善型`) maintenance plan filed | Project closure or transition to maintenance cadence |
+| **established** | Core technology (Layer 1) | Critical-path child capabilities matured to TRL-6; non-critical/helper child capabilities reached target_TRL or are explicitly non-critical; kill criteria un-fired; analysis at A4+ | Core tech ready for upstream consumption |
+| **promoted** | Project (target) | All core techs established, declared integration pattern's ordering check passed, and (if any core tech is `継続改善型`) maintenance plan filed | Project closure or transition to maintenance cadence |
 
 For Phenomenon / Mechanism Research, the equivalent external or load-bearing
 claim-level term is **`supported`**, with the same A4+ requirement at the
@@ -262,11 +262,11 @@ linked reference before executing the step:
 6. **Workflow** (`references/rd/rd_workflow.md`) — initial-day prohibitions,
    state-change logging, stop conditions.
 7. **Promotion** (`references/rd/rd_promotion_gate.md`) — promote a target
-   only when every core technology is `established` (all child capabilities
-   matured to TRL-6 with kill criteria un-fired and analysis at A4+),
-   integration test ran AFTER all upstream exits fired (ordering verified),
-   and — if any core technology is `継続改善型` — a maintenance plan is on
-   file in `decisions.md`.
+   only when every core technology is `established` (all critical-path child
+   capabilities matured to TRL-6 with kill criteria un-fired and analysis at
+   A4+), the declared integration pattern's pattern-aware ordering check
+   passes, and — if any core technology is `継続改善型` — a maintenance plan is
+   on file in `decisions.md`.
 
 ## Phenomenon / Mechanism Research (Pure Research-compatible)
 
@@ -544,14 +544,14 @@ the final report must carry enough intuitive evidence for human judgment.
   without citation are forbidden at those decision points.
 - **Entry guardrails**.
   - Capability / Technology Research: promotion-relevant or claim-bearing
-    implementation must wait until the charter and kill criteria exist. A
-    non-load-bearing scaffold, interface probe, smoke test, environment setup,
-    data plumbing, or file scaffold is allowed when it is labeled as enabling
-    work and is not used to advance TRL, fire a kill criterion, promote a
-    capability, or support an external claim. *Why*: kill criteria (Heilmeier
-    H6) must be ready before a trial can fire one. Evidence-producing code
-    created before kill criteria exist can accumulate sunk cost that biases
-    future kill decisions.
+    implementation must wait until the charter and kill criteria exist.
+    Before reviewed charter + kill criteria, only charter drafting, empty
+    scaffold creation, and tracking path setup are allowed. No Layer 1
+    decomposition, capability row contents, Scoping gate, data probe, smoke
+    test, or metric-producing work may be run or cited. *Why*: kill criteria
+    (Heilmeier H6) must be ready before a trial can fire one.
+    Evidence-producing code created before kill criteria exist can accumulate
+    sunk cost that biases future kill decisions.
   - Phenomenon / Mechanism Research first day: do not run a claim-bearing confirmation trial.
     PR/FAQ, targeted literature, exploratory planning, explanation
     candidates, lightweight exploratory probes, scaffold setup, and — when a
@@ -561,11 +561,11 @@ the final report must carry enough intuitive evidence for human judgment.
     forking paths. A confirmation trial run before the pre-registration is
     ready is a shopping trip — once you have seen the data,
     "pre-registration" is theater.
-  - **What IS allowed on day 1**: data infrastructure setup, environment
-    pinning (`uv.lock`), data version recording, raw data sourcing, scaffold
-    file creation. The prohibition targets evidence-producing work
-    (implementation that runs / trial that produces metrics), not
-    enabling work.
+  - **What IS allowed on day 1**: For Capability / Technology Research before
+    reviewed charter + kill criteria, only charter drafting, empty scaffold
+    creation, and tracking path setup. Broader exploratory setup belongs after
+    the charter is ready, or to Phenomenon / Mechanism Research where the
+    PR/FAQ and pre-registration rules define the evidence boundary.
 - **Session-level Capability / Technology Research sequencing**. Once the
   charter is complete, the seven R&D-compatible steps must preserve dependency
   order:

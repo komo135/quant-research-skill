@@ -225,12 +225,13 @@ Each K row has one status at a time. Allowed values:
 | Status | Meaning |
 |---|---|
 | `active` | Currently being worked on; child capabilities are in progress |
-| `established` | All child capabilities matured to TRL-6, kill criteria un-fired, analysis at A4+ |
+| `established` | Critical-path child capabilities matured to TRL-6; non-critical/helper child capabilities reached target_TRL or are explicitly non-critical; kill criteria un-fired; analysis at A4+ |
 | `blocked` | Cannot progress until a named dependency changes |
 | `split` | Decomposed into 2+ child K's (record children's IDs); the original row remains for traceability |
 | `merged` | Absorbed into another K (record the absorbing K's ID) |
 | `stale` | No longer relevant after a scope change or upstream decision |
 | `parked` | Deferred with a named unblock condition |
+| `killed` | Charter or K-level kill criterion fired with A4+ mechanism evidence, plus charter/decisions evidence showing terminal scope |
 
 Allowed transitions:
 
@@ -241,13 +242,20 @@ active → split (when too coarse, becomes parent of children)
 active → merged (when duplicate found)
 active → stale (when scope shifts)
 active → parked (when deferred)
+active → killed (when terminal kill is validated with A4+ evidence and recorded in charter/decisions evidence)
 blocked → active (when blocker resolved)
 parked → active (when unblock condition fires)
 parked → stale (when no longer relevant)
 ```
 
-Disallowed: `established → active` (promote-then-demote); use a deviation
-entry + new K instead.
+Disallowed: `established → active` (promote-then-demote); `killed → active`
+also requires a deviation entry plus a new K or explicit re-open rationale.
+
+Core tech terminal kill requires A4+ mechanism-level analysis plus
+charter/decisions evidence: cite the charter H6 or K-level kill criterion,
+the observation that fired it, alternatives ruled out, scope of the kill, and
+the dated `decisions.md` entry. If the failure is repairable, use `blocked`,
+`parked`, `split`, or `merged` instead of `killed`.
 
 ## Layer 1 closure
 

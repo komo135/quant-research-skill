@@ -44,11 +44,12 @@ Format: `[ ] item — required evidence — citation`
 ### B. Layer 1 (core technologies) all `established`
 
 - [ ] Every K row in Section 1 has status `established` (not active,
-  blocked, parked, etc.) OR is `merged` / `stale` / `killed` with
-  documented rationale
+  blocked, parked, etc.) OR is `merged` / `stale` / `killed` with documented rationale
   - Evidence: list each K row with its terminal status and rationale
-- [ ] Every `established` K satisfies its definition: all child
-  capabilities matured, kill criteria un-fired, A4+ analysis
+- [ ] Every `established` K satisfies its definition: critical-path child
+  capabilities matured to TRL-6, non-critical/helper child capabilities reached
+  target_TRL or are explicitly non-critical, kill criteria un-fired, A4+
+  analysis
   - Evidence: per-K cross-reference to capabilities and kill log
 
 ### C. Layer 2 (capabilities) — per-capability conditions
@@ -56,8 +57,12 @@ Format: `[ ] item — required evidence — citation`
 For each capability on the critical path (i.e., not killed / merged /
 stale), all of the following:
 
-- [ ] `current_TRL == target_TRL` (typically 6)
-  - Evidence: `capability_map.md` Section 2 row
+- [ ] `current_TRL == 6` and Status is `matured`
+  - Evidence: `capability_map.md` Section 2 row. target_TRL is the
+    per-capability row target, but critical-path capabilities must reach
+    TRL-6 for workstream promotion. target_TRL below 6 is for non-critical
+    or helper capabilities; target_TRL below 6 does not satisfy
+    critical-path promotion.
 - [ ] Status is `matured`
   - Evidence: same row
 - [ ] Stage 5 (Integrate) exit conditions met (operational test on
@@ -80,13 +85,29 @@ stale), all of the following:
   - Evidence: local run note, results row, tracker record, or equivalent
     external tracker record for the trial
 
-### D. Integration test ordering
+### D. Integration check — pattern-aware ordering
 
-- [ ] Integration test (the capability with `core_tech_id == integration`)
-  ran AFTER all upstream capabilities reached `matured`
+The integration gate is pattern-aware and must follow the declared
+integration pattern in charter H8. If no declared integration pattern exists,
+promotion blocks until the charter is amended and reviewed.
+
+- [ ] Declared integration pattern is cited (Pattern 1, Pattern 2, or Pattern 3)
+  - Evidence: charter H8 and any deviation entry if the pattern changed
+- [ ] Pattern 1: every critical K replacement test ran inside the framework
+  after that K's upstream prerequisites were `matured`; no separate final
+  `core_tech_id == integration` row is required
+  - Evidence: per-K replacement notes identify baseline, real implementation,
+    upstream prerequisites, and A/B result
+- [ ] Pattern 2: the final `core_tech_id == integration` capability ran after
+  all upstream critical-path capabilities reached `matured`
   - Evidence: integration notes identify the upstream capabilities consumed
-- [ ] No upstream capability re-opened during integration (no
-  `matured → active` transitions in the integration window)
+- [ ] Pattern 3: each K replacement test ran against the skeleton after that
+  K's prerequisites were `matured`; any declared final integration capability
+  ran after all upstream critical-path capabilities reached `matured`
+  - Evidence: skeleton replacement notes and, if applicable, final integration
+    notes
+- [ ] No upstream capability re-opened during its applicable integration window
+  (no `matured → active` transitions in that window)
   - Evidence: capability map entries and integration notes
 
 ### E. Cross-project dependencies

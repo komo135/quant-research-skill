@@ -156,9 +156,9 @@ filed.
 #### Integration pattern (REQUIRED)
 
 Per `references/rd/integration_patterns.md`, declare which pattern this
-project uses. Without an explicit declaration, the project implicitly
-defaults to Pattern 2 (bottom-up), which produces no working version
-until very late.
+project uses. A missing integration pattern blocks downstream work: do not
+write Layer 2 capability rows or run Stage-Gate until H8 names Pattern 1,
+Pattern 2, or Pattern 3 and explains why.
 
 Pick one:
 
