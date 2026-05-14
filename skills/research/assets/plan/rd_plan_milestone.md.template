@@ -1,0 +1,72 @@
+---
+plan_id: <id>
+slug: <slug>
+category: <category>
+mode: milestone
+status: planned
+created_at: YYYY-MM-DD
+created_commit: <git sha — auto-filled by new_plan.py>
+last_updated: YYYY-MM-DD
+---
+
+# <Plan title>
+
+## Question / Objective
+
+<One paragraph stating what artifact will be built and what it is for.>
+
+## Plan
+
+### Functional milestones
+
+- <feature 1>: <acceptance criterion>
+- <feature 2>: <acceptance criterion>
+
+### Performance milestones
+
+- <metric>: <threshold under stated conditions>
+
+### Acceptance tests
+
+- <scenario>: <pass criterion>
+- <scenario>: <pass criterion>
+
+### Out of scope
+
+- <explicit list of functionality not in this iteration>
+
+### Compute / time budget
+
+- <budget envelope>
+
+## Actual execution
+
+### Runs
+
+<List of acceptance test runs and performance measurement runs.>
+
+### System description (what was built)
+
+<Architecture, key design decisions, interfaces. NOT env locks.>
+
+### Test results
+
+<Per-milestone outcome. Link to test logs/reports.>
+
+## Planned vs Actual
+
+<Differences. Functionality deferred, scope changes. "No material deviation from plan." if none.>
+
+## Claims
+
+<Load-bearing claims about functional behavior and performance, using claim_structure.md.>
+
+## Decision
+
+<One of NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE — see iteration_loop.md.>
+
+## References
+
+- Runs: experiments/<plan_id>_<slug>/runs/
+- Related plans: <other plan IDs and their relationship>
+- Related literature: <papers.md entries>

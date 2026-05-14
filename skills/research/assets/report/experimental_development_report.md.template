@@ -1,0 +1,66 @@
+# <Report Title>
+
+**Report ID:** <report-id>
+**Source plan:** plans/<plan-id>_<slug>.md
+**Date:** YYYY-MM-DD
+**Category:** experimental_development
+
+## Summary
+
+<One or two paragraphs:>
+<- what was built>
+<- what it does, with the headline performance number>
+<- known limits and next action>
+
+## Background
+
+<What this artifact is for. What existed before. Why this iteration.>
+
+## System description
+
+### Architecture
+
+<Structural overview of the system. Components and their relationships.>
+
+### Key design decisions
+
+<Decisions made and why. What was considered and rejected.>
+
+### Interfaces
+
+<How the system is invoked. Inputs, outputs, configuration shape.>
+
+### Dependencies
+
+<What the system depends on, conceptually. Frameworks, classes of data. NOT env-lock specifics.>
+
+## Performance
+
+<Measured behavior under stated conditions, with figures.>
+
+| Metric | Value | Conditions |
+|---|---|---|
+
+![<Figure caption>](figures/<filename>.png)
+
+## Operational limits
+
+<- Known failure modes>
+<- Edge cases observed>
+<- Resource boundaries>
+
+## Limitations
+
+<- Conditions not tested>
+<- Future-iteration items>
+
+## Next action
+
+<- Iteration decision: NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE>
+<- Or specific request to the human reader>
+
+## References
+
+- Plan: plans/<plan-id>_<slug>.md
+- Source artifacts: experiments/<plan-id>_<slug>/runs/
+- Prior work: literature/papers.md entries cited above

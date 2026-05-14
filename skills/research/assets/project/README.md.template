@@ -1,0 +1,34 @@
+# <Project Name>
+
+<One-paragraph project description: what is this project for, what does it ultimately serve.>
+
+## Status
+
+<Current state of the project — one paragraph or a few bullets.>
+
+## Navigate
+
+- `project_state.md` — current plans, blockers, priorities
+- `decisions.md` — durable state transitions log
+- `plans/` — per-investigation plans (the research narrative for each open thread)
+- `experiments/` — per-plan code, configs, and run artifacts
+- `lib/` — shared, curated code (data loaders, eval, viz utilities)
+- `reports/` — human-facing deliverables (snapshots)
+- `literature/` — prior work and how this project differs
+
+## Getting started
+
+<How a new contributor (or future-you) gets oriented:>
+<- which plan to look at first>
+<- which entry point in `lib/` or `experiments/` to read>
+<- any environment setup notes (this is the only place env setup belongs)>
+
+## R&D Categories used in this project
+
+<List the categories active here, e.g.:>
+<- basic_research: plan 01_phase-transition>
+<- applied_research: plan 02_proposed-method>
+
+## Working in this project
+
+This project uses the `research` skill. Plans declare a category and mode; results are recorded in `plans/<id>.md` with claim structure; reports under `reports/<id>/` are the human-facing artifacts.
