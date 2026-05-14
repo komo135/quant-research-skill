@@ -67,6 +67,49 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertIn(f"Version {expected}", readme)
         self.assertIn(f"### v{expected} (current)", readme)
 
+    def test_packaged_skill_surfaces_do_not_restore_retired_rd_protocol_terms(self) -> None:
+        combined = "\n".join(
+            [
+                read_text("README.md"),
+                read_text(".codex-plugin/plugin.json"),
+                read_text(".claude-plugin/plugin.json"),
+                read_text(".claude-plugin/marketplace.json"),
+                read_text(".agents/plugins/marketplace.json"),
+                read_tree_text("skills"),
+            ]
+        )
+        normalized = normalize_for_assertion(combined)
+
+        for forbidden in [
+            "trl",
+            "technology readiness level",
+            "target_trl",
+            "current_trl",
+            "capability / technology research",
+            "core technologies",
+            "core technology",
+            "capability map",
+            "capability_map",
+            "stage-gate",
+            "stage gate",
+            "result-to-capability",
+            "r&d program",
+            "program map",
+            "charter",
+            "rd_charter",
+            "integration-pattern",
+            "integration_patterns",
+            "technology decomposition",
+            "technology_decomposition",
+            "rd_promotion_gate",
+            "promotion-eligible",
+        ]:
+            self.assertNotIn(
+                normalize_for_assertion(forbidden),
+                normalized,
+                f"Retired R&D protocol term remains on a packaged skill surface: {forbidden}",
+            )
+
     def test_superpowers_specs_are_not_tracked_plugin_artifacts(self) -> None:
         result = subprocess.run(
             ["git", "ls-files", "docs/superpowers/specs"],
@@ -447,6 +490,63 @@ class ProjectBoundaryTests(unittest.TestCase):
             self.assertIn("Effect on study results or conclusions", content)
             self.assertNotIn("unrelated workstream change", content)
             self.assertNotIn("No material changes recorded in decisions.md", content)
+
+    def test_draft_imrad_preserves_existing_workstream_draft_without_force(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "skills/research/scripts/new_project.py"),
+                    "phen",
+                    "--mode",
+                    "pure-research",
+                    "--root",
+                    tmp,
+                ],
+                check=True,
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            project = Path(tmp) / "phen"
+            workstream = project / "workstreams" / "WS001-phenomenon"
+            imrad_output = workstream / "imrad_draft.md"
+            original = imrad_output.read_text(encoding="utf-8")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "skills/research/scripts/draft_imrad.py"),
+                    "--project-dir",
+                    str(project),
+                ],
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn("--force", result.stderr)
+            self.assertEqual(original, imrad_output.read_text(encoding="utf-8"))
+
+            force_result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "skills/research/scripts/draft_imrad.py"),
+                    "--project-dir",
+                    str(project),
+                    "--force",
+                ],
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+
+            self.assertEqual(force_result.returncode, 0, force_result.stderr)
+            self.assertNotEqual(original, imrad_output.read_text(encoding="utf-8"))
 
     def test_research_skill_maps_state_before_workstream_gates(self) -> None:
         skill = read_text("skills/research/SKILL.md")
@@ -904,6 +1004,52 @@ class ProjectBoundaryTests(unittest.TestCase):
             self.assertIn(row, index)
             self.assertLess(index.index(row), index.index("## Artifact-status legend"))
 
+    def test_new_trial_recreates_missing_index_before_appending_entry(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "skills/research/scripts/new_project.py"),
+                    "alpha",
+                    "--mode",
+                    "rd",
+                    "--root",
+                    tmp,
+                ],
+                check=True,
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            project = Path(tmp) / "alpha"
+            index_path = project / "purposes/INDEX.md"
+            index_path.unlink()
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "skills/research/scripts/new_trial.py"),
+                    "--project-dir",
+                    str(project),
+                    "--slug",
+                    "latency_benchmark",
+                ],
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(index_path.exists())
+            index = index_path.read_text(encoding="utf-8")
+            self.assertIn("## Artifact-status legend", index)
+            self.assertIn(
+                "| trial_001 | rd | purposes/trial_001_latency_benchmark.py | WS001-rd | in-progress | pending |",
+                index,
+            )
+
     def test_results_schema_doc_describes_queryable_evidence_not_state_transitions(self) -> None:
         schema = read_text("skills/research/references/shared/results_db_schema.md")
 
@@ -980,6 +1126,45 @@ class ProjectBoundaryTests(unittest.TestCase):
         for user_facing_surface in [new_purpose, root_index_template]:
             self.assertNotIn("research_state.md", user_facing_surface)
             self.assertNotIn("hypotheses.md", user_facing_surface)
+
+    def test_new_purpose_fails_fast_without_writing_retired_stub(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp) / "alpha"
+            (project / "purposes").mkdir(parents=True)
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "skills/research/scripts/new_purpose.py"),
+                    "--project",
+                    "alpha",
+                    "--slug",
+                    "old_flow",
+                    "--hyp",
+                    "H1",
+                    "--root",
+                    tmp,
+                ],
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn("retired", result.stderr.lower())
+            self.assertIn("new_trial.py", result.stderr)
+            self.assertEqual([], list((project / "purposes").glob("pur_*.py")))
+
+    def test_new_project_exploratory_prereg_filter_fails_when_markers_move(self) -> None:
+        new_project = load_module("skills/research/scripts/new_project.py")
+
+        for malformed in [
+            "# Pre-registration\n\n## Exploratory body\nOnly exploratory remains.",
+            "# Pre-registration\n\n## Confirmatory body\nOnly confirmatory remains.",
+        ]:
+            with self.assertRaises(ValueError):
+                new_project.keep_only_exploratory_body(malformed)
 
     def test_process_review_uses_workstream_labels_not_project_modes(self) -> None:
         process_review = read_text("skills/research/references/review/process_review.md")
@@ -1426,6 +1611,33 @@ class ProjectBoundaryTests(unittest.TestCase):
                 "capability / technology research",
                 normalize_for_assertion(document),
             )
+
+    def test_rd_plan_template_defines_plan_execution_comparison_report_flow(self) -> None:
+        rd_plan_template = read_text("skills/research/assets/rd/rd_plan.md.template")
+        normalized = normalize_for_assertion(rd_plan_template)
+
+        for phrase in [
+            "R&D Plan",
+            "R&D category",
+            "planned_item",
+            "expected_output",
+            "pre-registration",
+            "decision_or_follow_up",
+            "execution status",
+            "evidence",
+            "report package",
+        ]:
+            self.assertIn(normalize_for_assertion(phrase), normalized)
+
+        for forbidden in [
+            "technology readiness level",
+            "trl",
+            "capability map",
+            "stage-gate",
+            "stage gate",
+            "technology decomposition",
+        ]:
+            self.assertNotIn(normalize_for_assertion(forbidden), normalized)
 
     def test_preregistration_docs_define_plan_execution_comparison_report_flow(self) -> None:
         skill = read_text("skills/research/SKILL.md")
@@ -2003,13 +2215,12 @@ class ProjectBoundaryTests(unittest.TestCase):
 
     def test_new_trial_replaces_legacy_and_current_prereg_placeholders(self) -> None:
         new_trial = load_module("skills/research/scripts/new_trial.py")
-        content = "\n".join(
-            [
-                "legacy: <REPLACE: optional prereg/PR_<id>.md>",
-                "current: <REPLACE: optional prereg/PR_<id>_<slug>.md>",
-                "generic: <REPLACE: optional prereg reference>",
-            ]
-        )
+        expected_placeholders = [
+            "<REPLACE: optional prereg/PR_<id>.md>",
+            "<REPLACE: optional prereg/PR_<id>_<slug>.md>",
+            "<REPLACE: optional prereg reference>",
+        ]
+        content = "\n".join(f"placeholder: {placeholder}" for placeholder in expected_placeholders)
 
         rendered = new_trial.substitute_pr(
             content,
@@ -2024,9 +2235,28 @@ class ProjectBoundaryTests(unittest.TestCase):
 
         self.assertEqual(
             rendered.count("workstreams/WS001-phenomenon/prereg/PR_001_initial.md"),
-            3,
+            len(expected_placeholders),
         )
-        self.assertNotIn("<REPLACE: optional prereg/PR_<id>.md>", rendered)
+        for placeholder in expected_placeholders:
+            self.assertNotIn(placeholder, rendered)
+
+    def test_new_trial_exposes_single_template_prereg_placeholder_contract(self) -> None:
+        new_trial = load_module("skills/research/scripts/new_trial.py")
+        template = read_text("skills/research/assets/pure_research/pr_trial.py.template")
+
+        self.assertIn("<REPLACE: optional prereg reference>", new_trial.PREREG_PLACEHOLDERS)
+        self.assertEqual(
+            (
+                "<REPLACE: optional prereg reference>",
+                "<REPLACE: optional prereg/PR_<id>.md>",
+                "<REPLACE: optional prereg/PR_<id>_<slug>.md>",
+            ),
+            new_trial.PREREG_PLACEHOLDERS,
+        )
+        self.assertEqual(
+            ["<REPLACE: optional prereg reference>"],
+            [placeholder for placeholder in new_trial.PREREG_PLACEHOLDERS if placeholder in template],
+        )
 
     def test_new_trial_next_steps_match_current_preregistration_reporting(self) -> None:
         new_trial = read_text("skills/research/scripts/new_trial.py")
@@ -2036,6 +2266,41 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertIn("transparent changes", normalized)
         self.assertNotIn("deviation review note", normalized)
         self.assertNotIn("drifted from pr_001_initial", normalized)
+
+    def test_review_docs_point_to_pr_trial_analysis_section(self) -> None:
+        combined = "\n".join(
+            [
+                read_text("skills/research/references/shared/analysis_depth.md"),
+                read_text("skills/research/references/shared/result_analysis.md"),
+                read_text("skills/research/references/review/conclusion_review.md"),
+            ]
+        )
+
+        self.assertNotIn("pr_trial.py.template § 6", combined)
+        self.assertNotIn("§ 5.3 / 6.3", combined)
+        self.assertNotIn("§ 6.3", combined)
+        self.assertIn("assets/pure_research/pr_trial.py.template` § 5", combined)
+
+    def test_trial_template_generator_comments_match_new_trial_cli(self) -> None:
+        pure_template = read_text("skills/research/assets/pure_research/pr_trial.py.template")
+        rd_template = read_text("skills/research/assets/rd/rd_trial.py.template")
+
+        self.assertIn(
+            "Generated by `scripts/new_trial.py` for a Phenomenon / Mechanism Research workstream.",
+            pure_template,
+        )
+        self.assertIn(
+            "Generated by `scripts/new_trial.py` for an R&D Workstream.",
+            rd_template,
+        )
+        self.assertNotIn("--mode", pure_template)
+        self.assertNotIn("--mode", rd_template)
+
+    def test_retired_root_readme_points_to_actual_mixed_readme_template(self) -> None:
+        template = read_text("skills/research/assets/README.md.template")
+
+        self.assertIn("assets/shared/README.md.template", template)
+        self.assertNotIn("assets/shared/project_state.md.template", template)
 
     def test_preregistered_outcome_reports_use_lightweight_package_shape(self) -> None:
         skill = read_text("skills/research/SKILL.md")

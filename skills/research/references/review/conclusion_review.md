@@ -176,7 +176,7 @@ The analysis reaches A4 minimum (`references/shared/analysis_depth.md`).
 - [ ] **Trial Analysis section all 5 sub-fields filled** (Observation
   / Decomposition / Evidence weighing / Tier rating / Gap to next
   tier)
-  - Evidence: trial notebook § 5 (R&D) or § 6 (Pure Research)
+  - Evidence: trial notebook § 5 (R&D and Pure Research)
 - [ ] **Tier rating is A4 or higher** with justification
   - Evidence: § Tier rating + "why this tier and not the next"
     explanation
@@ -193,7 +193,7 @@ The analysis reaches A4 minimum (`references/shared/analysis_depth.md`).
 - [ ] **Evidence form per claim**: each supporting evidence labeled
   numerical / structural-argument / literature-reference /
   null-result-of-X
-  - Evidence: § 5.3 / 6.3 columns
+  - Evidence: § 5.3 columns
 - [ ] **Structural-argument alone does not support A4**: at least one
   numerical evidence is cited per supporting candidate
   - Evidence: count of numerical evidence ≥ 1 per supported candidate

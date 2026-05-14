@@ -268,7 +268,7 @@ Allowed ending shapes:
 - `references/review/conclusion_review.md` — checks for generic labels
   on both sides as part of conclusion review
 - `assets/rd/rd_trial.py.template` § 5 and
-  `assets/pure_research/pr_trial.py.template` § 6 — Analysis section
+  `assets/pure_research/pr_trial.py.template` § 5 — Analysis section
   templates that operationalize this decomposition
 
 ## Migration note

@@ -135,7 +135,7 @@ the candidates.
 
 Every trial notebook (R&D and Pure Research) has an Analysis section
 with these 5 sub-fields. See `assets/rd/rd_trial.py.template` § 5 and
-`assets/pure_research/pr_trial.py.template` § 6.
+`assets/pure_research/pr_trial.py.template` § 5.
 
 ### 5.1 Observation
 

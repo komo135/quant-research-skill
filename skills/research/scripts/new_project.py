@@ -119,7 +119,10 @@ def keep_only_exploratory_body(content: str) -> str:
     confirmatory_marker = "## Confirmatory body"
     exploratory_marker = "## Exploratory body"
     if confirmatory_marker not in content or exploratory_marker not in content:
-        return content
+        raise ValueError(
+            "pre-registration template is missing required body markers: "
+            f"{confirmatory_marker!r} and {exploratory_marker!r}"
+        )
 
     prefix, after_confirmatory = content.split(confirmatory_marker, 1)
     _, exploratory = after_confirmatory.split(exploratory_marker, 1)
@@ -323,6 +326,9 @@ def main() -> None:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)
     except FileNotFoundError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(2)
+    except ValueError as e:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(2)
 

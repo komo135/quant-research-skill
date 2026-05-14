@@ -38,6 +38,14 @@ ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 
 RD_STATE_FILES = {"rd_plan.md"}
 PR_STATE_FILES = {"prfaq.md", "explanation_ledger.md", "imrad_draft.md"}
+PREREG_PLACEHOLDER = "<REPLACE: optional prereg reference>"
+COMPAT_PREREG_ID_PLACEHOLDER = "<REPLACE: optional prereg/PR_<id>.md>"
+COMPAT_PREREG_SLUG_PLACEHOLDER = "<REPLACE: optional prereg/PR_<id>_<slug>.md>"
+PREREG_PLACEHOLDERS = (
+    PREREG_PLACEHOLDER,
+    COMPAT_PREREG_ID_PLACEHOLDER,
+    COMPAT_PREREG_SLUG_PLACEHOLDER,
+)
 
 
 def detect_mode_from_state_dir(state_dir: Path, label: str) -> str:
@@ -150,6 +158,33 @@ def next_trial_number(purposes_dir: Path) -> int:
     return max(existing, default=0) + 1
 
 
+def ensure_index_file(purposes_dir: Path) -> Path:
+    """Create purposes/INDEX.md from the shared template if it is missing."""
+    index_path = purposes_dir / "INDEX.md"
+    if index_path.exists():
+        return index_path
+
+    template = ASSETS_DIR / "shared" / "INDEX.md.template"
+    if template.exists():
+        content = template.read_text(encoding="utf-8")
+    else:
+        content = "\n".join(
+            [
+                "# Trial INDEX",
+                "",
+                "## Entries",
+                "",
+                "| trial_id | mode | evidence artifact | optional protocol link | artifact status | ledger assessment |",
+                "|---|---|---|---|---|---|",
+                "",
+                "## Artifact-status legend",
+                "",
+            ]
+        )
+    index_path.write_text(content, encoding="utf-8")
+    return index_path
+
+
 def find_template(mode: str) -> Path:
     if mode == "rd":
         candidates = [
@@ -214,10 +249,8 @@ def substitute_pr(content: str, prereg_id: str | None, question_id: str | None,
         content = content.replace("<REPLACE: optional ledger row / claim>", question_id)
     if prereg_id:
         prereg_path = prereg_reference(prereg_id, workstream)
-        compat_prereg_placeholder = "<REPLACE: optional " + "prereg/PR_<" + "id>.md>"
-        content = content.replace("<REPLACE: optional prereg reference>", prereg_path)
-        content = content.replace(compat_prereg_placeholder, prereg_path)
-        content = content.replace("<REPLACE: optional prereg/PR_<id>_<slug>.md>", prereg_path)
+        for placeholder in PREREG_PLACEHOLDERS:
+            content = content.replace(placeholder, prereg_path)
     if discriminating:
         content = content.replace("<REPLACE: optional discriminating contrast>", discriminating)
     return content
@@ -254,25 +287,24 @@ def create_trial(args: argparse.Namespace) -> Path:
     out_path.write_text(content, encoding="utf-8")
 
     # Append to INDEX.md
-    index_path = purposes_dir / "INDEX.md"
-    if index_path.exists():
-        index = index_path.read_text(encoding="utf-8")
-        protocol_link = selected_workstream or "none"
-        if mode == "rd":
-            new_row = (
-                f"| trial_{nnn} | rd | purposes/trial_{nnn}_{slug}.py | {protocol_link} | in-progress | pending |\n"
-            )
-        else:
-            new_row = (
-                f"| trial_{nnn} | pure-research | purposes/trial_{nnn}_{slug}.py | "
-                f"{protocol_link} | in-progress | pending |\n"
-            )
-        marker = "\n## Artifact-status legend"
-        if marker in index:
-            before, after = index.split(marker, 1)
-            index_path.write_text(before.rstrip() + "\n" + new_row + marker + after, encoding="utf-8")
-        else:
-            index_path.write_text(index.rstrip() + "\n" + new_row, encoding="utf-8")
+    index_path = ensure_index_file(purposes_dir)
+    index = index_path.read_text(encoding="utf-8")
+    protocol_link = selected_workstream or "none"
+    if mode == "rd":
+        new_row = (
+            f"| trial_{nnn} | rd | purposes/trial_{nnn}_{slug}.py | {protocol_link} | in-progress | pending |\n"
+        )
+    else:
+        new_row = (
+            f"| trial_{nnn} | pure-research | purposes/trial_{nnn}_{slug}.py | "
+            f"{protocol_link} | in-progress | pending |\n"
+        )
+    marker = "\n## Artifact-status legend"
+    if marker in index:
+        before, after = index.split(marker, 1)
+        index_path.write_text(before.rstrip() + "\n" + new_row + marker + after, encoding="utf-8")
+    else:
+        index_path.write_text(index.rstrip() + "\n" + new_row, encoding="utf-8")
 
     return out_path
 
