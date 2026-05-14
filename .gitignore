@@ -5,5 +5,4 @@ __pycache__/
 .tdd/
 docs/
 skills/*/skill_tests/
-plugins/*/skills/*/skill_tests/
-
+plugins/*/skills/*/skill_t
