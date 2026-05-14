@@ -173,13 +173,23 @@ v1.1.0, install `research@research-skill`. The old standalone
 
 ## Status
 
-Version 1.1.9 - fixes research protocol contradictions and removes Japanese
-text from active skill surfaces.
+Version 1.1.10 - hardens R&D/preregistration report workflows and cache-safe
+plugin surfaces.
 
 <details>
 <summary>Changelog</summary>
 
-### v1.1.9 (current)
+### v1.1.10 (current)
+
+- Added packaged-surface guards so retired R&D protocol terms cannot re-enter
+  the research or quant adapter skills.
+- Retired `new_purpose.py` as a fail-fast command and protected
+  `draft_imrad.py` from overwriting edited drafts unless `--force` is passed.
+- Recreated missing trial indexes in `new_trial.py` and tightened
+  pre-registration placeholder compatibility tests.
+- Fixed stale Pure Research Analysis section references and plugin metadata.
+
+### v1.1.9
 
 - Replaced the former technology-maturation R&D flow with general R&D
   categories: basic research, applied research, and experimental development.
