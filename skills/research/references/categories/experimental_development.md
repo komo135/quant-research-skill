@@ -122,4 +122,10 @@ Performance claims are distribution claims. Report the distribution, not a singl
 
 ## Pitfalls
 
-- **Confusing the prototype with the result.** The artifact existing is not the result; the artifact working under stated c
+- **Confusing the prototype with the result.** The artifact existing is not the result; the artifact working under stated conditions is. "I built a system" without test evidence is not a completed milestone.
+- **Demo-driven evaluation.** A demo on hand-picked inputs is not evidence the system works generally. Acceptance tests must cover the declared input space.
+- **Skipping edge cases.** Most production failures are edge cases. Completion criteria should include edge-case scenarios.
+- **Documentation debt.** A working artifact that nobody else can run is half-built. The System description in the report must let a non-author bring the artifact up.
+- **Promoting development to applied research without ablations.** Claiming "system S beats system T because of innovation I" requires an ablation. Without ablation, the claim is "system S works," not "innovation I is the reason."
+- **Hidden infrastructure changes.** Modifying lib/ or shared infrastructure as part of development without recording it in `decisions.md` makes the change invisible to other plans.
+- **Single-run performance numbers.** Performance is a distribution. Report it as one.

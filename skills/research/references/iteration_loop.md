@@ -146,4 +146,6 @@ Sessions with no durable change need no entry. Smoke tests, environment setup, o
 - **"Continue and observe."** Not a branch. If the plan continues unchanged, it is `NEXT_STEP`. If it changes, it is `REFINE` or `ADJACENT`.
 - **Implicit pivots.** Quietly redefining the question without a `decisions.md` entry. Always log `REFINE` or `ADJACENT`. Hidden pivots break interoperability across sessions.
 - **Goalpost shift dressed as REFINE.** Changing success criteria after seeing a result to make the result look favorable. `REFINE` applies prospectively — prior runs are exploratory evidence under the old plan unless explicitly re-evaluated under the refined plan.
-- **Premature terminal_kill.** Calling it dead because two seeds failed without ruling out repairable causes. Use `REFINE` to control the con
+- **Premature terminal_kill.** Calling it dead because two seeds failed without ruling out repairable causes. Use `REFINE` to control the confound first.
+- **Parking without an unblock condition.** "PARK for now" is meaningless. Name the specific testable trigger that would prompt unpark.
+- **CLOSE without final claim.** A `CLOSE` entry that says "we did this thing" but does not state the actual conclusion is not a close — it is an abandonment.

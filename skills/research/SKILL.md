@@ -77,7 +77,7 @@ Boundaries that matter:
 - `experiments/<plan>/` is owned by one plan. Other plans must not import from it. To share, promote to `lib/` first. This prevents cross-plan zombie dependencies.
 - `runs/` artifacts have no required schema. Put what helps you. The skill does not audit them.
 
-## The Plan → Execute → Compare → Report cycle
+## The Plan → Execute → Analyze → Compare → Report cycle
 
 ```
 1. scripts/new_plan.py creates plans/<id>_<slug>.md from a mode-specific template
@@ -181,4 +181,15 @@ These are not formatting preferences. They are what makes other agents and human
 - **Decisions are labeled.** "Diagnostic detour," "let me keep going" are not decision labels. Pick from the 5.
 - **Claim records have all five fields.** Empty list `[]` is allowed; a missing field is not.
 - **Plan is the canonical Methods. Report summarizes, does not duplicate.** Full re-implementation detail lives in `plans/<id>.md` Methodology subsection. The report's Methods section is a human-readable summary that cites the plan for depth. Duplicating content is friction without audit value. See `references/report_format.md`.
-- **REFINE appends an Amendment, does not rewrite the Plan.
+- **REFINE appends an Amendment, does not rewrite the Plan.** Original Plan + `created_commit` are the historical time-anchor. New direction goes into an Amendments section at the bottom of the plan file. See `references/rd_plan.md`.
+- **Methods section aims at re-implementability.** "We used X" is not a methods description. Say what X is and how you applied it. (Subjective; not script-enforced — the agent owns this discipline.)
+- **Observation → Interpretation → Claim is staged.** Don't jump from raw output to load-bearing claim without the intermediate interpretation step. See `references/analysis.md`.
+
+## Sources
+
+- [Frascati Manual 2015 (OECD)](https://www.oecd.org/en/publications/frascati-manual-2015_9789264239012-en.html) — R&D category definitions
+- [Kline & Rosenberg (1986) — An Overview of Innovation](https://fenix.iseg.ulisboa.pt/downloadFile/1407508027548318/Kline%20and%20Rosenberg%20(1986)%20An%20overview%20of%20innovation.pdf) — non-linear R&D model
+- [Stokes (1997) — Pasteur's Quadrant](https://www.brookings.edu/books/pasteurs-quadrant/) — use-inspired basic research
+- [Drummond (2009) — Replicability is not Reproducibility](https://cogprints.org/7691/7/icmle09.pdf)
+- [Goodman, Fanelli, Ioannidis (2016) — What does research reproducibility mean?](https://www.science.org/doi/10.1126/scitranslmed.aaf5027)
+- [Toulmin (1958) — The Uses of Argument](https://en.wikipedia.org/wiki/Stephen_Toulmin#The_Toulmin_model_of_argument) — claim structure foundation

@@ -103,4 +103,12 @@ For basic research, **EDA and descriptive analysis IS the deliverable**. The wor
 
 The claim disclosure floor adapts: variance across replications is still required when claims are made. Ablations may not apply if there is no "method" to ablate — but **controlled variation** (changing one parameter, observing the effect) is the basic-research analog.
 
-Observations are the primary output. Promote to claim sparingly — only when t
+Observations are the primary output. Promote to claim sparingly — only when the observation is robust to the variations tested. See `analysis.md` for the staging discipline.
+
+## Pitfalls
+
+- **Treating basic research as failed when no decision is reached.** A characterized phenomenon and a refined question are valid completions.
+- **Implicit confirmatory framing.** Writing "we wanted to find that X" before doing the work converts exploration into confirmation. Either commit to confirmatory mode and write a hypothesis explicitly, or stay exploratory and write a variable space.
+- **Overclaiming generality.** A finding at σ ∈ [5, 10] is not a finding about all σ. `conditions_not_tested` must say so.
+- **Building a baseline without documenting it.** A baseline that nobody else can use is not a baseline. The report's Methods section is where the baseline becomes a usable reference.
+- **Inventing structure for the sake of inventing it.** Not every basic-research project produces a reusable baseline. Plenty of basic research only produces a refined question. That is still a completion.

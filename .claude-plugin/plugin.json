@@ -2,4 +2,9 @@
   "name": "research",
   "description": "v2.0.0 - Agent-driven R&D redesign. Frascati 3 categories, Toulmin-derived claim structure, analysis discipline, Z39.18-style human-readable reports. Breaking change from v1.x.",
   "version": "2.0.0",
-  "author
+  "author": {
+    "name": "komoootv",
+    "email": "komoootv@gmail.com"
+  },
+  "license": "MIT"
+}

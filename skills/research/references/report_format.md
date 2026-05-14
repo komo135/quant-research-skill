@@ -127,7 +127,7 @@ The Methods section must be specific enough that someone could re-implement the 
 
 - Architecture / structural overview
 - Key design decisions and the reasoning
-- Interfaces / how to invoke the system
+- Interfaces / how the system is invoked
 - What it depends on (conceptually — frameworks, classes of data — not env-lock specifics)
 
 **Results** emphasizes:
@@ -146,7 +146,7 @@ Each report is self-contained. Figures live under `reports/<id>_<slug>/figures/`
 
 The figures **must actually exist**. Generating a real figure may require code that lives in `experiments/<plan>/code/` or `lib/viz/`. The skill does not specify how figures are generated — only that they exist when the report references them.
 
-`scripts/check_report.py` (if/when added) will verify that referenced figures exist. For now, this is a human-checkable contract.
+`scripts/check_report.py` verifies that referenced figures exist.
 
 ## Provenance pointer (optional, one line)
 
@@ -160,4 +160,11 @@ This is a pointer, not a reproducibility section. It tells the reader where to l
 
 ## Common failures
 
-- **Placeholder figures.** Generate the figure or remove the reference. A report with `![figure](figures/TODO.png)` fails the co
+- **Placeholder figures.** Generate the figure or remove the reference. A report with `![figure](figures/TODO.png)` fails the contract.
+- **Methods section that does not enable re-implementation.** "We tuned hyperparameters" — what hyperparameters, on what objective, with what budget?
+- **Hidden limitations.** Caveats relegated to a final paragraph the reader skips. Move them up or call them out in Summary.
+- **Decision claimed but not labeled.** "We do not recommend X yet" without `REFINE` / `PARK` / `CLOSE`.
+- **No actual numbers in Results.** Prose without measurements is not a research result.
+- **Padding the Background or Discussion to look thorough.** Length is not the contract; clarity is.
+- **Single-run claims in Results.** A single number with no variance is not characterized. Always include n and variance for performance claims.
+- **Report longer than necessary.** A focused 2-page report beats an unfocused 10-page one. Length should follow content, not vice versa.

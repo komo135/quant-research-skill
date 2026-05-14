@@ -116,4 +116,11 @@ Pearl Rung 2 (intervention via ablation) is the standard warrant for "component 
 
 ## Pitfalls
 
-- **No baseline.** A new method wit
+- **No baseline.** A new method without a comparator is not applied research.
+- **Single-seed results.** Variance across seeds is part of the result. Always run multiple seeds for claim-bearing comparisons.
+- **Hyperparameter asymmetry.** If your method got more hyperparameter tuning than the baseline, the comparison is biased. Report tuning budgets explicitly.
+- **In-sample tuning.** Methods tuned on the test set are not tested. Use a validation split for tuning; test only at the end.
+- **Metric shopping.** If the primary metric did not improve, do not switch to a different metric and present it as a success. If a secondary metric is more relevant, REFINE the plan before any claim is made.
+- **Compute apples-vs-oranges.** Comparing a 10× larger model to a baseline tells you about scale, not about your method. Hold compute constant or report scaling curves.
+- **Ablation theater.** Single-component ablations on isolated runs do not isolate causal contribution if the components interact. Report joint ablations when interactions matter.
+- **Skipping the negative-result writeup.** A method that did not improve is still a result. Document it; the next agent should not re-run it.

@@ -61,7 +61,7 @@ Fix the boundaries, not the prediction. From Dirnagl (PLOS Biology 2020): explor
 
 ### Allowed transformations / procedures
 - <list of analyses the agent may apply during exploration>
-- <out-of-scope analyses, if useful to call out>
+- <if useful: out-of-scope analyses to call out>
 
 ### Selection / follow-up criteria
 - <what observations would trigger a deeper look>
@@ -215,4 +215,37 @@ Use exactly one of:
 ### REFINE
 - From: <original question>
 - To: <refined question>
-- Trigger:
+- Trigger: <evidence>
+- Prior runs: <carry over | exploratory only | re-run under new plan>
+```
+
+```markdown
+### ADJACENT
+- New plan: <new plan id>
+- Relationship: <blocks / feeds into / parallel>
+- Trigger: <evidence>
+```
+
+```markdown
+### PARK
+- Unblock condition: <named, specific, testable>
+- Current state: <what is done, what is pending>
+```
+
+```markdown
+### CLOSE: completed | terminal_kill | replaced
+- Final claim or conclusion: <one sentence, or claim_structure record if load-bearing>
+- Report: <link to reports/<id>/report.md if produced>
+- Replaced by: <plan id, if replaced>
+```
+
+Mirror the entry in `decisions.md` for any branch except `NEXT_STEP`.
+
+## Common failures
+
+- **No `mode` declared.** Pick exploratory, confirmatory, or milestone before writing the Plan section.
+- **Mode mismatch with category.** Applied research is usually confirmatory; basic research is usually exploratory; experimental development is usually milestone. Mismatches need justification in the Plan section.
+- **Confirmatory plan with no decision threshold.** The whole point of confirmatory is the threshold. State it explicitly.
+- **Exploratory plan with hidden hypothesis.** Writing "we expect X" without committing to a decision threshold converts exploration into informal confirmation. Either commit to confirmatory mode with an explicit threshold, or stay honestly exploratory with a variable space.
+- **Updating the Plan section after execution.** Plans get amended prospectively via `REFINE`. After-the-fact plan rewriting destroys the time-anchor — git diff will show the rewrite and any reviewer will catch it. Use the Planned vs Actual section instead.
+- **Methodology description too thin.** "We ran the experiments" is not a Methodology subsection. State the procedure, the parameters, the protocol.
