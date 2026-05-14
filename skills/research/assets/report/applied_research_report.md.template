@@ -1,0 +1,86 @@
+# <Report Title>
+
+**Report ID:** <report-id>
+**Source plan:** plans/<plan-id>_<slug>.md
+**Date:** YYYY-MM-DD
+**Category:** applied_research
+
+## Summary
+
+<One or two paragraphs:>
+<- what was proposed and tried>
+<- what worked, with the headline numbers>
+<- what the recommended next action is>
+
+## Background
+
+<What prior work this builds on. A handful of directly relevant citations from literature/papers.md. Why this approach was tried.>
+
+## Method
+
+<Substantive description — enough for re-implementation:>
+
+### Proposed approach
+
+<Architecture, algorithm, training procedure. Specific. "We used a Transformer" is not sufficient.>
+
+### Key design choices
+
+<Decisions that distinguish this method, with reasoning.>
+
+### Hyperparameters
+
+<Concrete values. List or table.>
+
+## Experiments
+
+### Datasets
+
+<Names, versions, splits, preprocessing.>
+
+### Baselines
+
+<What the method is compared against, with sources/versions.>
+
+### Evaluation protocol
+
+<How the primary metric is computed. Beam size, length penalty, test set, etc.>
+
+### Compute setup
+
+<Hardware and training duration for context. Not env locks.>
+
+## Results
+
+<Quantitative comparison with figures and tables. Include variance across seeds.>
+
+| Method | <metric> | <metric> | Notes |
+|---|---|---|---|
+| Baseline | x ± σ | | |
+| Proposed | y ± σ | | |
+
+![<Figure caption>](figures/<filename>.png)
+
+## Ablations
+
+<Component-wise contribution analysis. Table or figure.>
+
+| Component removed | <metric> | Δ from full method |
+|---|---|---|
+
+## Limitations
+
+<- Conditions not tested>
+<- Possible confounds (hyperparameter asymmetry, single dataset, etc.)>
+<- Failure modes observed>
+
+## Next action
+
+<- Iteration decision: NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE>
+<- Or specific request to the human reader>
+
+## References
+
+- Plan: plans/<plan-id>_<slug>.md
+- Source artifacts: experiments/<plan-id>_<slug>/runs/
+- Prior work: literature/papers.md entries cited above

@@ -1,90 +1,110 @@
 # research-skill
 
-A Claude Code and Codex plugin for agent-driven serious research and R&D.
-It ships two public skills in one plugin:
+A Claude Code and Codex plugin providing two skills for **agent-driven R&D**:
 
-- `research` - the generic base skill for disciplined, workstream-aware
-  research across R&D Workstreams and Phenomenon / Mechanism Research,
-  result analysis, experiment notes, report provenance for presented evidence,
-  process review, and conclusion review.
-- `quant-research` - a quantitative-finance adapter layered on top of
-  `research` for financial machine learning, backtests, time-series validation,
-  leakage checks, Sharpe/DSR review, transaction costs, and portfolio-oriented
-  evidence.
+- **`research`** — protocol skill for R&D work across the three Frascati categories: basic research (understanding phenomena, building baselines), applied research (achieving measurable objectives), and experimental development (building working systems). Enforces vocabulary, plan/claim structure, iteration discipline, analysis methodology, and human-readable reports.
+- **`quant-research`** — domain extension layered on `research` for time-series and statistically rigorous quantitative R&D. Adds methodology for time-series cross-validation, multiple-testing corrections, leakage detection, and statistical robustness.
 
-The core rule is: prefer a precise unresolved state over a shallow conclusion.
-Results create questions; questions drive analysis or further experiments; only
-evidence that survives the relevant gate should change project state.
+The core rule: **research-level reproducibility (someone can re-implement from your description) is enforced; experiment-level replicability (someone can rerun your exact code) is the agent's discretion.** This separation, following [Drummond (2009)](https://cogprints.org/7691/7/icmle09.pdf) and [Goodman et al. (2016)](https://www.science.org/doi/10.1126/scitranslmed.aaf5027), keeps agents focused on doing good research rather than on producing perfect env.lock files.
 
 ## Who this is for
 
-Use this plugin when the work is more than ordinary fact lookup or ordinary
-implementation:
+This plugin is for agents doing R&D work where:
 
-- R&D work that fits basic research, applied research, or experimental
-  development and needs transparent planning, execution, comparison, and
-  reporting.
-- Phenomenon / Mechanism Research work that resolves a phenomenon,
-  explanation, boundary condition, or claim.
-- Quantitative-finance research where conclusions must survive replication,
-  leakage checks, validation-design review, and cost-aware interpretation.
+- A claim needs to survive scrutiny — alternatives addressed, conditions stated, evidence cited
+- Multiple sessions or agents will share project state — needs interoperable vocabulary
+- A human will read the output and make a decision — needs Z39.18-style structured reports with real figures
 
-It is not a backtest engine, experiment tracker, or notebook framework. It is a
-protocol layer that helps an agent decide what evidence is needed, what state
-can change, and when a result is still only exploratory. Ordinary exploration
-can be tracked with a short run note, tracker run, notebook note, or results
-row; externally shared or claim-bearing report packages need evidence
-citations, report provenance, and rerun guidance for presented evidence.
+Examples of work that triggers the skill:
 
-## Research Structure
+- ML method research (architecture, training-procedure, evaluation studies)
+- Phenomenon investigations in computational science (chaos systems, simulation experiments)
+- Reference-baseline building (creating datasets, metrics, reference implementations for others to compare against)
+- System/prototype development with quantitative acceptance criteria
+- Quantitative-rigor extensions (time-series statistical evaluation, multiple-testing-aware claims)
 
-The generic `research` skill separates the work into durable layers:
+It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-- Protocol layer: reusable rules, schemas, gates, review requirements, and
-  promotion criteria.
-- Project layer: final intent, decision context, current uncertainties,
-  workstream list, cross-workstream dependencies, and durable decisions.
-- Workstream layer: the local unit that selects a state object and gate.
-- Project instance layer: concrete data, candidates, parameters, code, trial
-  notebooks, generated reports, and local implementation decisions.
-- Evidence artifacts: notebooks, result rows, tracker runs, lightweight run
-  notes, figures, and presented evidence records.
-- State documents: R&D plans, explanation ledgers, decision logs, and report
-  packages that cite evidence artifacts.
+## Core design (v2.0.0)
 
-A project can contain multiple workstreams. The project itself is not Pure
-Research or R&D; those names remain compatibility labels for workstream types.
-Project decision gates cite child workstream results and do not override child
-claims, report conclusions, or analysis tier.
+### R&D categories (Frascati 2015)
+
+Every plan declares one of:
+
+| Category | When | Default plan mode | Report shape |
+|---|---|---|---|
+| `basic_research` | Phenomenon investigation, baseline building, failure-mode catalog | `exploratory` | Phenomenon → Mechanism → Refined question |
+| `applied_research` | Method achieving a target metric vs baselines | `confirmatory` | Method → Experiments → Results → Ablations |
+| `experimental_development` | Working artifact + performance | `milestone` | System → Performance → Limits |
+
+Categories are not a one-way pipeline ([Kline & Rosenberg 1986](https://fenix.iseg.ulisboa.pt/downloadFile/1407508027548318/Kline%20and%20Rosenberg%20(1986)%20An%20overview%20of%20innovation.pdf); [Stokes 1997](https://www.brookings.edu/books/pasteurs-quadrant/)). Cycling between them is normal.
+
+### Plan-Execute-Analyze-Compare-Report cycle
+
+```
+1. new_plan.py creates plans/<id>_<slug>.md (mode-specific template)
+2. Write Plan section. git commit. (Plan is time-anchored.)
+3. Execute. Save artifacts under experiments/<plan>/runs/<run_id>/.
+4. ANALYZE — apply the discipline in references/analysis.md.
+5. Write Actual section + Planned-vs-Actual comparison.
+6. Record load-bearing claims using the Toulmin-derived structure.
+7. Pick one of 5 iteration branches: NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE.
+8. If human-facing, draft a report.
+```
+
+### Claim structure (Toulmin-derived, no numeric ladder)
+
+```yaml
+- claim: <specific assertion with metric, magnitude, conditions>
+  evidence: <file:line / value / artifact / citation>
+  alternatives_not_excluded: [...]    # empty list claims exhaustion
+  conditions_tested: <ranges, datasets, parameters>
+  conditions_not_tested: [...]        # empty list claims full coverage
+```
+
+Strength is read off the contents of `alternatives_not_excluded` and `conditions_not_tested`. There is no A0-A5, no TRL, no GRADE — those single-number ladders conflate causal strength, scope, and replication into one digit and invite overclaim by self-rating.
+
+### Analysis discipline (EDA + result analysis + depth stops)
+
+`references/analysis.md` provides:
+
+- The modern EDA standard pass (Tukey 1977 + Wickham): tidy → distribution → covariation → leakage probe
+- The claim disclosure floor for ML: leakage / ≥3 seeds / ablation / slice / calibration / perturbation / error analysis (per [Mitchell et al. 2019 Model Cards](https://arxiv.org/abs/1810.03993), [Bouthillier 2021](https://proceedings.mlsys.org/paper_files/paper/2021/file/0184b0cd3cfb185989f858a1d9f5c1eb-Paper.pdf), [Ribeiro 2020 CheckList](https://aclanthology.org/2020.acl-main.442.pdf))
+- Depth stop conditions (Tukey's compromise, depth-to-defend-claim, disclosure floor)
+- Observation → Interpretation → Claim staging with [Pearl's Ladder of Causation](https://causalai.net/r60.pdf)
+- HARKing prevention via [Gelman-Loken Garden of Forking Paths](https://sites.stat.columbia.edu/gelman/research/unpublished/p_hacking.pdf)
+
+### Reports for humans
+
+Z39.18-derived, lightweight structure with required sections (Summary / Background / Methods & Conditions / Results / Limitations / Next action). Figures must actually exist — `scripts/check_report.py` verifies references resolve. Reports cite the plan for full re-implementation detail rather than duplicating Methods content.
 
 ## Repository Layout
 
-```text
+```
 research-skill/
-├── .agents/plugins/
-│   └── marketplace.json
-├── .claude-plugin/
-│   ├── plugin.json
-│   └── marketplace.json
-├── .codex-plugin/
-│   └── plugin.json
+├── .agents/plugins/marketplace.json
+├── .claude-plugin/{plugin.json,marketplace.json}
+├── .codex-plugin/plugin.json
 ├── skills/
 │   ├── research/
 │   │   ├── SKILL.md
 │   │   ├── references/
-│   │   ├── scripts/
-│   │   └── assets/
+│   │   │   ├── categories/{basic_research,applied_research,experimental_development}.md
+│   │   │   ├── analysis.md
+│   │   │   ├── claim_structure.md
+│   │   │   ├── iteration_loop.md
+│   │   │   ├── rd_plan.md
+│   │   │   ├── report_format.md
+│   │   │   └── literature_review.md
+│   │   ├── assets/{project,plan,report}/*.template
+│   │   └── scripts/{new_project,new_plan,new_run,check_claims,check_report,draft_report}.py
 │   └── quant-research/
 │       ├── SKILL.md
-│       ├── references/
+│       ├── references/shared/
 │       └── scripts/
 ├── README.md
 └── LICENSE
 ```
-
-The repository root is the plugin root for both Claude Code and Codex. The
-Codex marketplace entry points to `"path": "."`, so `skills/` is the single
-source of truth for distributed skills.
 
 ## Installation
 
@@ -109,229 +129,104 @@ claude --plugin-dir /path/to/research-skill
 codex plugin marketplace add https://github.com/komo135/research-skill
 ```
 
-Enable the installed plugin in `~/.codex/config.toml`:
+Enable in `~/.codex/config.toml`:
 
 ```toml
 [plugins."research@research-skill"]
 enabled = true
 ```
 
-The installed Codex skills are exposed as `research` and `quant-research`.
+## Project layout the skill produces
 
-## Usage Flow
+When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
-1. Choose `research` for generic serious research or R&D. Choose
-   `quant-research` only when the domain is financial ML, backtesting,
-   time-series validation, portfolio research, or trading-system evidence.
-2. Map the current research state: project intent, current uncertainties, the
-   first workstream, its state object, and its gate.
-3. Write the entry document before expensive claim-bearing work: reviewed
-   R&D plan and pre-registration for R&D work, or PR/FAQ plus
-   pre-registration for phenomenon workstreams when planning/reporting
-   discipline is useful. Pre-registration may guide exploratory research,
-   applied investigation, experimental development, or confirmatory research.
-4. Run the smallest evidence-producing artifact that can answer the current
-   workstream question.
-5. Analyze the result before adding variants. A result should update a question,
-   split an explanation, revise an R&D objective, add a dependent workstream, or
-   justify a gate decision.
-6. Promote only when the relevant process review and conclusion review axes
-   pass for the load-bearing claim. Claim-bearing notebooks use the folded
-   experiment review references inside `research/references/review/`.
+```
+<project-root>/
+├── README.md, project_state.md, decisions.md
+├── plans/<id>_<slug>.md            # research narrative (plan + actual + claims + decision)
+├── literature/{papers.md,differentiation.md}
+├── lib/                             # shared curated code (tests required)
+├── experiments/<plan>/              # per-plan isolation
+│   ├── code/ configs/ notebooks/
+│   └── runs/<plan>__<n>__seed<N>/   # raw artifacts (no required schema)
+├── data/{raw,processed}/
+└── reports/<id>_<slug>/             # human-facing snapshots
+    ├── report.md
+    ├── figures/ tables/
+```
 
-## Bundled Helpers
+`lib/` is curated and shared; `experiments/<plan>/code/` is the plan's free zone. Cross-plan imports are forbidden — promote to `lib/` with a `decisions.md` entry first.
 
-Generic helpers live under `skills/research/scripts/`:
+## Bundled scripts
+
+`skills/research/scripts/`:
 
 | script | purpose |
 |---|---|
-| `new_project.py` | Initialize a research project folder with the standard layout |
-| `new_trial.py` | Generate a numbered evidence artifact notebook |
-| `aggregate_results.py` | Validate and append queryable evidence records |
-| `draft_imrad.py` | Draft a manuscript-shaped research summary |
-| `lit_fetch.py` | Fetch literature metadata into local research notes |
+| `new_project.py` | Initialize project directory with canonical layout |
+| `new_plan.py` | Create a plan from mode-specific template, capture git SHA |
+| `new_run.py` | Create a run directory with consistent naming |
+| `check_claims.py` | Verify claim record structure (5 required fields, vagueness heuristics) |
+| `check_report.py` | Verify report contract (figures resolve, required sections, non-placeholder) |
+| `draft_report.py` | Initialize a report directory from a plan |
 
-Finance adapters live under `skills/quant-research/scripts/`:
+`skills/quant-research/scripts/`:
 
 | script | purpose |
 |---|---|
-| `walk_forward.py` | Compute Sharpe distribution over rolling windows |
-| `bootstrap_sharpe.py` | Block-bootstrap CI for per-trade Sharpe |
-| `psr_dsr.py` | Probabilistic / Deflated Sharpe Ratio |
-| `fee_sensitivity.py` | Fee sweep with break-even fee extraction |
-| `sensitivity_grid.py` | 2D threshold sensitivity grid |
-| `vol_targeted_size.py` | Position sizing with size proportional to inverse volatility |
-| `purged_kfold.py` | Purged k-fold CV for time-series validation |
-| `leakage_check.py` | Detect look-ahead bias and target leakage in features |
-| `sanity_checks.py` | Programmatic finance-domain implementation checks |
-
-## Migration from v1.0.x
-
-The old plugin identity was `quant-research@quant-research-skill`. Starting in
-v1.1.0, install `research@research-skill`. The old standalone
-`experiment-review` skill is folded into the `research` review references.
+| `purged_kfold.py` | Purged k-fold CV for time-series with overlapping labels |
+| `cpcv.py` | Combinatorial Purged Cross-Validation |
+| `walk_forward.py` | Walk-forward time-series validation |
+| `multiple_testing.py` | Bonferroni / Benjamini-Hochberg / Romano-Wolf corrections |
+| `leakage_check.py` | Detect train/test feature leakage and look-ahead bias |
+| `sanity_checks.py` | Standard pre-claim sanity tests |
+| `sensitivity_grid.py` | Parameter sensitivity grid for robustness battery |
 
 ## Status
 
-Version 1.1.10 - hardens R&D/preregistration report workflows and cache-safe
-plugin surfaces.
+**Version 2.0.0** — agent-driven R&D redesign. Not backward compatible with v1.x.
 
 <details>
 <summary>Changelog</summary>
 
-### v1.1.10 (current)
+### v2.0.0 (current) — agent-driven R&D redesign
 
-- Added packaged-surface guards so retired R&D protocol terms cannot re-enter
-  the research or quant adapter skills.
-- Retired `new_purpose.py` as a fail-fast command and protected
-  `draft_imrad.py` from overwriting edited drafts unless `--force` is passed.
-- Recreated missing trial indexes in `new_trial.py` and tightened
-  pre-registration placeholder compatibility tests.
-- Fixed stale Pure Research Analysis section references and plugin metadata.
+Complete redesign. No backward compatibility with v1.x.
 
-### v1.1.9
+**Added**
 
-- Replaced the former technology-maturation R&D flow with general R&D
-  categories: basic research, applied research, and experimental development.
-- Changed the R&D scaffold to `WS001-rd/rd_plan.md` plus
-  `prereg/PR_001_initial.md`.
-- Removed Japanese lifecycle vocabulary from active skill surfaces.
-- Clarified quant robustness terminology so rolling-window stability is not
-  presented as true walk-forward validation.
+- 3 Frascati categories first-class: `basic_research`, `applied_research`, `experimental_development`
+- Plan modes: `exploratory`, `confirmatory`, `milestone`
+- Iteration FSA with 5 explicit branches: `NEXT_STEP` / `REFINE` / `ADJACENT` / `PARK` / `CLOSE`
+- Toulmin-derived claim structure (5 required fields, no numeric ladder)
+- `references/analysis.md` covering EDA, result analysis, depth stop conditions, and Observation→Interpretation→Claim staging — backed by Tukey 1977, Wickham, Mitchell 2019 Model Cards, Gebru 2021 Datasheets, Ribeiro 2020 CheckList, Guo 2017 calibration, Bouthillier 2021 variance, Pearl Ladder of Causation, Gelman-Loken forking paths, Toulmin 1958
+- Lightweight Amendment pattern: `REFINE` appends an Amendment rather than rewriting the Plan
+- Plan-canonical Methods: report's Methods section summarizes and cites the plan rather than duplicating
+- `scripts/check_report.py` verifying figure references resolve and required sections exist
+- `lib/` vs `experiments/<plan>/code/` separation with explicit promotion contract
+- Quant-research repositioned as time-series/statistical-rigor extension over `research`, applicable beyond finance
 
-### v1.1.8
+**Removed**
 
-- Reworked pre-registration as a general planning and reporting discipline
-  with explicit `confirmatory` and `exploratory` types.
-- Added outcome report package guidance with `report.md`, primary
-  `report.html`, optional `report.pdf` snapshot/export, figures, tables,
-  attachments, Plan-to-Result tables, and Transparent Changes.
-- Updated scaffolds and IMRAD generation for `PR_<id>_<slug>` /
-  `RPT_<id>_<slug>` naming and report-package Transparent Changes extraction.
+- Pure Research workstream (PR/FAQ, IMRAD, explanation_ledger) — Amazon-style business artifact not aligned with Frascati basic-research practice
+- A0-A5 analysis depth ladder — homemade, not standard, conflated dimensions
+- L2/L3 report classification — non-standard vocabulary
+- Separate `prereg/` directory — preregistration internalized into `plans/<id>.md` with git as time-anchor
+- Heavy `review/` pipeline — replaced by `check_claims.py` + `check_report.py` plus the iteration_loop FSA
+- Finance-specific quant-research surface (Sharpe-derivative scripts, portfolio construction, trading-specific references)
+- Experiment-level replicability requirements (env locks, commit pinning, seed databases) — explicitly the agent's discretion, not skill-enforced
 
-### v1.1.7
+**Design rationale**
 
-- Reserved A4+ for supported, external-claim, deployment-recommendation, and
-  terminal-decision outcomes.
-- Made A2-A3 sufficient for exploratory next-step, provisional go / no-go,
-  park, deprioritize, and reject-for-now decisions that do not create a
-  load-bearing claim.
-- Scoped quant-research finance checks to claim-bearing
-  decisions instead of making them blanket gates for exploratory work.
+This release is the result of a TDD pass on the skill: pressure scenarios run against baseline (no skill) revealed systemic gaps in vocabulary use, claim structuring, and state-file maintenance; the new skill closes those gaps with minimum machinery. External methodology survey informed every non-trivial design choice — see citations throughout `references/`.
 
-### v1.1.6
+### v1.1.10 and earlier
 
-- Softened former R&D entry guardrails: do not classify
-  the whole project as that workstream, and do not ban non-load-bearing
-  scaffold, interface probes, smoke tests, environment setup, or data plumbing.
-- Kept the hard gate where it matters: claim-bearing conclusions must wait
-  until the relevant plan, criteria, and evidence are ready.
-- Added regression coverage for the mixed-system pressure scenario that
-  previously pushed agents toward overclassification and blanket
-  implementation bans.
-
-### v1.1.5
-
-- Made the research entry workstream-aware: projects can contain multiple
-  workstreams, while R&D and Pure Research remain compatibility labels for
-  local state objects and gates.
-- Added mixed project scaffolding and workstream-targeted trial generation;
-  `--mode` now creates an initial workstream inside the mixed container rather
-  than classifying the whole project.
-- Limited implemented workstream labels to R&D Workstream and Phenomenon /
-  Mechanism Research; evaluation, design, exploration, and engineering support
-  remain activities inside a selected workstream.
-- Added regression coverage so ignored `docs/superpowers/specs` files are not
-  packaged as plugin artifacts.
-
-### v1.1.4
-- Clarified that Pure Research has separate exploratory and confirmatory
-  workflows.
-- Clarified that pre-registration is a planning and reporting discipline, not
-  a hypothesis freeze or an automatic approach-failure trigger.
-- Added per-file regression coverage for English-only Pure Research
-  pre-registration docs/templates and `PR_<id>_<slug>` vs current-state
-  comparison.
-
-### v1.1.3
-
-- Removed registration-proof mechanisms: no hashes, frozen records, dated note
-  references, registration logs, or history/timestamp comparisons for proving
-  planning order.
-- Kept the useful parts: reviewed planning documents, material-change
-  disclosure, and report provenance for claim-bearing report packages.
-- Added regression coverage to block reintroducing proof-artifact language.
-
-### v1.1.2
-
-- Relaxed tracking requirements: ordinary exploration may use
-  lightweight run notes, tracker runs, notebook notes, or results rows.
-- Limited strong evidence citations, rerun guidance, and presented evidence
-  sets to externally shared or claim-bearing report packages.
-- Changed process and conclusion review from full mandatory inventories to
-  targeted lightweight review of load-bearing axes.
-
-### v1.1.1
-
-- Required user-facing outcome reports to include a plain-language decision,
-  intuitive visual or tabular evidence, citations, scope/caveats, and next
-  action.
-- Added finance-specific report evidence examples such as equity/drawdown
-  curves, fee sensitivity, regime performance, and deployment diagnostics.
-
-### v1.1.0
-
-- Renamed the project and plugin identity from the old quant-only package to
-  `research-skill` / `research`.
-- Added `skills/research` as the generic serious-research and R&D base skill.
-- Reworked `skills/quant-research` into a finance adapter on top of
-  `research`.
-- Folded the old standalone `experiment-review` skill into
-  `skills/research/references/review/`.
-
-### v1.0.7
-
-- Added shared Result-to-Question and R&D plan feedback loops.
-- Added right-sized rigor guidance and project/workstream boundaries.
-
-### v1.0.6
-
-- Added optional tracker compatibility for report evidence provenance.
-- Required complete run inventory/export for external trackers.
-  Superseded in v1.1.2 by presented evidence sets instead of complete
-  inventory for every project.
-- Kept local notes/parquet compatibility for existing projects.
-
-### v1.0.5
-
-- Decoupled evidence artifacts from state decisions and report-package contracts.
-- Standardized queryable evidence records across R&D and Pure Research.
-- Removed capability or pre-registration requirements from neutral trial
-  artifact creation.
-
-### v1.0.4
-
-- Relaxed kill and reproducibility gates so terminal claims require concrete
-  evidence without overclaiming machine-verifiable reproducibility.
-
-### v1.0.3
-
-- Added the protocol-layer / project-instance-layer boundary contract.
-- Added project-instance `configs/`, `src/`, and `tests/` areas.
-- Made R&D and Pure Research trial notebooks neutral evidence artifacts.
-
-### v1.0.2
-
-- Made the repository root the Codex plugin root.
-- Removed the stale duplicate plugin distribution copy.
-
-### v1.0.0
-
-- Rebuilt the protocol around R&D and Pure Research disciplines, A0-A5 analysis
-  depth, reproducibility notes, and two-axis review.
+See git history for the prior workstream-based design (`pure_research`, `review/`, `A0-A5`, etc.) — replaced wholesale in v2.0.0.
 
 </details>
 
 ## License
 
 MIT. See [LICENSE](./LICENSE).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

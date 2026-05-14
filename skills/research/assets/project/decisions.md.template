@@ -1,0 +1,20 @@
+# Decisions Log
+
+Durable state transitions only. Routine `NEXT_STEP` entries are not recorded here. Smoke tests, environment setup, and orientation are not durable changes.
+
+Each entry uses this shape:
+
+```markdown
+## YYYY-MM-DD HH:MM <plan_id> <BRANCH>
+- From: <previous state — question, scope, status>
+- To: <new state>
+- Trigger: <what evidence prompted this>
+- Evidence: <file:line / claim ID / run reference>
+- Next: <what the next session does>
+```
+
+Branches: `REFINE`, `ADJACENT`, `PARK`, `CLOSE`. (`NEXT_STEP` does not require an entry.)
+
+---
+
+<!-- Entries below this line, newest first. -->

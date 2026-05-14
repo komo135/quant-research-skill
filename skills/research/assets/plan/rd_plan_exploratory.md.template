@@ -1,0 +1,73 @@
+---
+plan_id: <id>
+slug: <slug>
+category: <category>
+mode: exploratory
+status: planned
+created_at: YYYY-MM-DD
+created_commit: <git sha — auto-filled by new_plan.py>
+last_updated: YYYY-MM-DD
+---
+
+# <Plan title>
+
+## Question / Objective
+
+<One paragraph stating what phenomenon or question this plan investigates.>
+
+## Plan
+
+### Variable space
+
+- <variable 1>: <range, justification for the range>
+- <variable 2>: ...
+
+### Allowed transformations / procedures
+
+- <list of analyses the agent may apply during exploration>
+- <if useful: out-of-scope analyses to call out>
+
+### Selection / follow-up criteria
+
+- <what observations would trigger a deeper look>
+- <what would trigger PARK or CLOSE>
+
+### Expected output type
+
+- <one of: phenomenon description / refined question / characterized baseline / failure-mode catalog / theoretical insight>
+
+### Out of scope
+
+- <explicit list of things not to chase, to prevent scope creep>
+
+## Actual execution
+
+### Runs
+
+<List as runs accumulate. Link to experiments/<plan_id>_<slug>/runs/<run_id>/>
+
+### Methodology used
+
+<Substantive description — enough for re-implementation. NOT env locks or commit hashes.>
+
+### Observations
+
+<What was seen. Reference figures in reports/<id>/figures/ if reports have been started.>
+
+## Planned vs Actual
+
+<Differences between plan and execution, with reasoning. "No material deviation from plan." if none.>
+
+## Claims
+
+<Load-bearing claims using the schema in claim_structure.md. May be empty during early exploration.>
+
+## Decision
+
+<One of NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE — see iteration_loop.md.>
+
+## References
+
+- Runs: experiments/<plan_id>_<slug>/runs/
+- Related plans: <other plan IDs and their relationship>
+- Related literature: <papers.md entries>

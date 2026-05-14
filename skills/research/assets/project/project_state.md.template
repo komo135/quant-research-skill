@@ -1,0 +1,34 @@
+# Project State
+
+Updated: YYYY-MM-DD
+
+## Project intent
+
+<What this project is ultimately for. What decision, understanding, or artifact it serves.>
+
+## Active plans
+
+| Plan ID | Slug | Category | Mode | Status | Next action |
+|---|---|---|---|---|---|
+
+## Parked plans
+
+| Plan ID | Slug | Parked at | Unblock condition |
+|---|---|---|---|
+
+## Recently closed plans
+
+| Plan ID | Slug | Outcome | Report |
+|---|---|---|---|
+
+## Cross-plan dependencies
+
+<Plans that block, feed into, or depend on each other. Optional. Empty if all plans are independent.>
+
+## Current uncertainties
+
+<What is not yet known that blocks decisions about which plans to prioritize. Optional.>
+
+## Notes
+
+<Anything else a future agent needs to orient quickly.>

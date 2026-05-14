@@ -1,0 +1,81 @@
+---
+plan_id: <id>
+slug: <slug>
+category: <category>
+mode: confirmatory
+status: planned
+created_at: YYYY-MM-DD
+created_commit: <git sha — auto-filled by new_plan.py>
+last_updated: YYYY-MM-DD
+---
+
+# <Plan title>
+
+## Question / Objective
+
+<One paragraph stating the practical objective and what improving it would mean.>
+
+## Plan
+
+### Hypothesis
+
+<One-sentence prediction. Specific enough to be falsified.>
+
+### Primary metric
+
+- <metric name>: <how it is computed, units, where defined>
+
+### Baseline(s)
+
+- <baseline name>: <description, source/version>
+- <baseline 2>: ...
+
+### Decision threshold
+
+- Supported when: <quantitative criterion>
+- Rejected when: <observation that would lead to rejection>
+
+### Datasets / evaluation setup
+
+- <dataset>: <split definition, evaluation protocol>
+
+### Compute / sample budget
+
+- <budget envelope; total runs, total GPU-hours, deadline>
+
+### Ablations planned
+
+- <component 1>: <how it will be tested for individual contribution>
+- <component 2>: ...
+
+## Actual execution
+
+### Runs
+
+<List as runs accumulate.>
+
+### Methodology used
+
+<Substantive description — architecture, training procedure, evaluation protocol, hyperparameters. Enough for re-implementation.>
+
+### Observations
+
+<Per-run results, ablation outcomes, anomalies.>
+
+## Planned vs Actual
+
+<Differences, with reasoning. "No material deviation from plan." if none.>
+
+## Claims
+
+<Load-bearing claims using the schema in claim_structure.md.>
+
+## Decision
+
+<One of NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE — see iteration_loop.md.>
+
+## References
+
+- Runs: experiments/<plan_id>_<slug>/runs/
+- Related plans: <other plan IDs and their relationship>
+- Related literature: <papers.md entries>
