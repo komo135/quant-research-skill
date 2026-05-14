@@ -1,9 +1,7 @@
-"""new_purpose.py — Create a numbered research trial notebook.
+"""new_purpose.py - retired wrapper for older projects.
 
-The generated notebook is a small state-updating trial. It may be used for
-R&D capability work or Phenomenon / Mechanism Research, but it is only valid
-when success and failure update a named row in capability_map.md,
-explanation_ledger.md, or decisions.md.
+Use `new_trial.py` for current workstream-aware projects. The generated
+notebook template is retired and should not be used for new research.
 
 Usage:
     python new_purpose.py --project <project-name> --slug <trial> --hyp H1
@@ -101,8 +99,8 @@ def main() -> None:
     )
     print(f"created: {out}")
     print("next steps:")
-    print(f"  1. Edit the Markdown cells in {out} (workstream label, state row, acceptance).")
-    print(f"  2. Update capability_map.md or explanation_ledger.md for {args.hyp}, or record the decision in decisions.md.")
+    print(f"  1. Prefer scripts/new_trial.py for current workstream-aware projects.")
+    print(f"  2. If maintaining an older project, update the relevant state document or decisions.md for {args.hyp}.")
     print(f"  3. Open the notebook with marimo edit {out}.")
 
 

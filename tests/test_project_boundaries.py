@@ -120,13 +120,13 @@ class ProjectBoundaryTests(unittest.TestCase):
         ]:
             self.assertIn(phrase, skill)
 
-    def test_skill_keeps_research_contracts_out_of_evidence_artifacts(self) -> None:
+    def test_skill_keeps_report_contracts_out_of_evidence_artifacts(self) -> None:
         skill = read_text("skills/research/SKILL.md")
 
         for phrase in [
-            "Evidence artifacts do not own research contracts",
-            "Framework code must not require capability IDs",
-            "capability_map.md is not an implementation API",
+            "Evidence artifacts do not own state decisions or report contracts",
+            "Framework code must not require research-state IDs",
+            "rd_plan.md is not an implementation API",
         ]:
             self.assertIn(phrase, skill)
 
@@ -148,15 +148,15 @@ class ProjectBoundaryTests(unittest.TestCase):
                 stderr=subprocess.PIPE,
                 text=True,
             )
-            self.assertIn("Choose a lightweight tracking path", result.stdout)
-            self.assertIn("before the first load-bearing claim", result.stdout)
+            self.assertIn("Review the R&D plan", result.stdout)
+            self.assertIn("Compare execution and results against the pre-registration", result.stdout)
 
             project = Path(tmp) / "alpha"
-            workstream = project / "workstreams" / "WS001-capability"
+            workstream = project / "workstreams" / "WS001-rd"
             for path in [
                 "project_state.md",
-                "workstreams/WS001-capability/charter.md",
-                "workstreams/WS001-capability/capability_map.md",
+                "workstreams/WS001-rd/rd_plan.md",
+                "workstreams/WS001-rd/prereg/PR_001_initial.md",
                 "decisions.md",
                 "configs/.gitkeep",
                 "src/.gitkeep",
@@ -168,11 +168,13 @@ class ProjectBoundaryTests(unittest.TestCase):
                 self.assertTrue((project / path).exists(), path)
             self.assertFalse((project / "charter.md").exists())
             self.assertFalse((project / "capability_map.md").exists())
+            self.assertFalse((workstream / "charter.md").exists())
+            self.assertFalse((workstream / "capability_map.md").exists())
             self.assertTrue(workstream.exists())
 
             decisions = (project / "decisions.md").read_text(encoding="utf-8")
-            self.assertIn("tracking backend selected", decisions)
-            self.assertIn("Decision-relevant run set", decisions)
+            self.assertIn("report provenance note", decisions)
+            self.assertIn("Presented evidence", decisions)
 
             readme = (project / "README.md").read_text(encoding="utf-8")
             for phrase in [
@@ -225,8 +227,8 @@ class ProjectBoundaryTests(unittest.TestCase):
                 (
                     "cap",
                     "rd",
-                    "WS001-capability",
-                    "Capability / Technology Research workstream",
+                    "WS001-rd",
+                    "R&D Workstream",
                 ),
                 (
                     "phen",
@@ -290,15 +292,15 @@ class ProjectBoundaryTests(unittest.TestCase):
                 stderr=subprocess.PIPE,
                 text=True,
             )
-            cap_project = Path(tmp) / "cap"
-            cap_result = subprocess.run(
+            rd_project = Path(tmp) / "cap"
+            rd_result = subprocess.run(
                 [
                     sys.executable,
-                    str(ROOT / "skills/research/scripts/render_capability_dag.py"),
+                    str(ROOT / "skills/research/scripts/new_trial.py"),
                     "--project-dir",
-                    str(cap_project),
-                    "--workstream",
-                    "WS001-capability",
+                    str(rd_project),
+                    "--slug",
+                    "initial_probe",
                 ],
                 cwd=ROOT,
                 stdout=subprocess.PIPE,
@@ -306,8 +308,9 @@ class ProjectBoundaryTests(unittest.TestCase):
                 text=True,
             )
 
-            self.assertEqual(cap_result.returncode, 0, cap_result.stderr)
-            self.assertIn("flowchart", cap_result.stdout)
+            self.assertEqual(rd_result.returncode, 0, rd_result.stderr)
+            self.assertTrue((rd_project / "purposes/trial_001_initial_probe.py").exists())
+            self.assertFalse((ROOT / "skills/research/scripts/render_capability_dag.py").exists())
 
             subprocess.run(
                 [
@@ -456,9 +459,9 @@ class ProjectBoundaryTests(unittest.TestCase):
             "project itself is not pure research or r&d",
             "workstream is the unit that selects a state object and gate",
             "project decision gate",
-            "does not re-score trl, support status, or a-tier",
+            "does not override child workstream claims or report conclusions",
             "phenomenon / mechanism research",
-            "capability / technology research",
+            "r&d workstream",
         ]:
             self.assertIn(phrase, normalized)
 
@@ -510,12 +513,11 @@ class ProjectBoundaryTests(unittest.TestCase):
                 read_text("skills/research/assets/shared/INDEX.md.template"),
                 encoding="utf-8",
             )
-            capability = project / "workstreams" / "WS002-capability"
+            capability = project / "workstreams" / "WS002-rd"
             phenomenon = project / "workstreams" / "WS001-phenomenon"
             capability.mkdir(parents=True)
             phenomenon.mkdir(parents=True)
-            (capability / "charter.md").write_text("# Charter\n", encoding="utf-8")
-            (capability / "capability_map.md").write_text("# Capability Map\n", encoding="utf-8")
+            (capability / "rd_plan.md").write_text("# R&D Plan\n", encoding="utf-8")
             (phenomenon / "prfaq.md").write_text("# PR/FAQ\n", encoding="utf-8")
             (phenomenon / "explanation_ledger.md").write_text("# Explanation Ledger\n", encoding="utf-8")
 
@@ -526,7 +528,7 @@ class ProjectBoundaryTests(unittest.TestCase):
                     "--project-dir",
                     str(project),
                     "--workstream",
-                    "WS002-capability",
+                    "WS002-rd",
                     "--slug",
                     "latency_benchmark",
                 ],
@@ -541,7 +543,7 @@ class ProjectBoundaryTests(unittest.TestCase):
             self.assertTrue(trial.exists())
             index = (project / "purposes/INDEX.md").read_text(encoding="utf-8")
             self.assertIn(
-                "| trial_001 | rd | purposes/trial_001_latency_benchmark.py | WS002-capability | in-progress | pending |",
+                "| trial_001 | rd | purposes/trial_001_latency_benchmark.py | WS002-rd | in-progress | pending |",
                 index,
             )
 
@@ -560,7 +562,7 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertEqual(
             [
                 "Phenomenon / Mechanism Research",
-                "Capability / Technology Research",
+                "R&D Workstream",
             ],
             labels,
         )
@@ -577,13 +579,13 @@ class ProjectBoundaryTests(unittest.TestCase):
         state_options = [option.strip() for option in match.group(1).split(";")]
         self.assertEqual(
             [
-                "Capability / Technology Research",
+                "R&D Workstream",
                 "Phenomenon / Mechanism Research",
             ],
             state_options,
         )
 
-    def test_capability_entry_guidance_does_not_overclassify_or_ban_scaffolding(self) -> None:
+    def test_rd_entry_guidance_uses_general_r_and_d_without_technology_maturation_stack(self) -> None:
         combined = "\n".join(
             [
                 read_text("skills/research/SKILL.md"),
@@ -594,24 +596,27 @@ class ProjectBoundaryTests(unittest.TestCase):
         normalized = normalize_for_assertion(combined)
 
         for phrase in [
-            "do not classify the whole project as capability / technology research",
-            "provisional workstream fit",
-            "empty scaffold creation",
-            "tracking path setup",
-            "promotion-relevant or claim-bearing implementation",
-            "wait until the charter and kill criteria exist",
+            "basic research",
+            "applied research",
+            "experimental development",
+            "current-state assessment is orientation, not an r&d category",
+            "hypothesis validation is evidence discipline, not an r&d category",
+            "r&d workstream",
+            "rd_plan.md",
+            "plan -> execute -> compare -> report",
         ]:
             self.assertIn(normalize_for_assertion(phrase), normalized)
 
         for forbidden in [
-            "Capability / Technology Research first day: no implementation",
-            "Capability / Technology Research first day permits **only**",
-            "Any implementation that runs",
-            "Day 1 implementation",
-            "Code commits before charter",
-            "interface probe, and smoke test work are allowed",
-            "interface probe",
-            "smoke test work are allowed",
+            "capability / technology research",
+            "core technologies",
+            "capability map",
+            "stage-gate",
+            "stage gate",
+            "technology readiness level",
+            "target_trl",
+            "heilmeyer",
+            "heilmeier",
         ]:
             self.assertNotIn(normalize_for_assertion(forbidden), normalized)
 
@@ -621,7 +626,7 @@ class ProjectBoundaryTests(unittest.TestCase):
             (project / "purposes").mkdir(parents=True)
             (project / "workstreams" / "WS999-ambiguous").mkdir(parents=True)
             ambiguous = project / "workstreams" / "WS999-ambiguous"
-            (ambiguous / "capability_map.md").write_text("# Capability Map\n", encoding="utf-8")
+            (ambiguous / "rd_plan.md").write_text("# R&D Plan\n", encoding="utf-8")
             (ambiguous / "prfaq.md").write_text("# PR/FAQ\n", encoding="utf-8")
 
             result = subprocess.run(
@@ -651,7 +656,7 @@ class ProjectBoundaryTests(unittest.TestCase):
             external = Path(tmp) / "external"
             workstreams.mkdir(parents=True)
             external.mkdir()
-            (external / "capability_map.md").write_text("# Capability Map\n", encoding="utf-8")
+            (external / "rd_plan.md").write_text("# R&D Plan\n", encoding="utf-8")
             link = workstreams / "WS999-link"
             try:
                 os.symlink(external, link, target_is_directory=True)
@@ -721,6 +726,48 @@ class ProjectBoundaryTests(unittest.TestCase):
             self.assertIn("workstreams/WS001-phenomenon/prereg/PR_001_regime_probe.md", content)
             self.assertIn("- **Optional ledger target**: Q1", content)
             self.assertNotIn("<REPLACE: optional prereg", content)
+
+    def test_new_trial_uses_rd_workstream_preregistration_path(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "skills/research/scripts/new_project.py"),
+                    "alpha",
+                    "--mode",
+                    "rd",
+                    "--root",
+                    tmp,
+                ],
+                check=True,
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            project = Path(tmp) / "alpha"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "skills/research/scripts/new_trial.py"),
+                    "--project-dir",
+                    str(project),
+                    "--slug",
+                    "initial_probe",
+                    "--prereg-id",
+                    "PR_001_initial",
+                ],
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            content = (project / "purposes/trial_001_initial_probe.py").read_text(encoding="utf-8")
+            self.assertIn("workstreams/WS001-rd/prereg/PR_001_initial.md", content)
+            self.assertNotIn("<REPLACE: rd_plan.md section / relevant preregistration>", content)
 
     def test_trial_scaffold_is_protocol_agnostic_evidence_artifact(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -853,7 +900,7 @@ class ProjectBoundaryTests(unittest.TestCase):
             )
 
             index = (project / "purposes/INDEX.md").read_text(encoding="utf-8")
-            row = "| trial_001 | rd | purposes/trial_001_latency_benchmark.py | WS001-capability | in-progress | pending |"
+            row = "| trial_001 | rd | purposes/trial_001_latency_benchmark.py | WS001-rd | in-progress | pending |"
             self.assertIn(row, index)
             self.assertLess(index.index(row), index.index("## Artifact-status legend"))
 
@@ -873,12 +920,17 @@ class ProjectBoundaryTests(unittest.TestCase):
         readme_template = read_text("skills/research/assets/rd/README.md.template")
 
         self.assertIn("evidence artifacts", readme_template.lower())
-        self.assertIn("capability assessment", readme_template.lower())
+        self.assertIn("r&d category", readme_template.lower())
+        self.assertIn("plan-to-result", readme_template.lower())
         for phrase in [
+            "capability assessment",
             "stage-N-on-Cn",
             "TRL <current>/<target>",
             "includes analysis_tier and core_tech_id",
             "Critical path summary",
+            "Core Technologies",
+            "Capability map",
+            "Stage-Gate",
         ]:
             self.assertNotIn(phrase, readme_template)
 
@@ -896,6 +948,7 @@ class ProjectBoundaryTests(unittest.TestCase):
             "capability + Stage-Gate anchored",
             "pre-registration + explanation-discrimination anchored",
             "core_tech_id, `lifecycle`",
+            "Capability / Technology Research",
         ]:
             self.assertNotIn(phrase, combined_docs)
 
@@ -932,7 +985,7 @@ class ProjectBoundaryTests(unittest.TestCase):
         process_review = read_text("skills/research/references/review/process_review.md")
 
         self.assertIn("Workstream label is explicitly declared", process_review)
-        self.assertIn("Capability / Technology Research workstream", process_review)
+        self.assertIn("R&D Workstream", process_review)
         self.assertIn("Phenomenon / Mechanism Research workstream", process_review)
         for phrase in [
             "Mode is explicitly declared",
@@ -941,6 +994,8 @@ class ProjectBoundaryTests(unittest.TestCase):
             "Mode mixing",
             "For R&D projects only",
             "For Pure Research projects only",
+            "Capability / Technology Research workstream",
+            "Stage gate",
         ]:
             self.assertNotIn(phrase, process_review)
 
@@ -966,24 +1021,24 @@ class ProjectBoundaryTests(unittest.TestCase):
 
     def test_kill_policy_reserves_kill_for_terminal_evidence(self) -> None:
         skill = read_text("skills/research/SKILL.md")
-        stages = read_text("skills/research/references/rd/rd_stages.md")
+        rd_workflow = read_text("skills/research/references/rd/rd_workflow.md")
 
         self.assertNotIn("A kill criterion firing once is sufficient to kill", skill)
         self.assertNotIn("Go/Kill gate", skill)
         self.assertNotIn("de-risk to kill", skill)
-        self.assertNotIn("default to Kill under uncertainty", stages)
+        self.assertNotIn("default to Kill under uncertainty", rd_workflow)
         self.assertIn("Kill requires A4+ evidence", skill)
-        self.assertIn("Default to Hold or Recycle under uncertainty", stages)
-        self.assertIn("Re-scope", stages)
+        self.assertIn("terminal decision", rd_workflow)
+        self.assertIn("prospective re-scope", rd_workflow)
 
     def test_a4_rigor_is_reserved_for_claim_bearing_or_promotion_decisions(self) -> None:
         skill = read_text("skills/research/SKILL.md")
         normalized = normalize_for_assertion(skill)
 
         for phrase in [
-            "a4+ is reserved for supported, matured, established, promoted, external claim, or deployment recommendation",
+            "a4+ is reserved for `supported`, external claim, deployment recommendation, or terminal decision",
             "a2-a3 may decide the next experiment, provisional go / no-go, park, deprioritize, or reject-for-now",
-            "exploratory decisions do not create a load-bearing claim or promotion",
+            "exploratory decisions do not create a load-bearing claim",
         ]:
             self.assertIn(phrase, normalized)
 
@@ -991,8 +1046,7 @@ class ProjectBoundaryTests(unittest.TestCase):
         combined = "\n".join(
             [
                 read_text("skills/research/SKILL.md"),
-                read_text("skills/research/references/rd/capability_map_schema.md"),
-                read_text("skills/research/references/rd/rd_stages.md"),
+                read_text("skills/research/references/rd/rd_workflow.md"),
                 read_text("skills/research/references/review/process_review.md"),
             ]
         )
@@ -1012,53 +1066,89 @@ class ProjectBoundaryTests(unittest.TestCase):
         ]:
             self.assertNotIn(forbidden, normalized)
 
-    def test_reproducibility_contract_is_scoped_and_not_overclaimed(self) -> None:
+    def test_report_provenance_is_scoped_and_not_trial_tracking_contract(self) -> None:
         skill = read_text("skills/research/SKILL.md")
         reproducibility = read_text("skills/research/references/shared/reproducibility.md")
+        combined = "\n".join([skill, reproducibility])
 
         self.assertNotIn("Every trial that produces a metric", skill)
-        self.assertIn("promotion-eligible or claim-cited trial", skill)
+        self.assertIn("presented evidence", skill)
+        self.assertIn("claim-bearing report package", reproducibility)
         self.assertIn("Rerun guidance", reproducibility)
         self.assertNotIn("machine-verifiable proof", reproducibility)
         self.assertNotIn("produce the same result", reproducibility)
+        for forbidden in [
+            "Tracking Backend",
+            "tracking backend selected",
+            "before the first load-bearing claim",
+            "promotion-eligible or claim-cited trial",
+            "Every promotion-eligible or claim-cited trial",
+            "Reproducibility 3-tuple",
+            "selected tracking backend",
+        ]:
+            self.assertNotIn(forbidden.lower(), combined.lower())
         self.assertIn("traceable", reproducibility.lower())
         self.assertIn("rerunnable", reproducibility.lower())
         self.assertIn("reproduced", reproducibility.lower())
         self.assertIn("validated", reproducibility.lower())
 
-    def test_reproducibility_docs_match_tracking_contract(self) -> None:
+    def test_trial_templates_do_not_force_report_provenance_fields(self) -> None:
+        combined = "\n".join(
+            [
+                read_text("skills/research/assets/rd/rd_trial.py.template"),
+                read_text("skills/research/assets/pure_research/pr_trial.py.template"),
+            ]
+        )
+
+        self.assertIn("## Optional report provenance", combined)
+        self.assertIn("Fill this only if the artifact is cited by a report package", combined)
+        for forbidden in [
+            "## Reproducibility",
+            "- Data version:",
+            "- Git commit:",
+            "- Environment pin:",
+            "- Run note / provenance path:",
+        ]:
+            self.assertNotIn(forbidden, combined)
+
+    def test_reproducibility_docs_match_report_provenance_boundary(self) -> None:
         reproducibility = read_text("skills/research/references/shared/reproducibility.md")
         process_review = read_text("skills/research/references/review/process_review.md")
+        combined = "\n".join([reproducibility, process_review])
 
         self.assertNotIn("Captures `git rev-parse HEAD` and writes to a per-trial line", reproducibility)
         self.assertNotIn("auto-detected via Python import scan", reproducibility)
         self.assertNotIn("--project <project_name>", reproducibility)
-        self.assertIn("data_versions.txt", reproducibility)
-        self.assertIn("env_lock_ref.txt", reproducibility)
-        self.assertIn("Local note or tracker record", reproducibility)
-        self.assertIn("promotion-eligible or claim-cited", process_review)
+        self.assertIn("report provenance", reproducibility.lower())
+        self.assertIn("presented evidence", reproducibility)
+        self.assertIn("claim-bearing report package", process_review)
         self.assertNotIn("per-trial entry in `results.parquet`", process_review)
-        self.assertIn("durable run log", process_review)
+        self.assertNotIn("durable run log", process_review)
+        self.assertNotIn("promotion-eligible", combined)
+        self.assertNotIn("claim-cited trial", combined)
 
-    def test_tracking_backend_contract_is_decision_relevant_not_full_inventory(self) -> None:
+    def test_report_provenance_does_not_require_backend_contract(self) -> None:
         skill = read_text("skills/research/SKILL.md")
         schema = read_text("skills/research/references/shared/results_db_schema.md")
         process_review = read_text("skills/research/references/review/process_review.md")
         conclusion_review = read_text("skills/research/references/review/conclusion_review.md")
+        combined = "\n".join([skill, schema, process_review, conclusion_review])
 
-        self.assertIn("complete inventory/export is not mandatory", skill.lower())
-        self.assertIn("decision-relevant evidence", skill)
-        self.assertIn("R&D transition to `matured`", skill)
+        self.assertIn("report provenance", skill.lower())
+        self.assertIn("presented evidence", skill)
+        self.assertIn("claim-bearing report package", skill)
         self.assertIn("## Conditional required fields", schema)
-        self.assertIn("When an external tracker is the canonical run store", schema)
-        self.assertIn("decision-relevant run set", schema)
+        self.assertIn("When a report package cites an external tracker", schema)
+        self.assertIn("presented evidence set", schema)
         self.assertIn("failed runs, abandoned parameter combinations", schema)
         self.assertIn("model-selection attempts", schema)
-        self.assertIn("Decision-relevant run set exists", process_review)
-        self.assertIn("missing early backend selection is a logged gap", process_review)
-        self.assertIn("complete export of", process_review.lower())
+        self.assertIn("Presented evidence can be resolved", process_review)
+        self.assertNotIn("missing early backend selection is a logged gap", process_review)
+        self.assertNotIn("complete export of", process_review.lower())
         self.assertIn("tracker record / exported", conclusion_review)
-        self.assertIn("run record", conclusion_review)
+        self.assertIn("report provenance", conclusion_review.lower())
+        self.assertNotIn("tracking backend selected", combined.lower())
+        self.assertNotIn("before the first load-bearing claim", combined.lower())
         self.assertNotIn("project trial count from\n    `results.parquet`", process_review)
 
     def test_lightweight_review_contract_removes_session_and_trial_forcing(self) -> None:
@@ -1086,60 +1176,71 @@ class ProjectBoundaryTests(unittest.TestCase):
         for phrase in [
             "Only sessions that change durable research state",
             "Ordinary exploration",
-            "Claim-cited or promotion-relevant results update",
+            "Claim-bearing report packages and supported findings cite",
             "lightweight run notes",
         ]:
             self.assertIn(phrase, combined)
 
-    def test_program_layer_is_coordination_not_third_discipline(self) -> None:
+    def test_research_skill_does_not_reintroduce_r_and_d_program_layer(self) -> None:
         skill = read_text("skills/research/SKILL.md")
-        program = read_text("skills/research/references/program/program_map.md")
-        normalized_program = " ".join(program.split())
 
-        self.assertIn("R&D Program", skill)
-        self.assertIn("coordination layer, not a third discipline", skill)
-        self.assertIn("does not own TRL, analysis tier, promotion, or claim truth", program)
-        for phrase in [
-            "active symbols",
-            "tuned parameters",
-            "current performance metrics",
-            "research_to_rd",
-            "rd_to_rd",
-            "rd_observation_to_research",
-            "shared_infra",
-            "integration",
-            "Relationship / routing labels",
+        self.assertNotIn("R&D Program", skill)
+        self.assertNotIn("program-promoted", read_tree_text("skills/research"))
+
+    def test_active_surfaces_do_not_reference_internal_charter_or_program_map(self) -> None:
+        skill = read_text("skills/research/SKILL.md")
+        combined = "\n".join([read_text("README.md"), read_tree_text("skills")])
+        normalized = normalize_for_assertion(combined)
+
+        for forbidden in [
+            ".rebuild/charter.md",
+            "charter c",
+            "program map",
+            "initial-day prohibitions",
+            "charter and kill criteria exist",
+            "promotion-eligible",
         ]:
-            self.assertIn(phrase, normalized_program)
+            self.assertNotIn(forbidden, normalized)
         for forbidden in [
             "Program discipline",
             "third discipline",
             "program-supported",
             "program-promoted",
-            "Dependency types",
-            "Current child state",
-            "rd_to_research",
+            "Relationship / routing labels",
+            "research_to_rd",
+            "rd_to_rd",
+            "rd_observation_to_research",
         ]:
-            self.assertNotIn(forbidden, program)
+            self.assertNotIn(forbidden, skill)
 
     def test_research_skill_owns_generic_research_protocol(self) -> None:
         research = read_text("skills/research/SKILL.md")
         research_tree = read_tree_text("skills/research")
 
         for phrase in [
-            "Use for serious research or capability/technology workstreams",
+            "Use for serious research or R&D workstreams",
             "Do not use for ordinary fact lookup",
             "First Decision: Map the Current Research State",
             "project decision gate",
-            "Capability / Technology Research",
+            "R&D Workstream",
             "Phenomenon / Mechanism Research",
-            "R&D Program",
+            "basic research",
+            "applied research",
+            "experimental development",
             "Right-Sized Rigor",
             "Result-to-Question",
-            "Result-to-Capability",
             "A4 minimum",
         ]:
             self.assertIn(phrase, research)
+
+        for forbidden in [
+            "Capability / Technology Research",
+            "Core Technologies",
+            "Capability Map",
+            "Stage-Gate",
+            "TRL",
+        ]:
+            self.assertNotIn(forbidden, research)
 
         for forbidden in [
             "Sharpe",
@@ -1192,11 +1293,10 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertIn("## Right-Sized Rigor", skill)
         self.assertIn("Rigor is sized to the research state being changed", skill)
         for phrase in [
-            "A4+ for `supported`, `matured`, `established`, or `promoted`",
+            "A4+ for `supported`, external claim, deployment recommendation, or terminal decision",
             "Reviewed pre-registration",
-            "Reviewed charter and kill criteria",
-            "Reproducibility records",
-            "Maintenance plan requirements",
+            "Report provenance and rerun guidance",
+            "claim-bearing report packages",
         ]:
             self.assertIn(phrase, skill)
 
@@ -1219,12 +1319,12 @@ class ProjectBoundaryTests(unittest.TestCase):
             self.assertIn(phrase, skill)
         self.assertIn("user-facing outcome reports", description)
 
-    def test_evidence_citation_covers_established_core_technology_claims(self) -> None:
+    def test_evidence_citation_covers_load_bearing_claims(self) -> None:
         skill = read_text("skills/research/SKILL.md")
         normalized = normalize_for_assertion(skill)
 
         self.assertIn(
-            "supports `supported`, `matured`, `established`, `promoted`, `killed`",
+            "supports `supported`, terminal decision, external sharing, deployment recommendation",
             normalized,
         )
 
@@ -1254,7 +1354,7 @@ class ProjectBoundaryTests(unittest.TestCase):
         normalized = normalize_for_assertion(quant)
 
         for phrase in [
-            "finance-specific checks are promotion-relevant or claim-bearing checks",
+            "finance-specific checks are claim-bearing checks",
             "they are not mandatory gates for exploratory finance work",
             "exploratory finance work may choose the next experiment, provisional go / no-go, park, deprioritize, or reject-for-now before the full finance check battery",
         ]:
@@ -1267,24 +1367,24 @@ class ProjectBoundaryTests(unittest.TestCase):
 
     def test_result_loops_route_to_workstream_state_objects(self) -> None:
         pr_workflow = read_text("skills/research/references/pure_research/pr_workflow.md")
-        rd_stages = read_text("skills/research/references/rd/rd_stages.md")
+        rd_workflow = read_text("skills/research/references/rd/rd_workflow.md")
         result_analysis = read_text("skills/research/references/shared/result_analysis.md")
 
         self.assertIn("Result-to-Question Loop", pr_workflow)
         self.assertIn("explanation_ledger.md", pr_workflow)
-        self.assertIn("Result-to-Capability Loop", rd_stages)
-        self.assertIn("capability_map.md", rd_stages)
+        self.assertIn("Result-to-R&D Plan Loop", rd_workflow)
+        self.assertIn("rd_plan.md", rd_workflow)
         normalized_result_analysis = " ".join(result_analysis.split())
         self.assertIn("selected workstream state object", normalized_result_analysis)
         self.assertIn("Phenomenon / Mechanism Research", result_analysis)
-        self.assertIn("Capability / Technology Research", result_analysis)
+        self.assertIn("R&D Workstream", result_analysis)
         self.assertNotIn("mode-specific state object", result_analysis)
         self.assertNotIn("Pure Research returns to Q/E state", result_analysis)
         self.assertNotIn("R&D returns to capability state", result_analysis)
-        self.assertIn("goalpost shifting", rd_stages)
-        self.assertIn("prospective re-scope", rd_stages)
+        self.assertIn("transparent changes", rd_workflow.lower())
+        self.assertIn("prospective re-scope", rd_workflow)
 
-    def test_rd_flow_names_lightweight_research_lanes_before_decomposition(self) -> None:
+    def test_rd_flow_uses_general_research_and_development_categories(self) -> None:
         skill = read_text("skills/research/SKILL.md")
         rd_workflow = read_text("skills/research/references/rd/rd_workflow.md")
         expected_phrases = [
@@ -1292,10 +1392,12 @@ class ProjectBoundaryTests(unittest.TestCase):
             "applied research",
             "experimental development",
             "current-state assessment is orientation, not an r&d category",
-            "hypothesis validation is a cross-cutting evidence discipline, not an r&d category",
-            "technical decomposition is not required before current-state assessment",
-            "core technologies, capability map, trl, and stage-gate are escalation protocols, not default prerequisites",
-            "heavy technical decomposition is only for durable capability or technology state transition claims",
+            "hypothesis validation is evidence discipline, not an r&d category",
+            "novel",
+            "creative",
+            "uncertain",
+            "systematic",
+            "transferable or reproducible",
         ]
 
         assert_phrases_present(self, skill, expected_phrases)
@@ -1304,23 +1406,24 @@ class ProjectBoundaryTests(unittest.TestCase):
             rd_workflow,
             [
                 "current-state assessment is orientation, not an r&d category",
-                "hypothesis validation is a cross-cutting evidence discipline, not an r&d category",
-                "technical decomposition is not required before current-state assessment",
-                "core technologies, capability map, trl, and stage-gate are escalation protocols, not default prerequisites",
-                "heavy technical decomposition is only for durable capability or technology state transition claims",
+                "hypothesis validation is evidence discipline, not an r&d category",
+                "basic research",
+                "applied research",
+                "experimental development",
+                "plan -> execute -> compare -> report",
             ],
         )
 
         skill_normalized = normalize_for_assertion(skill)
         rd_normalized = normalize_for_assertion(rd_workflow)
-        for phrase in ["lightweight", "default", "escalation"]:
+        for phrase in ["r&d workstream", "rd_plan.md", "pre-registration"]:
             self.assertIn(phrase, skill_normalized)
-        for phrase in ["ordinary exploration", "default", "escalation"]:
+        for phrase in ["rd_plan.md", "pre-registration", "report"]:
             self.assertIn(phrase, rd_normalized)
 
         for document in [skill, rd_workflow]:
             self.assertNotIn(
-                "required sequence for all capability / technology research work",
+                "capability / technology research",
                 normalize_for_assertion(document),
             )
 
@@ -1425,127 +1528,87 @@ class ProjectBoundaryTests(unittest.TestCase):
             ],
         )
 
-    def test_rd_stages_no_longer_skips_derisk_trl_two(self) -> None:
-        rd_stages = read_text("skills/research/references/rd/rd_stages.md")
-        normalized = normalize_for_assertion(rd_stages)
-
-        for forbidden in [
-            "trl advances 1 → 3",
-            "trl 1→3",
-        ]:
-            self.assertFalse(
-                forbidden in normalized,
-                f"Legacy skipped TRL transition remains: {forbidden}",
-            )
-
-    def test_rd_docs_distinguish_target_trl_from_critical_path_trl6(self) -> None:
+    def test_rd_active_surface_removes_technology_maturation_protocol(self) -> None:
         combined = "\n".join(
             [
+                read_text("README.md"),
                 read_text("skills/research/SKILL.md"),
-                read_text("skills/research/references/rd/core_technologies.md"),
-                read_text("skills/research/references/rd/capability_map_schema.md"),
-                read_text("skills/research/references/rd/rd_promotion_gate.md"),
-                read_text("skills/research/references/rd/rd_stages.md"),
-                read_text("skills/research/references/rd/trl_scale.md"),
+                read_tree_text("skills/research/assets/shared"),
+                read_tree_text("skills/research/references/rd"),
+                read_tree_text("skills/research/assets/rd"),
+                read_text("skills/research/scripts/new_project.py"),
+                read_text("skills/research/scripts/new_trial.py"),
             ]
         )
         normalized = normalize_for_assertion(combined)
 
         for phrase in [
-            "target_trl is the per-capability row target",
-            "critical-path capabilities must reach trl-6 for workstream promotion",
-            "target_trl below 6 is for non-critical or helper capabilities",
-            "target_trl below 6 does not satisfy critical-path promotion",
-            "critical-path child capabilities matured to trl-6",
+            "basic research",
+            "applied research",
+            "experimental development",
+            "rd_plan.md",
+            "pre-registration",
+            "plan-to-result",
         ]:
-            self.assertTrue(phrase in normalized, f"Missing TRL distinction contract: {phrase}")
+            self.assertIn(normalize_for_assertion(phrase), normalized)
 
         for forbidden in [
-            "all child capabilities matured to trl-6",
-            "all child capabilities matured, kill criteria un-fired",
-            "matured requires trl-6 and a4+",
-            "`matured` requires trl-6 and a4+",
-            "not promotable to `matured` — the trl-6 exit requires a4 minimum",
-            "trl-6 + analysis a4+ + kill un-fired is the per-capability requirement",
-            "each cap independently needs trl-6 demonstration",
+            "core technologies",
+            "core technology",
+            "charter",
+            "program map",
+            "initial-day prohibitions",
+            "promotion-eligible",
+            "capability map",
+            "capability_map.md",
+            "technology readiness level",
+            "target_trl",
+            "current_trl",
+            "trl-",
+            "stage-gate",
+            "stage gate",
+            "cooper",
+            "heilmeier",
+            "matured",
+            "established",
+            "result-to-capability",
+            "layer 1",
+            "layer 2",
+            "capability claim",
+            "recycle a capability",
         ]:
-            self.assertFalse(
-                forbidden in normalized,
-                f"K maturity wording still treats every child capability as critical-path: {forbidden}",
+            self.assertNotIn(
+                forbidden,
+                normalized,
+                f"Old technology-maturation protocol term remains: {forbidden}",
             )
 
-    def test_undeclared_integration_pattern_blocks_instead_of_implicit_pattern2(self) -> None:
-        combined = "\n".join(
+    def test_removed_rd_maturation_reference_files_are_not_packaged(self) -> None:
+        existing = {path.name for path in (ROOT / "skills/research/references/rd").glob("*.md")}
+
+        self.assertEqual({"rd_workflow.md"}, existing)
+
+        for removed in [
+            "core_technologies.md",
+            "capability_map_schema.md",
+            "trl_scale.md",
+            "rd_stages.md",
+            "rd_promotion_gate.md",
+            "rd_charter.md",
+            "integration_patterns.md",
+        ]:
+            self.assertFalse((ROOT / "skills/research/references/rd" / removed).exists())
+
+    def test_rd_preregistration_template_scopes_report_contracts_to_reports(self) -> None:
+        template = read_text("skills/research/assets/rd/preregistration.md.template")
+
+        assert_phrases_present(
+            self,
+            template,
             [
-                read_text("skills/research/references/rd/rd_charter.md"),
-                read_text("skills/research/references/rd/integration_patterns.md"),
-                read_text("skills/research/references/rd/rd_stages.md"),
-            ]
-        )
-        normalized = normalize_for_assertion(combined)
-
-        for forbidden in [
-            "without an explicit declaration, the project implicitly defaults to pattern 2",
-            "without explicit declaration, the project is implicitly committing to pattern 2",
-            "implicit pattern 2 default",
-            "pattern 2 mapping (current protocol default)",
-        ]:
-            self.assertFalse(
-                forbidden in normalized,
-                f"Undeclared integration pattern still implies Pattern 2: {forbidden}",
-            )
-        self.assertTrue("missing integration pattern" in normalized, "Missing absent-pattern wording.")
-        self.assertTrue("blocks" in normalized, "Missing blocking consequence for absent integration pattern.")
-
-    def test_rd_promotion_gate_integration_check_is_pattern_aware(self) -> None:
-        combined = "\n".join(
-            [
-                read_text("skills/research/SKILL.md"),
-                read_text("skills/research/references/rd/rd_promotion_gate.md"),
-                read_text("skills/research/references/rd/rd_workflow.md"),
-                read_text("skills/research/references/rd/trl_scale.md"),
-                read_text("skills/research/references/review/process_review.md"),
-            ]
-        )
-        normalized = normalize_for_assertion(combined)
-
-        legacy_pattern2_check = (
-            "integration test (the capability with `core_tech_id == integration`) "
-            "ran after all upstream capabilities reached `matured`"
-        )
-        self.assertFalse(
-            legacy_pattern2_check in normalized,
-            "Integration promotion check is still written as an unconditional Pattern 2 check.",
-        )
-        for phrase in [
-            "declared integration pattern",
-            "pattern-aware",
-            "pattern 1",
-            "pattern 2",
-            "pattern 3",
-        ]:
-            self.assertTrue(phrase in normalized, f"Missing pattern-aware integration gate phrase: {phrase}")
-
-        for forbidden in [
-            "integration test ran after upstream exits",
-            "integration test ran after all upstream capabilities reached `matured`",
-            "all upstream exits fired before the integration test ran",
-            "before integration test",
-        ]:
-            self.assertFalse(
-                forbidden in normalized,
-                f"High-level R&D guidance still assumes one final integration test: {forbidden}",
-            )
-
-    def test_k_row_killed_status_matches_rd_promotion_gate(self) -> None:
-        core_technologies = read_text("skills/research/references/rd/core_technologies.md")
-        promotion_gate = read_text("skills/research/references/rd/rd_promotion_gate.md")
-
-        self.assertTrue("| `killed` |" in core_technologies, "K-row status vocabulary is missing `killed`.")
-        self.assertTrue("active → killed" in core_technologies, "K-row transitions are missing `active → killed`.")
-        self.assertTrue(
-            "`merged` / `stale` / `killed` with documented rationale" in promotion_gate,
-            "R&D promotion gate does not use the same terminal K-row vocabulary.",
+                "report contracts apply to report packages and presented evidence, not to research or experiments",
+                "reporting-side requirement, not a continuous research tracking contract",
+            ],
         )
 
     def test_pr_promotion_gate_does_not_treat_weakened_as_terminal_status(self) -> None:
@@ -1776,7 +1839,7 @@ class ProjectBoundaryTests(unittest.TestCase):
         self.assertIn("prereg/PR_<id>_<slug>.md", combined)
         self.assertIn("claim-bearing confirmation trial", combined)
         self.assertIn("affected result has weaker diagnostic value", combined)
-        self.assertIn("Every claim-cited, promotion-eligible, externally shared, or", project_readme_template)
+        self.assertIn("Every claim-bearing, externally shared, or terminal-decision", project_readme_template)
         self.assertIn("high-reliability trial has a reviewed pre-registration", project_readme_template)
         self.assertIn("Then choose the next path", prfaq_template)
         self.assertIn("Exploratory research", prfaq_template)
@@ -1976,10 +2039,11 @@ class ProjectBoundaryTests(unittest.TestCase):
 
     def test_preregistered_outcome_reports_use_lightweight_package_shape(self) -> None:
         skill = read_text("skills/research/SKILL.md")
+        root_readme = read_text("README.md")
         outcome_report = read_text("skills/research/references/shared/outcome_reports.md")
         outcome_report_template = read_text("skills/research/assets/shared/outcome_report.md.template")
         readme_template = read_text("skills/research/assets/pure_research/README.md.template")
-        combined = "\n".join([skill, outcome_report, outcome_report_template, readme_template])
+        combined = "\n".join([skill, root_readme, outcome_report, outcome_report_template, readme_template])
         normalized = normalize_for_assertion(combined)
 
         core_shape_phrases = [
@@ -2064,16 +2128,17 @@ class ProjectBoundaryTests(unittest.TestCase):
         ]:
             self.assertNotIn(phrase, combined_templates)
 
-    def test_reproducibility_contract_mentions_claim_cited_trials(self) -> None:
+    def test_reproducibility_contract_mentions_claim_bearing_reports(self) -> None:
         reproducibility = read_text("skills/research/references/shared/reproducibility.md")
 
-        self.assertIn("promotion-eligible or claim-cited trial", reproducibility)
+        self.assertIn("claim-bearing report package", reproducibility)
+        self.assertIn("presented evidence", reproducibility)
 
-    def test_exploratory_runs_must_rerun_before_promotion_citation(self) -> None:
+    def test_exploratory_runs_must_rerun_before_claim_bearing_citation(self) -> None:
         skill = read_text("skills/research/SKILL.md")
 
         self.assertNotIn("retroactively relabel exploratory output as complete", skill)
-        self.assertIn("rerun under the promotion-eligible protocol", skill)
+        self.assertIn("rerun under the claim-bearing plan", skill)
 
     def test_removed_reproducibility_scripts_are_not_referenced(self) -> None:
         research_tree = read_tree_text("skills/research")

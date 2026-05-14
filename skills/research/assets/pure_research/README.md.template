@@ -27,7 +27,7 @@ the project decision log, and reviewed pre-registrations define the scoped
 question, competing explanations, planning commitments, evidence status, and
 durable state transitions. Exploratory notes may inform candidates; they do not
 become claim-cited evidence until rerun or confirmed under the appropriate
-promotion-eligible protocol.
+claim-bearing plan.
 
 **Project-instance artifacts**: `../../configs/`, `../../src/`,
 `../../tests/`, `../../purposes/`, and `../../results/` contain concrete
@@ -113,7 +113,7 @@ point:
 - [ ] `prfaq.md` is reviewed and status is READY
 - [ ] Exploratory research and confirmatory research are labeled separately in
   run notes, tracker rows, notebooks, or result rows
-- [ ] Every claim-cited, promotion-eligible, externally shared, or
+- [ ] Every claim-bearing, externally shared, or terminal-decision
   high-reliability trial has a reviewed pre-registration (`prereg/PR_<id>_<slug>.md`
   status is READY before confirmatory execution)
 - [ ] Before claim-bearing confirmatory execution, `PR_<id>_<slug>.md` was
@@ -138,14 +138,15 @@ point:
 - [ ] Every trial in `purposes/` has a complete Analysis section (5
   sub-fields, A0-A5 tier explicit), and preregistered outcome reports include
   Transparent Changes
-- [ ] `decisions.md` records durable state transitions and promotion-relevant
+- [ ] `decisions.md` records durable state transitions and claim-bearing
   material changes; ordinary run notes may stay with the tracker or trial artifact
-- [ ] Tracking backend or run-note convention is clear before the first
-  load-bearing claim
+- [ ] Report provenance or run-note convention is clear for each
+  claim-bearing report package
 - [ ] Selection, sweep, and failed-run records exist when they affect a
-  multiple-testing or promotion judgment
-- [ ] Reproducibility 3-tuple recorded for every promotion-eligible
-  trial via a local run note, results row, or equivalent tracker record
+  multiple-testing or support judgment
+- [ ] Report provenance records enough rerun guidance for presented evidence
+  via a local run note, results row, report provenance file, or equivalent
+  tracker record
 - [ ] No material change from any pre-registration is unaddressed; claim-cited
   use is narrowed or rerun when the original plan no longer answers the
   intended question

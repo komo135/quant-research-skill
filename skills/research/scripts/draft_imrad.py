@@ -421,7 +421,7 @@ def section_results(art: ProjectArtifacts, supported_e: str) -> str:
 
 
 def section_discussion(art: ProjectArtifacts, supported_e: str) -> str:
-    """Section 4: Discussion. Requires A4+ analysis per CHARTER C13."""
+    """Section 4: Discussion. Requires A4+ analysis per analysis_depth.md."""
     supported_e_row = next((e for e in art.ledger_e if get_col(e, "ID") == supported_e), {})
     rejected_es = [e for e in art.ledger_e if "rejected" in get_col(e, "Status").lower()]
     weakened_es = [e for e in art.ledger_e if "weakened" in get_col(e, "Status").lower()]
