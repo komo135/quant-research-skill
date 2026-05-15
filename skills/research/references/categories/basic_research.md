@@ -4,6 +4,8 @@
 
 Basic research investigates a phenomenon, builds a baseline that future research will use, characterizes failure modes, or refines a question that was previously vague. The defining feature, from the Frascati Manual (OECD 2015), is uncertainty of outcome — you don't yet know what you'll find, and that uncertainty is the point.
 
+Classify by the plan's purpose and uncertainty, not by where the idea came from. Basic research can be use-inspired or triggered by an engineering failure when the immediate output is understanding, characterization, a baseline, or a better question.
+
 Pick basic research when:
 
 - You want to understand a mechanism, not yet to optimize it.
@@ -112,3 +114,4 @@ Observations are the primary output. Promote to claim sparingly — only when th
 - **Overclaiming generality.** A finding at σ ∈ [5, 10] is not a finding about all σ. `conditions_not_tested` must say so.
 - **Building a baseline without documenting it.** A baseline that nobody else can use is not a baseline. The report's Methods section is where the baseline becomes a usable reference.
 - **Inventing structure for the sake of inventing it.** Not every basic-research project produces a reusable baseline. Plenty of basic research only produces a refined question. That is still a completion.
+- **Classifying by origin.** A plan is not applied research merely because it extends a prior basic-research result. If its primary purpose is still to understand, characterize, or refine the question, keep it basic research.
