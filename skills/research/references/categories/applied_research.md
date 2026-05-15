@@ -4,6 +4,8 @@
 
 Applied research aims at a specific practical objective by designing a method, model, or procedure. The defining feature, from the Frascati Manual (OECD 2015), is that the work is directed toward a stated objective with a measurable success criterion.
 
+Classify by the objective, intended use, output, and uncertainty type, not by source. A plan can build on basic research and still remain basic if the immediate purpose is characterization; it becomes applied research when the immediate purpose is achieving a stated objective through planned comparative evaluation.
+
 Pick applied research when:
 
 - You have a target metric (BLEU, accuracy, energy efficiency, error rate, throughput).
@@ -78,7 +80,7 @@ The headline claim is typically: "method M achieves metric value V on benchmark 
 - `conditions_tested` must specify which datasets, which model sizes, which compute regimes
 - `conditions_not_tested` must explicitly call out generalization gaps
 
-Ablations support claims about which components are responsible. Without ablations, "method M works because of innovation I" is weak — you cannot rule out that the improvement comes from one component you happened to also change.
+Ablations support claims about which components are responsible. Without ablations, "method M works because of component I" is weak — you cannot rule out that the improvement comes from one component you happened to also change.
 
 Example claim record:
 
@@ -124,3 +126,4 @@ Pearl Rung 2 (intervention via ablation) is the standard warrant for "component 
 - **Compute apples-vs-oranges.** Comparing a 10× larger model to a baseline tells you about scale, not about your method. Hold compute constant or report scaling curves.
 - **Ablation theater.** Single-component ablations on isolated runs do not isolate causal contribution if the components interact. Report joint ablations when interactions matter.
 - **Skipping the negative-result writeup.** A method that did not improve is still a result. Document it; the next agent should not re-run it.
+- **Origin-only classification.** "This extends basic research" is not enough. The applied-research label requires a planned measurable objective, intended practical use, and baseline comparison.
