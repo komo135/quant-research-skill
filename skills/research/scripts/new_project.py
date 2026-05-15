@@ -56,8 +56,8 @@ def main():
         "# Prior work\n\nUse the format from `references/literature_review.md`.\n",
         encoding="utf-8",
     )
-    (target / "literature" / "differentiation.md").write_text(
-        "# How this work differs\n\nUse the format from `references/literature_review.md`.\n",
+    (target / "literature" / "positioning.md").write_text(
+        "# How the work stands on prior work\n\nThis is `literature/positioning.md`. Use the format from `references/literature_review.md`.\n",
         encoding="utf-8",
     )
 

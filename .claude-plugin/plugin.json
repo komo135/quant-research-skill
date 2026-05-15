@@ -1,7 +1,7 @@
 {
   "name": "research",
-  "description": "v2.0.3 - Clarifies methods reproducibility vs provenance/evidence integrity and fixes multiple-testing correction behavior. Breaking change from v1.x.",
-  "version": "2.0.3",
+  "description": "v2.0.4 - Requires prior-work grounding for every plan and replaces differentiation tracking with positioning. Breaking change from v1.x.",
+  "version": "2.0.4",
   "author": {
     "name": "komoootv",
     "email": "komoootv@gmail.com"
