@@ -1,3 +1,6 @@
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 
@@ -25,6 +28,12 @@ def assert_ordered_fragments(text: str, *fragments: str):
         else:
             cursor = index + len(fragment)
     assert not missing, f"missing ordered fragments: {missing}"
+
+
+def assert_absent(text: str, *terms: str):
+    lowered = text.lower()
+    present = [term for term in terms if term.lower() in lowered]
+    assert not present, f"unexpected terms present: {present}"
 
 
 def test_report_format_distinguishes_material_conditions_from_env_locks():
@@ -189,3 +198,178 @@ def test_plan_templates_prompt_for_material_conditions():
     for template in template_dir.glob("*.template"):
         text = template.read_text(encoding="utf-8")
         assert "material conditions" in text, template
+
+
+def test_every_plan_template_requires_prior_work_grounding_before_plan():
+    template_dir = ROOT / "skills" / "research" / "assets" / "plan"
+
+    for template in template_dir.glob("*.template"):
+        text = template.read_text(encoding="utf-8")
+        assert "## Prior-work grounding" in text, template
+        assert text.index("## Prior-work grounding") < text.index("## Plan"), template
+        assert_mentions(
+            text,
+            "bounded but sufficient",
+            "question/objective",
+            "inherited assumptions",
+            "method choice",
+            "baselines/evaluation protocol",
+            "known limitations",
+        )
+        assert_absent(
+            text,
+            "Novelty / differentiation thesis",
+            "unknown-not-yet-reviewed if no novelty claim is made",
+            "literature/differentiation.md",
+        )
+
+
+def test_plan_schema_makes_prior_work_grounding_first_class_not_novelty_optional():
+    rd_plan = read("skills/research/references/rd_plan.md")
+
+    assert_ordered_fragments(
+        rd_plan,
+        "## Question / Objective",
+        "## Prior-work grounding",
+        "## Divergence checkpoint",
+        "## Plan",
+    )
+    assert_mentions(
+        rd_plan,
+        "bounded but sufficient",
+        "question/objective",
+        "inherited assumptions",
+        "method choice",
+        "baselines/evaluation protocol",
+        "known limitations",
+        "named constraint",
+        "narrow or block relevant claims",
+    )
+    assert_absent(
+        rd_plan,
+        "Novelty / differentiation thesis",
+        "unknown-not-yet-reviewed",
+        "literature/differentiation.md",
+    )
+
+
+def test_literature_review_contract_uses_positioning_for_grounding_not_default_novelty():
+    literature = read("skills/research/references/literature_review.md")
+
+    assert_mentions(
+        literature,
+        "prior-work grounding",
+        "bounded but sufficient",
+        "literature/positioning.md",
+        "stands on prior work",
+        "claim scope",
+        "comprehensive literature survey",
+        "to our knowledge",
+    )
+    assert_ordered_fragments(
+        literature,
+        "every plan needs prior-work grounding",
+        "not optional just because no novelty claim is made",
+    )
+    assert_absent(
+        literature,
+        "A brief pass is appropriate",
+        "literature/differentiation.md",
+        "differentiation.md format",
+    )
+
+
+def test_research_skill_and_project_seed_positioning_not_differentiation():
+    skill = read("skills/research/SKILL.md")
+    new_project = read("skills/research/scripts/new_project.py")
+    project_readme = read("skills/research/assets/project/README.md.template")
+
+    for text in [skill, new_project, project_readme]:
+        assert_mentions(text, "literature/positioning.md")
+        assert_absent(text, "literature/differentiation.md")
+
+    assert_mentions(
+        new_project,
+        "positioning.md",
+        "how the work stands on prior work",
+    )
+    assert_absent(new_project, "differentiation.md")
+
+
+def test_readme_and_plugin_metadata_are_v204_prior_work_grounding_release():
+    readme = read("README.md")
+    codex_plugin = read(".codex-plugin/plugin.json")
+    claude_plugin = read(".claude-plugin/plugin.json")
+    marketplace = read(".claude-plugin/marketplace.json")
+
+    for text in [readme, codex_plugin, claude_plugin, marketplace]:
+        assert_mentions(text, "2.0.4", "prior-work grounding")
+        assert_absent(text, '"version": "2.0.3"')
+
+    assert_mentions(readme, "literature/{papers.md,positioning.md}")
+    assert_absent(readme, "literature/{papers.md,differentiation.md}")
+
+
+def test_research_docs_do_not_preserve_legacy_light_review_loopholes():
+    docs = [
+        "skills/research/SKILL.md",
+        "skills/research/references/literature_review.md",
+        "skills/research/references/rd_plan.md",
+        "skills/research/assets/plan/rd_plan_exploratory.md.template",
+        "skills/research/assets/plan/rd_plan_confirmatory.md.template",
+        "skills/research/assets/plan/rd_plan_milestone.md.template",
+        "README.md",
+    ]
+
+    for path in docs:
+        assert_absent(
+            read(path),
+            "brief pass",
+            "light review",
+            "unknown-not-yet-reviewed if no novelty claim is made",
+            "unknown-not-yet-reviewed is allowed only when",
+            "Novelty / differentiation thesis",
+            "literature/differentiation.md",
+        )
+
+
+def test_new_plan_guidance_includes_prior_work_grounding_before_plan_commit():
+    new_plan = read("skills/research/scripts/new_plan.py")
+
+    assert_mentions(new_plan, "Prior-work grounding")
+    assert_ordered_fragments(
+        new_plan,
+        "Question / Objective",
+        "Prior-work grounding",
+        "Divergence checkpoint",
+        "Plan",
+        "time-anchor",
+    )
+
+
+def test_new_project_seeds_positioning_with_required_fields():
+    script = ROOT / "skills" / "research" / "scripts" / "new_project.py"
+    required_fields = [
+        "What it establishes",
+        "Inherited assumption",
+        "Baseline / protocol use",
+        "Known limitation",
+        "Position of this work",
+        "Claim scope",
+    ]
+
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(tmp) / "project"
+        subprocess.run(
+            [sys.executable, str(script), str(target), "--name", "Positioning Seed Test"],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        positioning = (target / "literature" / "positioning.md").read_text(encoding="utf-8")
+
+    assert "literature/positioning.md" in positioning
+    for field in required_fields:
+        assert field in positioning
+    assert_absent(positioning, "Use the format from `references/literature_review.md`.")

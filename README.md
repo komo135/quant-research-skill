@@ -25,7 +25,7 @@ Examples of work that triggers the skill:
 
 It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-## Core design (v2.0.3)
+## Core design (v2.0.4)
 
 ### R&D categories (Frascati 2015)
 
@@ -43,7 +43,7 @@ Categories are not a one-way pipeline ([Kline & Rosenberg 1986](https://fenix.is
 
 ```
 1. new_plan.py creates plans/{id}_{slug}.md (mode-specific template)
-2. Write Question / Objective and the Divergence checkpoint.
+2. Write Question / Objective, Prior-work grounding, and the Divergence checkpoint.
 3. Write Plan section. git commit. (Plan is time-anchored.)
 4. Execute. Save artifacts under experiments/{plan}/runs/{run_id}/.
 5. ANALYZE — apply the discipline in references/analysis.md.
@@ -54,13 +54,21 @@ Categories are not a one-way pipeline ([Kline & Rosenberg 1986](https://fenix.is
 10. If human-facing, draft a report.
 ```
 
+### Prior-work grounding
+
+Every new plan records first-class prior-work grounding before the Plan section. The required depth is bounded but sufficient: enough to support the plan's question/objective, inherited assumptions, method choice, baselines/evaluation protocol, and known limitations. It is not optional just because no novelty claim is made.
+
+Projects use `literature/{papers.md,positioning.md}`. `positioning.md` records how the work stands on prior work: grounding, inheritance, baseline choice, known limitations, and claim scope. Differences or novelty can be recorded there when claimed, but novelty is not the default purpose.
+
+Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims. That is separate from the plan-scoped prior-work grounding every plan needs.
+
 ### Divergence checkpoint
 
 Every plan now records a pre-execution checkpoint before committing to a route:
 
 - Approach portfolio: the chosen approach plus meaningfully different alternatives
 - Anchoring audit: prior results, prior approaches, or convenient datasets being imported as assumptions
-- Novelty / differentiation thesis: whether the contribution is a new method, evaluation, data, system, replication, or baseline strengthening
+- Research positioning: whether the work stands as a new question, mechanism, data, metric, evaluation protocol, method, system, replication, or baseline strengthening
 - Disconfirming evidence: observations that would trigger REFINE / ADJACENT / PARK / CLOSE
 - Commitment decision: why this route is selected now, and what skipped divergence limits later claims
 
@@ -169,7 +177,7 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 {project-root}/
 ├── README.md, project_state.md, decisions.md
 ├── plans/{id}_{slug}.md            # research narrative (plan + actual + claims + decision)
-├── literature/{papers.md,differentiation.md}
+├── literature/{papers.md,positioning.md}
 ├── lib/                             # shared curated code (tests required)
 ├── experiments/{plan}/              # per-plan isolation
 │   ├── code/ configs/ notebooks/
@@ -209,12 +217,24 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.0.3** — clarifies methods reproducibility vs provenance/evidence-integrity and fixes multiple-testing correction behavior. Not backward compatible with v1.x.
+**Version 2.0.4** — reframes literature review around mandatory prior-work grounding and `literature/positioning.md`. Not backward compatible with v1.x.
 
 <details>
 <summary>Changelog</summary>
 
-### v2.0.3 (current) — reproducibility vocabulary and multiple-testing fixes
+### v2.0.4 (current) — prior-work grounding and positioning
+
+Reframes literature review from novelty/differentiation toward prior-work grounding for every plan.
+
+**Changed**
+
+- Every new plan now requires a Prior-work grounding section before the Plan section.
+- Required grounding depth is bounded but sufficient for the plan's question/objective, inherited assumptions, method choice, baselines/evaluation protocol, and known limitations.
+- Replaced the project-level differentiation file with `literature/positioning.md`, focused on how the work stands on prior work.
+- Comprehensive literature survey remains required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims, separate from plan-scoped grounding.
+- Removed the no-novelty loophole for unknown prior work; unknown prior work must be recorded as a named constraint that narrows or blocks relevant claims.
+
+### v2.0.3 — reproducibility vocabulary and multiple-testing fixes
 
 Separates methods reproducibility from audit provenance and evidence-integrity checks, and fixes multiple-testing correction behavior in the quant-research extension.
 
@@ -246,7 +266,7 @@ Strengthens v2 research discipline without changing plugin identity.
 
 **Added / changed**
 
-- Required Divergence checkpoint before execution: approach portfolio, anchoring audit, novelty/differentiation thesis, disconfirming evidence, and commitment decision.
+- Required Divergence checkpoint before execution: approach portfolio, anchoring audit, research positioning, disconfirming evidence, and commitment decision.
 - Required single research-review subagent before load-bearing claims, state-changing decisions, or reports.
 - Research review verdicts are `PASS` / `REWORK` / `INVALID`; only `PASS` + `PASS` permits promotion.
 - `REWORK` requires named reanalysis, repair, or rerun before any claim, decision, or report.
@@ -262,7 +282,7 @@ Complete redesign. No backward compatibility with v1.x.
 - 3 Frascati categories first-class: `basic_research`, `applied_research`, `experimental_development`
 - Plan modes: `exploratory`, `confirmatory`, `milestone`
 - Iteration FSA with 5 explicit branches: `NEXT_STEP` / `REFINE` / `ADJACENT` / `PARK` / `CLOSE`
-- Divergence checkpoint before execution to expose alternatives, anchoring risk, novelty basis, and disconfirming evidence before committing to a plan
+- Divergence checkpoint before execution to expose alternatives, anchoring risk, research positioning, and disconfirming evidence before committing to a plan
 - Single research-review subagent before claim/decision/report promotion, covering analysis sufficiency and result reliability
 - Toulmin-derived claim structure (5 required fields, no numeric ladder)
 - `references/analysis.md` covering EDA, result analysis, depth stop conditions, and Observation→Interpretation→Claim staging — backed by Tukey 1977, Wickham, Mitchell 2019 Model Cards, Gebru 2021 Datasheets, Ribeiro 2020 CheckList, Guo 2017 calibration, Bouthillier 2021 variance, Pearl Ladder of Causation, Gelman-Loken forking paths, Toulmin 1958
