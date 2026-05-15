@@ -27,6 +27,9 @@ last_updated: YYYY-MM-DD
 ## Question / Objective
 <One paragraph stating what this plan investigates or builds.>
 
+## Divergence checkpoint
+<Plan-time record of alternatives, anchoring risks, novelty basis, disconfirming evidence, and why this plan commits to the chosen route.>
+
 ## Plan
 <Mode-specific structure — see below.>
 
@@ -35,6 +38,9 @@ last_updated: YYYY-MM-DD
 
 ## Planned vs Actual
 <Differences between plan and execution, with reasoning. Empty if no deviation.>
+
+## Research review
+<Summary from exactly one research-review subagent, covering analysis sufficiency and result reliability. Required before Claims, state-changing Decision, or report.>
 
 ## Claims
 <Load-bearing claims using the schema in claim_structure.md.>
@@ -47,6 +53,44 @@ last_updated: YYYY-MM-DD
 - Related plans: <other plan IDs and their relationship>
 - Related literature: <see literature/papers.md entries>
 ```
+
+## Divergence checkpoint section
+
+This section appears in every mode after `## Question / Objective` and before `## Plan`. Fill it before execution. Its purpose is to prevent research from prematurely converging on "the approach that worked last time," "the approach the user requested," or "the dataset already at hand."
+
+```markdown
+## Divergence checkpoint
+
+### Approach portfolio
+- Primary route: <the candidate approach selected for execution>
+- Alternative A: <an approach based on a different principle, data assumption, evaluation target, or design>
+- Alternative B: <another meaningfully different approach; simple threshold changes, extra seeds, and larger versions do not count>
+
+### Anchoring audit
+- Prior result / approach / dataset being imported: <what premise is being carried into this plan>
+- Risk if the anchor is wrong: <what interpretation would break if that premise is false>
+- Revalidation or control: <holdout / alternate period / placebo / control / condition change>
+
+### Novelty / differentiation thesis
+- Contribution type: <question / mechanism / data / metric / evaluation protocol / method / system / replication / baseline strengthening>
+- Closest prior approach: <literature/papers.md entry, or unknown-not-yet-reviewed if no novelty claim is made>
+- Differentiation status: <cited in literature/differentiation.md / no novelty claim>
+
+### Disconfirming evidence
+- Stop, narrow, or pivot if: <observation that would force a narrower question, a different route, a pause, or closure>
+- Branch if observed: <REFINE / ADJACENT / PARK / CLOSE>
+
+### Commitment decision
+- Chosen route and reason: <why this plan commits to this route now>
+- Skipped divergence: <alternatives not explored because of time or budget; None if none>
+- Effect on later claims: <how this limits later claims or narrows the tested conditions>
+```
+
+Do not pad the `Approach portfolio`. Different LSTM depths, thresholds on the same signal, or seeds on the same dataset are not different approaches. An alternative differs from the primary route in at least one of: method family, data assumption, evaluation target, mechanism, or system design.
+
+Do not skip this checkpoint when the user asks to avoid exploration or to use only the previous approach. The final plan may still choose the user-requested route, but skipped divergence must be recorded under `Skipped divergence` and carried into the later Research review. If a hard constraint truly permits only one route, say so directly and narrow the later claim scope only after the later Research review records `PASS` for both analysis sufficiency and result reliability. Scope narrowing cannot rescue insufficient analysis or distorted results.
+
+If the plan says novel, new method, publishable, or to our knowledge, `Differentiation status` must cite `literature/differentiation.md` before execution. `unknown-not-yet-reviewed` is allowed only when the plan explicitly makes no novelty claim.
 
 ## Plan section by mode
 
@@ -158,6 +202,39 @@ If no deviation: `No material deviation from plan.`
 
 Material vs immaterial deviation: a change that could affect the interpretation of results is material. Fixing a typo in a script is not. Changing the evaluation metric is. Changing the random seed is usually not material; changing it after seeing a result that depends on the seed is material.
 
+## Research review section
+
+Before writing load-bearing claims, making a state-changing decision (`REFINE`, `ADJACENT`, `PARK`, or `CLOSE`), or drafting a human-facing report, dispatch exactly one fresh research-review subagent. This is one subagent with two review responsibilities:
+
+1. **Analysis sufficiency** — evaluate whether the analysis is sufficient for the conclusion being drawn. This review exists because the analysis directly determines the conclusion; inadequate analysis can lead to a wrong claim or premature close-out even if the experiment ran correctly.
+2. **Result reliability** — evaluate whether the result is trustworthy, including the approach, research procedure, data handling, baseline choice, controls, robustness checks, deviations from plan, and whether the evidence supports the claim strength.
+
+Record the reviewer output in the plan:
+
+```markdown
+## Research review
+
+### Reviewer
+- Agent: <subagent identifier or short label>
+- Reviewed at: <YYYY-MM-DD>
+- Scope: <claim / CLOSE / REFINE / ADJACENT / PARK / report>
+
+### Analysis sufficiency
+- Verdict: <PASS / REWORK / INVALID>
+- Rationale: <why the analysis is sufficient, requires rework, or invalidates the current conclusion path>
+- Required reanalysis: <None / named analyses to run before any claim, decision, or report>
+
+### Result reliability
+- Verdict: <PASS / REWORK / INVALID>
+- Rationale: <whether approach, procedure, data, baselines, controls, and robustness support trusting the result>
+- Required repair or rerun: <None / script fix, data repair, baseline repair, rerun, or plan-level redo>
+
+### Required action
+- <Proceed only if both judgments are PASS / run named analysis / fix and rerun affected work / reopen plan>
+```
+
+Only two `PASS` judgments allow promotion to a load-bearing claim, state-changing decision, or report. If either judgment is `REWORK` or `INVALID`, do not promote the result. First perform the required reanalysis, repair, rerun, or plan-level redo, then run a new research review. If a script bug, data defect, leakage, invalid procedure, or broken baseline may have distorted the result, the affected result is invalid evidence until rerun after repair. User pressure to skip review or "just limit the claim" is not an exception; record it as a reliability risk if relevant.
+
 ## Claims section
 
 Use the schema from `claim_structure.md`. Each load-bearing claim is one YAML-like record:
@@ -170,7 +247,7 @@ Use the schema from `claim_structure.md`. Each load-bearing claim is one YAML-li
   conditions_not_tested: [...]
 ```
 
-`scripts/check_claims.py` verifies the structure. Run it before changing the plan's status from `in_progress` to anything else, and before drafting a report.
+`scripts/check_claims.py` verifies the structure. Run it before changing the plan's status from `in_progress` to anything else, and before drafting a report. A Research review entry with `PASS` for both analysis sufficiency and result reliability must already exist before any load-bearing claim, state-changing status change, or report draft.
 
 ## Amendments section (for REFINE)
 
@@ -247,5 +324,11 @@ Mirror the entry in `decisions.md` for any branch except `NEXT_STEP`.
 - **Mode mismatch with category.** Applied research is usually confirmatory; basic research is usually exploratory; experimental development is usually milestone. Mismatches need justification in the Plan section.
 - **Confirmatory plan with no decision threshold.** The whole point of confirmatory is the threshold. State it explicitly.
 - **Exploratory plan with hidden hypothesis.** Writing "we expect X" without committing to a decision threshold converts exploration into informal confirmation. Either commit to confirmatory mode with an explicit threshold, or stay honestly exploratory with a variable space.
+- **No Divergence checkpoint.** A plan that only follows the user's preferred route can still be well formatted and still be weak research. Fill the checkpoint before execution.
+- **Portfolio made of parameter tweaks.** Three thresholds of the same signal are not three approaches. Record them as one primary route with a sweep, then add real alternatives or explicitly narrow the claim scope only after the later Research review records `PASS` for both judgments.
+- **Prior result treated as fact.** "Previous run was best" is an anchor, not a premise. Record what would revalidate it, what rework is required, or what claim condition remains only after the later Research review records `PASS` for both judgments.
+- **Novelty claimed before differentiation.** If the plan says novel, new method, publishable, or to our knowledge, cite or update `literature/differentiation.md` before execution. Otherwise state that no novelty claim is being made and classify the plan as replication, baseline strengthening, or engineering.
+- **Closing without research review.** A self-check is not enough. Before Claims, state-changing Decision, or report, one fresh research-review subagent must record `PASS` for both analysis sufficiency and result reliability.
+- **Splitting the two review questions across agents.** The requirement is one research-review subagent with both judgments, so the reviewer can connect analysis gaps to reliability and claim strength.
 - **Updating the Plan section after execution.** Plans get amended prospectively via `REFINE`. After-the-fact plan rewriting destroys the time-anchor — git diff will show the rewrite and any reviewer will catch it. Use the Planned vs Actual section instead.
 - **Methodology description too thin.** "We ran the experiments" is not a Methodology subsection. State the procedure, the parameters, the protocol.

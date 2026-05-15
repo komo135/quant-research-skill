@@ -25,7 +25,7 @@ Examples of work that triggers the skill:
 
 It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-## Core design (v2.0.0)
+## Core design (v2.0.1)
 
 ### R&D categories (Frascati 2015)
 
@@ -43,14 +43,37 @@ Categories are not a one-way pipeline ([Kline & Rosenberg 1986](https://fenix.is
 
 ```
 1. new_plan.py creates plans/{id}_{slug}.md (mode-specific template)
-2. Write Plan section. git commit. (Plan is time-anchored.)
-3. Execute. Save artifacts under experiments/{plan}/runs/{run_id}/.
-4. ANALYZE — apply the discipline in references/analysis.md.
-5. Write Actual section + Planned-vs-Actual comparison.
-6. Record load-bearing claims using the Toulmin-derived structure.
-7. Pick one of 5 iteration branches: NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE.
-8. If human-facing, draft a report.
+2. Write Question / Objective and the Divergence checkpoint.
+3. Write Plan section. git commit. (Plan is time-anchored.)
+4. Execute. Save artifacts under experiments/{plan}/runs/{run_id}/.
+5. ANALYZE — apply the discipline in references/analysis.md.
+6. Write Actual section + Planned-vs-Actual comparison.
+7. Dispatch exactly one research-review subagent to evaluate analysis sufficiency and result reliability.
+8. Record load-bearing claims using the Toulmin-derived structure.
+9. Pick one of 5 iteration branches: NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE.
+10. If human-facing, draft a report.
 ```
+
+### Divergence checkpoint
+
+Every plan now records a pre-execution checkpoint before committing to a route:
+
+- Approach portfolio: the chosen approach plus meaningfully different alternatives
+- Anchoring audit: prior results, prior approaches, or convenient datasets being imported as assumptions
+- Novelty / differentiation thesis: whether the contribution is a new method, evaluation, data, system, replication, or baseline strengthening
+- Disconfirming evidence: observations that would trigger REFINE / ADJACENT / PARK / CLOSE
+- Commitment decision: why this route is selected now, and what skipped divergence limits later claims
+
+This keeps agents from silently accepting "just improve last time's best approach" as a complete research plan.
+
+### Research review
+
+Before a result becomes a load-bearing claim, state-changing decision (`REFINE`, `ADJACENT`, `PARK`, or `CLOSE`), or report, the agent dispatches exactly one fresh research-review subagent. That reviewer must record a verdict for both:
+
+- Analysis sufficiency: whether the analysis is adequate for the conclusion, because weak analysis can directly produce a wrong close-out.
+- Result reliability: whether the result is trustworthy given the approach, research procedure, data handling, baselines, controls, robustness checks, and plan deviations.
+
+The review records `PASS`, `REWORK`, or `INVALID` for each judgment in the plan's Research review section. Only two `PASS` judgments allow promotion. `REWORK` requires the named analysis, repair, or rerun before any claim, decision, or report; `INVALID` means the affected result is not evidence until the distorted work is redone.
 
 ### Claim structure (Toulmin-derived, no numeric ladder)
 
@@ -184,12 +207,25 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.0.0** — agent-driven R&D redesign. Not backward compatible with v1.x.
+**Version 2.0.1** — strengthens research planning and review gates on top of the v2 redesign. Not backward compatible with v1.x.
 
 <details>
 <summary>Changelog</summary>
 
-### v2.0.0 (current) — agent-driven R&D redesign
+### v2.0.1 (current) — divergence and review gate hardening
+
+Strengthens v2 research discipline without changing plugin identity.
+
+**Added / changed**
+
+- Required Divergence checkpoint before execution: approach portfolio, anchoring audit, novelty/differentiation thesis, disconfirming evidence, and commitment decision.
+- Required single research-review subagent before load-bearing claims, state-changing decisions, or reports.
+- Research review verdicts are `PASS` / `REWORK` / `INVALID`; only `PASS` + `PASS` permits promotion.
+- `REWORK` requires named reanalysis, repair, or rerun before any claim, decision, or report.
+- `INVALID` makes affected results unusable as evidence until repair, rerun, or research-plan redo.
+- Quant time-series test-set reuse is treated as a reliability failure requiring protocol reopening and fresh evaluation, not a weaker writeup.
+
+### v2.0.0 — agent-driven R&D redesign
 
 Complete redesign. No backward compatibility with v1.x.
 
@@ -198,6 +234,8 @@ Complete redesign. No backward compatibility with v1.x.
 - 3 Frascati categories first-class: `basic_research`, `applied_research`, `experimental_development`
 - Plan modes: `exploratory`, `confirmatory`, `milestone`
 - Iteration FSA with 5 explicit branches: `NEXT_STEP` / `REFINE` / `ADJACENT` / `PARK` / `CLOSE`
+- Divergence checkpoint before execution to expose alternatives, anchoring risk, novelty basis, and disconfirming evidence before committing to a plan
+- Single research-review subagent before claim/decision/report promotion, covering analysis sufficiency and result reliability
 - Toulmin-derived claim structure (5 required fields, no numeric ladder)
 - `references/analysis.md` covering EDA, result analysis, depth stop conditions, and Observation→Interpretation→Claim staging — backed by Tukey 1977, Wickham, Mitchell 2019 Model Cards, Gebru 2021 Datasheets, Ribeiro 2020 CheckList, Guo 2017 calibration, Bouthillier 2021 variance, Pearl Ladder of Causation, Gelman-Loken forking paths, Toulmin 1958
 - Lightweight Amendment pattern: `REFINE` appends an Amendment rather than rewriting the Plan

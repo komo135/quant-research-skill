@@ -11,8 +11,10 @@ Creates:
     plans/<id>_<slug>.md           (from template, with metadata filled in)
     experiments/<id>_<slug>/{code,configs,runs,notebooks}/
 
-The plan is NOT auto-committed. Commit it yourself once the Plan section is filled in —
-that commit is the time-anchor for the plan.
+The plan is NOT auto-committed. Commit it yourself once the Question / Objective,
+Divergence checkpoint, and Plan sections are filled in — that commit is the
+time-anchor for the plan. After execution, fill the Research review section
+before writing Claims, a state-changing Decision, or a report.
 """
 import argparse
 import subprocess
@@ -109,9 +111,13 @@ def main():
     print(f"Created experiments:    {exp_dir.relative_to(project)}/")
     print()
     print("Next steps:")
-    print(f"  1. Fill in the Plan section of {plan_path.relative_to(project)}")
+    print(
+        f"  1. Fill in the Question / Objective, Divergence checkpoint, and Plan sections of "
+        f"{plan_path.relative_to(project)}"
+    )
     print(f"  2. git add plans/{plan_name}.md experiments/{plan_name}/")
     print(f"  3. git commit -m 'Plan {plan_id}: {slug}'")
+    print("  4. After execution, fill Research review before Claims, state-changing Decision, or report")
     print()
     print("The commit time-anchors the plan. Execution comes after.")
 
