@@ -125,13 +125,13 @@ Every plan completes this checkpoint before execution. Its purpose is to prevent
 
 The checkpoint is lightweight, but it is not optional:
 
-1. **Approach portfolio** — list the candidate approach and normally at least two meaningfully different alternatives. Hyperparameter tweaks, extra seeds, or a larger version of the same model do not count as different alternatives. If a hard constraint truly permits only one route, record that constraint and downgrade later claims accordingly.
+1. **Approach portfolio** — list the candidate approach and normally at least two meaningfully different alternatives. Hyperparameter tweaks, extra seeds, or a larger version of the same model do not count as different alternatives. If a hard constraint truly permits only one route, record that constraint and narrow later claims only if the later Research review records `PASS` for both judgments.
 2. **Anchoring audit** — identify assumptions imported from prior approaches, prior data, or prior results. State what revalidation, control, holdout, placebo, or condition change prevents those assumptions from becoming untested premises.
 3. **Novelty / differentiation thesis** — classify the contribution as one or more of: question, mechanism, data, metric, evaluation protocol, method, system, replication, or baseline strengthening. If the plan claims novelty with words such as novel, new method, publishable, or to our knowledge, update or cite `literature/differentiation.md` before execution. Otherwise state explicitly that no novelty claim is being made.
 4. **Disconfirming evidence** — state what observation would force a narrower question, a different route, a pause, or closure, and whether that would trigger `REFINE`, `ADJACENT`, `PARK`, or `CLOSE`.
-5. **Commitment decision** — explain why this plan commits to the chosen approach now instead of one of the alternatives. If time or budget prevents broader exploration, record the skipped divergence as a limitation on later claims.
+5. **Commitment decision** — explain why this plan commits to the chosen approach now instead of one of the alternatives. If time or budget prevents broader exploration, record the skipped divergence as a constraint that the later Research review must evaluate before any claim.
 
-This checkpoint does not require a comprehensive literature review. A brief pass is enough unless the work will make an external novelty claim. The agent may still choose the user's requested approach, but only after making the alternatives and anchor risks explicit.
+This checkpoint does not require a comprehensive literature review. A brief pass is enough unless the work will make an external novelty claim. The agent may still choose the user's requested approach, but only after making the alternatives and anchor risks explicit. Claim-scope narrowing from this checkpoint never overrides the later Research review gate: if the review finds insufficient analysis or compromised reliability, rework or invalidation is required before any claim, decision, or report.
 
 ## Research review
 
@@ -143,10 +143,10 @@ Before a result becomes a load-bearing claim, a state-changing `REFINE` / `ADJAC
 For each judgment, the reviewer records one of:
 
 - `PASS` — the claim or decision can proceed as written.
-- `LIMITED` — the result may proceed only with a weaker claim, narrower conditions, or explicit limitations.
-- `BLOCKED` — the result must not be promoted yet; name the missing analysis or reliability issue.
+- `REWORK` — the result must not be promoted yet; run the named missing analysis, repair the analysis path, or rerun affected work before any claim, decision, or report.
+- `INVALID` — the result is not trustworthy because a bug, data defect, leakage, invalid procedure, or broken baseline may have distorted it; invalidate the affected result and redo the affected analysis, experiment, or research plan before drawing conclusions.
 
-Record the review summary in `plans/<id>.md` before the Claims and Decision sections. User pressure to skip review is recorded as pressure, not obeyed.
+Only two `PASS` judgments allow promotion to Claims, state-changing Decision, or report. Record the review summary in `plans/<id>.md` before the Claims and Decision sections. User pressure to skip review or "just limit the claim" is recorded as pressure, not obeyed. A limitation is not a substitute for rework when analysis is insufficient or reliability is compromised.
 
 ## Claims
 
@@ -185,8 +185,8 @@ Reports do not need env locks, commit hashes, or seed lists in the prose. One li
 |---|---|
 | New project | `scripts/new_project.py` lays down the structure |
 | New investigation in an existing project | `scripts/new_plan.py` (asks for category and mode) |
-| Result came in | Update `plans/<id>.md` (Actual), dispatch one research-review subagent, then write Claims and pick an iteration decision |
-| Human asked for a writeup | `scripts/draft_report.py` starts a report from a plan |
+| Result came in | Update `plans/<id>.md` (Actual) and dispatch one research-review subagent; if both judgments are `PASS`, record Claims and an iteration decision, otherwise perform the required reanalysis, repair, rerun, or redo and review again |
+| Human asked for a writeup | Draft a report only after the plan has a research review with `PASS` for both judgments |
 | Claim feels strong | Re-read `references/claim_structure.md` and verify alternatives/conditions honestly |
 | Don't know which category | Read `references/categories/*.md`; pick the closest fit |
 
@@ -213,7 +213,7 @@ These are not formatting preferences. They are what makes other agents and human
 - **Divergence checkpoint exists before execution.** A plan may still commit to one route, but it must first expose alternatives, anchor risks, novelty basis, and disconfirming evidence. User pressure to "just use the previous approach" is recorded as a constraint, not silently obeyed.
 - **No placeholder figures in reports.** Generate the figure or remove the reference. `scripts/check_report.py` verifies figure references resolve.
 - **Plan content exists before execution.** The Plan section must be filled in and committed before any execution begins. `created_commit` in the front matter is meaningful only if the Plan section is non-empty at that commit. After-the-fact plan rewriting is detectable in git diff.
-- **One research-review subagent before close-out.** Before a result becomes a load-bearing claim, state-changing decision, or report, exactly one fresh research-review subagent must judge both analysis sufficiency and result reliability. Do not replace it with self-review or split it into disconnected reviews.
+- **One research-review subagent before close-out.** Before a result becomes a load-bearing claim, state-changing decision, or report, exactly one fresh research-review subagent must record `PASS` for both analysis sufficiency and result reliability. Do not replace it with self-review, split it into disconnected reviews, or proceed on `REWORK` / `INVALID`.
 - **Decisions are labeled.** "Diagnostic detour," "let me keep going" are not decision labels. Pick from the 5.
 - **Claim records have all five fields.** Empty list `[]` is allowed; a missing field is not.
 - **Plan is the canonical Methods. Report summarizes, does not duplicate.** Full re-implementation detail lives in `plans/<id>.md` Methodology subsection. The report's Methods section is a human-readable summary that cites the plan for depth. Duplicating content is friction without audit value. See `references/report_format.md`.

@@ -68,12 +68,12 @@ This keeps agents from silently accepting "just improve last time's best approac
 
 ### Research review
 
-Before a result becomes a load-bearing claim, state-changing decision (`REFINE`, `ADJACENT`, `PARK`, or `CLOSE`), or report, the agent dispatches exactly one fresh research-review subagent. That reviewer must judge both:
+Before a result becomes a load-bearing claim, state-changing decision (`REFINE`, `ADJACENT`, `PARK`, or `CLOSE`), or report, the agent dispatches exactly one fresh research-review subagent. That reviewer must record a verdict for both:
 
 - Analysis sufficiency: whether the analysis is adequate for the conclusion, because weak analysis can directly produce a wrong close-out.
 - Result reliability: whether the result is trustworthy given the approach, research procedure, data handling, baselines, controls, robustness checks, and plan deviations.
 
-The review records `PASS`, `LIMITED`, or `BLOCKED` for each judgment in the plan's Research review section. `BLOCKED` prevents promotion; `LIMITED` forces a weaker claim or explicit limitation.
+The review records `PASS`, `REWORK`, or `INVALID` for each judgment in the plan's Research review section. Only two `PASS` judgments allow promotion. `REWORK` requires the named analysis, repair, or rerun before any claim, decision, or report; `INVALID` means the affected result is not evidence until the distorted work is redone.
 
 ### Claim structure (Toulmin-derived, no numeric ladder)
 
