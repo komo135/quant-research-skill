@@ -25,7 +25,7 @@ Examples of work that triggers the skill:
 
 It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-## Core design (v2.0.0)
+## Core design (v2.0.1)
 
 ### R&D categories (Frascati 2015)
 
@@ -207,12 +207,25 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.0.0** — agent-driven R&D redesign. Not backward compatible with v1.x.
+**Version 2.0.1** — strengthens research planning and review gates on top of the v2 redesign. Not backward compatible with v1.x.
 
 <details>
 <summary>Changelog</summary>
 
-### v2.0.0 (current) — agent-driven R&D redesign
+### v2.0.1 (current) — divergence and review gate hardening
+
+Strengthens v2 research discipline without changing plugin identity.
+
+**Added / changed**
+
+- Required Divergence checkpoint before execution: approach portfolio, anchoring audit, novelty/differentiation thesis, disconfirming evidence, and commitment decision.
+- Required single research-review subagent before load-bearing claims, state-changing decisions, or reports.
+- Research review verdicts are `PASS` / `REWORK` / `INVALID`; only `PASS` + `PASS` permits promotion.
+- `REWORK` requires named reanalysis, repair, or rerun before any claim, decision, or report.
+- `INVALID` makes affected results unusable as evidence until repair, rerun, or research-plan redo.
+- Quant time-series test-set reuse is treated as a reliability failure requiring protocol reopening and fresh evaluation, not a weaker writeup.
+
+### v2.0.0 — agent-driven R&D redesign
 
 Complete redesign. No backward compatibility with v1.x.
 
