@@ -39,7 +39,7 @@ After experiments run, before a load-bearing claim is recorded, the result analy
 | **Perturbation / robustness probe** | Any claim of practical applicability | [Hendrycks robustness](https://danhendrycks.com/robustness/); [Taori et al. NeurIPS 2020](https://proceedings.neurips.cc/paper/2020/file/d8330f857a17c53d217014ee776bfd50-Paper.pdf) |
 | **Error analysis on a sample of failures** | Any claim that needs a mechanism | [Ng CS230 Section 8](https://cs230.stanford.edu/section/8/) |
 
-Below this floor, the claim is exploratory, not confirmatory. If an applied-research plan declares `mode: confirmatory` but skips items above that apply, the report's Limitations section must acknowledge the gap explicitly.
+Below this floor, the result remains an exploratory observation, not a claim-bearing conclusion. If an applied-research plan declares `mode: confirmatory` but skips applicable items above, the missing analysis must be completed before promotion to a load-bearing claim, state-changing decision, or report.
 
 For non-ML quantitative research, the same principle adapts:
 
@@ -119,6 +119,7 @@ The transition from interpretation to claim is where the disclosure floor applie
 - The evidence is anchored to specific artifacts (file:line, run, value)
 - Alternative explanations have been actively considered (and listed if not excluded)
 - The conditions under which the claim holds are stated precisely
+- Exactly one fresh research-review subagent has recorded `PASS` for both analysis sufficiency and result reliability in `plans/<id>.md` Research review section
 
 ### Pearl's Ladder applies
 
