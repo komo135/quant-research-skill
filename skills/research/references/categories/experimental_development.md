@@ -4,6 +4,8 @@
 
 Experimental development is systematic work to produce a working artifact — a prototype, a tool, a system, or an improved process — drawing on prior research and practical experience. The defining feature, from the Frascati Manual (OECD 2015), is that the deliverable is something that works in practice, not just a piece of knowledge.
 
+Classify by the plan's intended output and acceptance uncertainty, not by source. Implementing a research paper is experimental development only when the primary deliverable is a functioning artifact; if the primary claim is that a method beats a baseline, use applied research.
+
 Pick experimental development when:
 
 - You are building a system or prototype that has to function end-to-end.
@@ -13,7 +15,7 @@ Pick experimental development when:
 
 Examples: building a reference implementation of a published method, engineering a data pipeline for a domain that did not have one, prototyping an interactive tool, hardening a research codebase into something a non-author can run, implementing a non-trivial algorithm with correctness tests.
 
-This is not "applied research with code." Applied research produces a methods claim with comparative evidence. Experimental development produces a functioning artifact whose value is in operating correctly, not in proving a method is better.
+This is not "applied research with code." Applied research is organized around a methods claim and planned comparison to baselines. Experimental development produces a functioning artifact whose value is in operating correctly, not in proving a method is better.
 
 ## Typical outputs
 
@@ -37,7 +39,7 @@ Milestone mode differs from confirmatory:
 - Confirmatory fixes a metric and a decision threshold ("does method X beat baseline B by ≥ Δ?")
 - Milestone fixes acceptance criteria ("system handles input class A, latency under T ms, returns correct output on the regression suite under conditions C")
 
-Both can coexist in one plan — e.g., a system must function correctly (milestone) AND must achieve a benchmark target (confirmatory part). In that case write both sets of criteria.
+One plan still declares one mode. A milestone plan may include benchmark thresholds as acceptance criteria, but if the benchmark comparison becomes the load-bearing evidence for a methods claim, open an `ADJACENT` applied-research plan with confirmatory mode instead of making the plan both milestone and confirmatory.
 
 `exploratory` mode is sometimes appropriate for very early-stage development (figuring out what is even buildable). Switch to `milestone` once the shape of the system is clear.
 
@@ -126,6 +128,6 @@ Performance claims are distribution claims. Report the distribution, not a singl
 - **Demo-driven evaluation.** A demo on hand-picked inputs is not evidence the system works generally. Acceptance tests must cover the declared input space.
 - **Skipping edge cases.** Most production failures are edge cases. Completion criteria should include edge-case scenarios.
 - **Documentation debt.** A working artifact that nobody else can run is half-built. The System description in the report must let a non-author bring the artifact up.
-- **Promoting development to applied research without ablations.** Claiming "system S beats system T because of innovation I" requires an ablation. Without ablation, the claim is "system S works," not "innovation I is the reason."
+- **Promoting development to applied research without ablations.** Claiming "system S beats system T because of component I" requires an ablation. Without ablation, the claim is "system S works," not "component I is the reason."
 - **Hidden infrastructure changes.** Modifying lib/ or shared infrastructure as part of development without recording it in `decisions.md` makes the change invisible to other plans.
 - **Single-run performance numbers.** Performance is a distribution. Report it as one.

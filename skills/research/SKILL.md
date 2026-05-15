@@ -29,13 +29,21 @@ This distinction follows Drummond (2009) and Goodman et al. (2016): methods repr
 
 Every plan declares exactly one category. The choice changes the planning style, completion criteria, and report shape. Categories are from the Frascati Manual (OECD 2015) — they are the field-standard vocabulary.
 
+Choose the category by the plan's primary purpose, intended use, expected output, and type of uncertainty.
+
+- Do not classify work by its source or origin alone: extending a basic-research result does not automatically make the next plan applied research, and implementing a paper does not automatically make the plan experimental development.
+- "Innovation" is not a primary R&D category label here.
+- Do not mix the contribution at publication time with later adoption, diffusion, or social value when classifying the plan.
+
 | Category | When to use | Typical output | Default plan mode | Report shape |
 |---|---|---|---|---|
 | **basic_research** | Investigating a phenomenon, building a baseline, characterizing failure modes, refining a question | New observations, refined question, theoretical insight, reference baseline, failure-mode catalog | exploratory | Phenomenon → Mechanism → Learned → Refined question |
 | **applied_research** | Achieving a measurable objective by designing a new method or system | Method achieving target metric, ablation results, comparison vs baselines | confirmatory | Background → Method → Experiments → Ablations → Discussion |
 | **experimental_development** | Engineering a working system, prototype, or process improvement | Functioning artifact, performance metrics, operational limits | milestone | System → Performance → Limits → Next iteration |
 
-Categories are not a one-way pipeline. A project may cycle: basic research characterizes a phenomenon → applied research builds a method against the resulting baseline → development engineers it into a system → basic research investigates the new failure modes. The non-linear view is the modern consensus (Kline & Rosenberg 1986; Stokes 1997). Cycling is normal.
+Categories are not a one-way pipeline. A project or program may mix and cycle between them: basic research characterizes a phenomenon → applied research builds a method against the resulting baseline → development engineers it into a system → basic research investigates the new failure modes. The non-linear view is the modern consensus (Kline & Rosenberg 1986; Stokes 1997). Cycling is normal.
+
+The plan is the unit that must make a single category declaration. If secondary category work is incidental, record it as context only, not as another declared category inside the same plan. If it becomes load-bearing for a claim, decision, or report, open a separate plan. When there is an originating plan, normally record that transition as an `ADJACENT` decision.
 
 Read `references/categories/<category>.md` after picking a category.
 
