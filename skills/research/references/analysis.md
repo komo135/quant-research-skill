@@ -119,6 +119,7 @@ The transition from interpretation to claim is where the disclosure floor applie
 - The evidence is anchored to specific artifacts (file:line, run, value)
 - Alternative explanations have been actively considered (and listed if not excluded)
 - The conditions under which the claim holds are stated precisely
+- Exactly one fresh research-review subagent has judged both analysis sufficiency and result reliability, with the summary recorded in `plans/<id>.md` Research review section
 
 ### Pearl's Ladder applies
 

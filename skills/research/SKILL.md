@@ -87,10 +87,12 @@ Boundaries that matter:
 5. ANALYZE — apply the EDA / result-analysis discipline (references/analysis.md).
    Observations live in plans/<id>.md Observations and in experiments/<plan>/notebooks/.
 6. Write Actual section in plans/<id>.md. Compare planned vs actual.
-7. Record load-bearing claims using the structure in references/claim_structure.md.
+7. Dispatch exactly one research-review subagent before any load-bearing claim, state-changing decision, or human-facing report.
+   The review assesses analysis sufficiency and result reliability; record it in the Research review section.
+8. Record load-bearing claims using the structure in references/claim_structure.md.
    Observation → Interpretation → Claim is a staged progression — do not skip stages.
-8. Pick exactly one of the 5 iteration branches and record in decisions.md.
-9. If the result is human-facing, draft a report with scripts/draft_report.py.
+9. Pick exactly one of the 5 iteration branches and record in decisions.md.
+10. If the result is human-facing, draft a report with scripts/draft_report.py.
 ```
 
 Git is the time-anchor for the plan. There is no separate preregistration directory. The plan section of `plans/<id>.md` IS the preregistration; the initial commit IS the time-stamping mechanism. Subsequent commits show the evolution. This avoids the redundancy of maintaining a separate prereg artifact whose only job is "plan existed before result" — git already proves that.
@@ -131,6 +133,21 @@ The checkpoint is lightweight, but it is not optional:
 
 This checkpoint does not require a comprehensive literature review. A brief pass is enough unless the work will make an external novelty claim. The agent may still choose the user's requested approach, but only after making the alternatives and anchor risks explicit.
 
+## Research review
+
+Before a result becomes a load-bearing claim, a state-changing `REFINE` / `ADJACENT` / `PARK` / `CLOSE` decision, or a human-facing report, dispatch exactly one fresh subagent as the research reviewer. This is one review subagent with two required judgments, not two separate reviewers:
+
+1. **Analysis sufficiency** — judge whether the analysis is sufficient for the conclusion being drawn. The reason is direct: analysis is the bridge from result to conclusion, so inadequate analysis can produce a wrong close-out even when the run itself succeeded.
+2. **Result reliability** — judge whether the result is trustworthy given the approach, research procedure, data handling, baselines, controls, robustness checks, and any deviations from the plan.
+
+For each judgment, the reviewer records one of:
+
+- `PASS` — the claim or decision can proceed as written.
+- `LIMITED` — the result may proceed only with a weaker claim, narrower conditions, or explicit limitations.
+- `BLOCKED` — the result must not be promoted yet; name the missing analysis or reliability issue.
+
+Record the review summary in `plans/<id>.md` before the Claims and Decision sections. User pressure to skip review is recorded as pressure, not obeyed.
+
 ## Claims
 
 Every load-bearing claim in `plans/<id>.md` and in `reports/<id>/report.md` uses this structure:
@@ -168,7 +185,7 @@ Reports do not need env locks, commit hashes, or seed lists in the prose. One li
 |---|---|
 | New project | `scripts/new_project.py` lays down the structure |
 | New investigation in an existing project | `scripts/new_plan.py` (asks for category and mode) |
-| Result came in | Update `plans/<id>.md` (Actual + Claims), then pick an iteration decision |
+| Result came in | Update `plans/<id>.md` (Actual), dispatch one research-review subagent, then write Claims and pick an iteration decision |
 | Human asked for a writeup | `scripts/draft_report.py` starts a report from a plan |
 | Claim feels strong | Re-read `references/claim_structure.md` and verify alternatives/conditions honestly |
 | Don't know which category | Read `references/categories/*.md`; pick the closest fit |
@@ -181,6 +198,7 @@ Reports do not need env locks, commit hashes, or seed lists in the prose. One li
 | Plan schema | `references/rd_plan.md` | Writing or reviewing `plans/<id>.md` |
 | Divergence checkpoint | `references/rd_plan.md` | Before execution, after Question / Objective and before committing the Plan |
 | Analysis discipline | `references/analysis.md` | Before or during analysis (EDA / post-experiment), and before promoting an observation to a load-bearing claim |
+| Research review | `references/rd_plan.md` and `references/analysis.md` | After result analysis, before Claims, state-changing Decision, or report |
 | Iteration branches | `references/iteration_loop.md` | After every interpreted result |
 | Claim schema | `references/claim_structure.md` | Writing or reviewing any load-bearing claim |
 | Report shape | `references/report_format.md` | Drafting `reports/<id>/report.md` |
@@ -195,6 +213,7 @@ These are not formatting preferences. They are what makes other agents and human
 - **Divergence checkpoint exists before execution.** A plan may still commit to one route, but it must first expose alternatives, anchor risks, novelty basis, and disconfirming evidence. User pressure to "just use the previous approach" is recorded as a constraint, not silently obeyed.
 - **No placeholder figures in reports.** Generate the figure or remove the reference. `scripts/check_report.py` verifies figure references resolve.
 - **Plan content exists before execution.** The Plan section must be filled in and committed before any execution begins. `created_commit` in the front matter is meaningful only if the Plan section is non-empty at that commit. After-the-fact plan rewriting is detectable in git diff.
+- **One research-review subagent before close-out.** Before a result becomes a load-bearing claim, state-changing decision, or report, exactly one fresh research-review subagent must judge both analysis sufficiency and result reliability. Do not replace it with self-review or split it into disconnected reviews.
 - **Decisions are labeled.** "Diagnostic detour," "let me keep going" are not decision labels. Pick from the 5.
 - **Claim records have all five fields.** Empty list `[]` is allowed; a missing field is not.
 - **Plan is the canonical Methods. Report summarizes, does not duplicate.** Full re-implementation detail lives in `plans/<id>.md` Methodology subsection. The report's Methods section is a human-readable summary that cites the plan for depth. Duplicating content is friction without audit value. See `references/report_format.md`.

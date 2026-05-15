@@ -88,6 +88,30 @@ last_updated: YYYY-MM-DD
 
 <Differences. Functionality deferred, scope changes. "No material deviation from plan." if none.>
 
+## Research review
+
+### Reviewer
+
+- Agent: <one fresh research-review subagent>
+- Reviewed at: <YYYY-MM-DD>
+- Scope: <claim / CLOSE / REFINE / ADJACENT / PARK / report>
+
+### Analysis sufficiency
+
+- Verdict: <PASS / LIMITED / BLOCKED>
+- Rationale: <why the analysis is or is not sufficient for the conclusion>
+- Missing or limiting analyses: <None / list>
+
+### Result reliability
+
+- Verdict: <PASS / LIMITED / BLOCKED>
+- Rationale: <whether approach, procedure, data, baselines, controls, and robustness support trusting the result>
+- Reliability risks: <None / list>
+
+### Required action
+
+- <Proceed / weaken claim / add limitation / run named analysis / revise decision>
+
 ## Claims
 
 <Load-bearing claims about functional behavior and performance, using claim_structure.md.>

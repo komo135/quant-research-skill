@@ -39,6 +39,9 @@ last_updated: YYYY-MM-DD
 ## Planned vs Actual
 <Differences between plan and execution, with reasoning. Empty if no deviation.>
 
+## Research review
+<Summary from exactly one research-review subagent, covering analysis sufficiency and result reliability. Required before Claims, state-changing Decision, or report.>
+
 ## Claims
 <Load-bearing claims using the schema in claim_structure.md.>
 
@@ -199,6 +202,39 @@ If no deviation: `No material deviation from plan.`
 
 Material vs immaterial deviation: a change that could affect the interpretation of results is material. Fixing a typo in a script is not. Changing the evaluation metric is. Changing the random seed is usually not material; changing it after seeing a result that depends on the seed is material.
 
+## Research review section
+
+Before writing load-bearing claims, making a state-changing decision (`REFINE`, `ADJACENT`, `PARK`, or `CLOSE`), or drafting a human-facing report, dispatch exactly one fresh research-review subagent. This is one subagent with two review responsibilities:
+
+1. **Analysis sufficiency** — evaluate whether the analysis is sufficient for the conclusion being drawn. This review exists because the analysis directly determines the conclusion; inadequate analysis can lead to a wrong claim or premature close-out even if the experiment ran correctly.
+2. **Result reliability** — evaluate whether the result is trustworthy, including the approach, research procedure, data handling, baseline choice, controls, robustness checks, deviations from plan, and whether the evidence supports the claim strength.
+
+Record the reviewer output in the plan:
+
+```markdown
+## Research review
+
+### Reviewer
+- Agent: <subagent identifier or short label>
+- Reviewed at: <YYYY-MM-DD>
+- Scope: <claim / CLOSE / REFINE / ADJACENT / PARK / report>
+
+### Analysis sufficiency
+- Verdict: <PASS / LIMITED / BLOCKED>
+- Rationale: <why the analysis is or is not sufficient for the conclusion>
+- Missing or limiting analyses: <None / list>
+
+### Result reliability
+- Verdict: <PASS / LIMITED / BLOCKED>
+- Rationale: <whether approach, procedure, data, baselines, controls, and robustness support trusting the result>
+- Reliability risks: <None / list>
+
+### Required action
+- <Proceed / weaken claim / add limitation / run named analysis / revise decision>
+```
+
+If either judgment is `BLOCKED`, do not promote the result to a load-bearing claim or state-changing decision. If either judgment is `LIMITED`, the next claim or decision must carry the stated limitation. User pressure to skip review is not an exception; record it as a reliability risk if relevant.
+
 ## Claims section
 
 Use the schema from `claim_structure.md`. Each load-bearing claim is one YAML-like record:
@@ -211,7 +247,7 @@ Use the schema from `claim_structure.md`. Each load-bearing claim is one YAML-li
   conditions_not_tested: [...]
 ```
 
-`scripts/check_claims.py` verifies the structure. Run it before changing the plan's status from `in_progress` to anything else, and before drafting a report.
+`scripts/check_claims.py` verifies the structure. Run it before changing the plan's status from `in_progress` to anything else, and before drafting a report. A Research review entry must already exist before any load-bearing claim, state-changing status change, or report draft.
 
 ## Amendments section (for REFINE)
 
@@ -292,5 +328,7 @@ Mirror the entry in `decisions.md` for any branch except `NEXT_STEP`.
 - **Portfolio made of parameter tweaks.** Three thresholds of the same signal are not three approaches. Record them as one primary route with a sweep, then add real alternatives or explicitly downgrade the claim scope.
 - **Prior result treated as fact.** "Previous run was best" is an anchor, not a premise. Record what would revalidate it or what limitation follows from not revalidating it.
 - **Novelty claimed before differentiation.** If the plan says novel, new method, publishable, or to our knowledge, cite or update `literature/differentiation.md` before execution. Otherwise state that no novelty claim is being made and classify the plan as replication, baseline strengthening, or engineering.
+- **Closing without research review.** A self-check is not enough. Before Claims, state-changing Decision, or report, one fresh research-review subagent must judge both analysis sufficiency and result reliability.
+- **Splitting the two review questions across agents.** The requirement is one research-review subagent with both judgments, so the reviewer can connect analysis gaps to reliability and claim strength.
 - **Updating the Plan section after execution.** Plans get amended prospectively via `REFINE`. After-the-fact plan rewriting destroys the time-anchor — git diff will show the rewrite and any reviewer will catch it. Use the Planned vs Actual section instead.
 - **Methodology description too thin.** "We ran the experiments" is not a Methodology subsection. State the procedure, the parameters, the protocol.

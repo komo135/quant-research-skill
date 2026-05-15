@@ -48,9 +48,10 @@ Categories are not a one-way pipeline ([Kline & Rosenberg 1986](https://fenix.is
 4. Execute. Save artifacts under experiments/{plan}/runs/{run_id}/.
 5. ANALYZE — apply the discipline in references/analysis.md.
 6. Write Actual section + Planned-vs-Actual comparison.
-7. Record load-bearing claims using the Toulmin-derived structure.
-8. Pick one of 5 iteration branches: NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE.
-9. If human-facing, draft a report.
+7. Dispatch exactly one research-review subagent to evaluate analysis sufficiency and result reliability.
+8. Record load-bearing claims using the Toulmin-derived structure.
+9. Pick one of 5 iteration branches: NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE.
+10. If human-facing, draft a report.
 ```
 
 ### Divergence checkpoint
@@ -64,6 +65,15 @@ Every plan now records a pre-execution checkpoint before committing to a route:
 - Commitment decision: why this route is selected now, and what skipped divergence limits later claims
 
 This keeps agents from silently accepting "just improve last time's best approach" as a complete research plan.
+
+### Research review
+
+Before a result becomes a load-bearing claim, state-changing decision (`REFINE`, `ADJACENT`, `PARK`, or `CLOSE`), or report, the agent dispatches exactly one fresh research-review subagent. That reviewer must judge both:
+
+- Analysis sufficiency: whether the analysis is adequate for the conclusion, because weak analysis can directly produce a wrong close-out.
+- Result reliability: whether the result is trustworthy given the approach, research procedure, data handling, baselines, controls, robustness checks, and plan deviations.
+
+The review records `PASS`, `LIMITED`, or `BLOCKED` for each judgment in the plan's Research review section. `BLOCKED` prevents promotion; `LIMITED` forces a weaker claim or explicit limitation.
 
 ### Claim structure (Toulmin-derived, no numeric ladder)
 
@@ -212,6 +222,7 @@ Complete redesign. No backward compatibility with v1.x.
 - Plan modes: `exploratory`, `confirmatory`, `milestone`
 - Iteration FSA with 5 explicit branches: `NEXT_STEP` / `REFINE` / `ADJACENT` / `PARK` / `CLOSE`
 - Divergence checkpoint before execution to expose alternatives, anchoring risk, novelty basis, and disconfirming evidence before committing to a plan
+- Single research-review subagent before claim/decision/report promotion, covering analysis sufficiency and result reliability
 - Toulmin-derived claim structure (5 required fields, no numeric ladder)
 - `references/analysis.md` covering EDA, result analysis, depth stop conditions, and Observation→Interpretation→Claim staging — backed by Tukey 1977, Wickham, Mitchell 2019 Model Cards, Gebru 2021 Datasheets, Ribeiro 2020 CheckList, Guo 2017 calibration, Bouthillier 2021 variance, Pearl Ladder of Causation, Gelman-Loken forking paths, Toulmin 1958
 - Lightweight Amendment pattern: `REFINE` appends an Amendment rather than rewriting the Plan
