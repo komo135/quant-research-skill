@@ -39,7 +39,7 @@ Milestone mode differs from confirmatory:
 - Confirmatory fixes a metric and a decision threshold ("does method X beat baseline B by ≥ Δ?")
 - Milestone fixes acceptance criteria ("system handles input class A, latency under T ms, returns correct output on the regression suite under conditions C")
 
-One plan still declares one mode. A milestone plan may include benchmark thresholds as acceptance criteria, but if the benchmark comparison becomes the load-bearing evidence for a methods claim, open an `ADJACENT` confirmatory plan instead of making the plan both milestone and confirmatory.
+One plan still declares one mode. A milestone plan may include benchmark thresholds as acceptance criteria, but if the benchmark comparison becomes the load-bearing evidence for a methods claim, open an `ADJACENT` applied-research plan with confirmatory mode instead of making the plan both milestone and confirmatory.
 
 `exploratory` mode is sometimes appropriate for very early-stage development (figuring out what is even buildable). Switch to `milestone` once the shape of the system is clear.
 

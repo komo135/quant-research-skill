@@ -4,7 +4,7 @@
 
 Applied research aims at a specific practical objective by designing a method, model, or procedure. The defining feature, from the Frascati Manual (OECD 2015), is that the work is directed toward a stated objective with a measurable success criterion.
 
-Classify by the objective, intended use, output, and uncertainty type, not by source. A plan can build on basic research and still remain basic if the immediate purpose is characterization; it becomes applied research when the immediate purpose is achieving a stated objective through planned comparative evaluation.
+Classify by the objective, intended use, output, and uncertainty type, not by source. A plan can build on basic research and still remain basic if the primary purpose is characterization; it becomes applied research when the primary purpose is achieving a stated objective through planned comparative evaluation.
 
 Pick applied research when:
 
