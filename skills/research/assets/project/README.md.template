@@ -14,7 +14,7 @@
 - `experiments/` — per-plan code, configs, and run artifacts
 - `lib/` — shared, curated code (data loaders, eval, viz utilities)
 - `reports/` — human-facing deliverables (snapshots)
-- `literature/` — prior work and how this project differs
+- `literature/` — prior work and `literature/positioning.md`, how the work stands on prior work
 
 ## Getting started
 

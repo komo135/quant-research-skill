@@ -15,6 +15,22 @@ last_updated: YYYY-MM-DD
 
 <One paragraph stating what phenomenon or question this plan investigates.>
 
+## Prior-work grounding
+
+### Grounding scope
+
+- Question/objective supported by: <literature/papers.md entries and why they are relevant>
+- Inherited assumptions: <assumptions carried from prior approaches, data, results, or systems>
+- Method choice: <prior work or constraint motivating the selected exploratory route>
+- Baselines/evaluation protocol: <baseline, control, metric, split, benchmark, or comparison source>
+- Known limitations: <limitations from prior work that constrain interpretation>
+
+### Research positioning
+
+- Positioning entry: <literature/positioning.md entry showing how this work stands on prior work>
+- Claim scope: <what this bounded but sufficient grounding supports, narrows, or blocks for the question/objective, inherited assumptions, method choice, baselines/evaluation protocol, and known limitations>
+- Unknown prior-work constraint: <named constraint and affected claims; None if none>
+
 ## Divergence checkpoint
 
 ### Approach portfolio
@@ -29,11 +45,11 @@ last_updated: YYYY-MM-DD
 - Risk if the anchor is wrong: <what interpretation would break>
 - Revalidation or control: <holdout / counterexample / placebo / condition change>
 
-### Novelty / differentiation thesis
+### Research positioning
 
 - Contribution type: <question / mechanism / data / metric / evaluation protocol / method / system / replication / baseline strengthening>
-- Closest prior approach: <literature/papers.md entry, or unknown-not-yet-reviewed if no novelty claim is made>
-- Differentiation status: <literature/differentiation.md entry / no novelty claim>
+- Positioning status: <literature/positioning.md entry and claim scope>
+- External novelty / no-baseline claim: <None, or comprehensive literature survey reference before execution>
 
 ### Disconfirming evidence
 

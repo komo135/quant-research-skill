@@ -27,8 +27,11 @@ last_updated: YYYY-MM-DD
 ## Question / Objective
 <One paragraph stating what this plan investigates or builds.>
 
+## Prior-work grounding
+<Bounded but sufficient grounding for the plan's question/objective, inherited assumptions, method choice, baselines/evaluation protocol, and known limitations. Cite `literature/papers.md` and `literature/positioning.md`. If prior work is genuinely unknown, record the named constraint and narrow or block relevant claims.>
+
 ## Divergence checkpoint
-<Plan-time record of alternatives, anchoring risks, novelty basis, disconfirming evidence, and why this plan commits to the chosen route.>
+<Plan-time record of alternatives, anchoring risks, research positioning, disconfirming evidence, and why this plan commits to the chosen route.>
 
 ## Plan
 <Mode-specific structure — see below.>
@@ -56,7 +59,33 @@ last_updated: YYYY-MM-DD
 
 ## Divergence checkpoint section
 
-This section appears in every mode after `## Question / Objective` and before `## Plan`. Fill it before execution. Its purpose is to prevent research from prematurely converging on "the approach that worked last time," "the approach the user requested," or "the dataset already at hand."
+This section appears in every mode after `## Prior-work grounding` and before `## Plan`. Fill it before execution. Its purpose is to prevent research from prematurely converging on "the approach that worked last time," "the approach the user requested," or "the dataset already at hand."
+
+## Prior-work grounding section
+
+Every plan has first-class prior-work grounding before the Divergence checkpoint and before the Plan section. This is not optional just because no novelty claim is made. The grounding must be bounded but sufficient: enough to support the plan's question/objective, inherited assumptions, method choice, baselines/evaluation protocol, and known limitations.
+
+Use `literature/papers.md` for cited prior work and `literature/positioning.md` for how the work stands on prior work. `positioning.md` is where the plan records grounding, inheritance, baseline choice, known limitations, and claim scope. Differences or novelty can be recorded there when claimed, but novelty is not the default purpose.
+
+If prior work is genuinely unknown, the plan must record a named constraint and narrow or block relevant claims until the grounding is repaired. Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims; this is separate from the plan-scoped grounding every plan needs.
+
+```markdown
+## Prior-work grounding
+
+### Grounding scope
+- Question/objective supported by: <literature/papers.md entries and why they are relevant>
+- Inherited assumptions: <assumptions carried from prior approaches, data, results, or systems>
+- Method choice: <prior work or constraint motivating the selected method family>
+- Baselines/evaluation protocol: <baseline, control, metric, split, benchmark, or acceptance-test source>
+- Known limitations: <limitations from prior work that constrain interpretation>
+
+### Research positioning
+- Positioning entry: <literature/positioning.md entry>
+- Claim scope: <what this grounding supports, narrows, or blocks>
+- Unknown prior-work constraint: <named constraint and affected claims; None if none>
+```
+
+## Divergence checkpoint section
 
 ```markdown
 ## Divergence checkpoint
@@ -71,10 +100,10 @@ This section appears in every mode after `## Question / Objective` and before `#
 - Risk if the anchor is wrong: <what interpretation would break if that premise is false>
 - Revalidation or control: <holdout / alternate period / placebo / control / condition change>
 
-### Novelty / differentiation thesis
+### Research positioning
 - Contribution type: <question / mechanism / data / metric / evaluation protocol / method / system / replication / baseline strengthening>
-- Closest prior approach: <literature/papers.md entry, or unknown-not-yet-reviewed if no novelty claim is made>
-- Differentiation status: <cited in literature/differentiation.md / no novelty claim>
+- Positioning status: <literature/positioning.md entry and claim scope>
+- External novelty / no-baseline claim: <None, or comprehensive literature survey reference before execution>
 
 ### Disconfirming evidence
 - Stop, narrow, or pivot if: <observation that would force a narrower question, a different route, a pause, or closure>
@@ -90,7 +119,7 @@ Do not pad the `Approach portfolio`. Different LSTM depths, thresholds on the sa
 
 Do not skip this checkpoint when the user asks to avoid exploration or to use only the previous approach. The final plan may still choose the user-requested route, but skipped divergence must be recorded under `Skipped divergence` and carried into the later Research review. If a hard constraint truly permits only one route, say so directly and narrow the later claim scope only after the later Research review records `PASS` for both analysis sufficiency and result reliability. Scope narrowing cannot rescue insufficient analysis or distorted results.
 
-If the plan says novel, new method, publishable, or to our knowledge, `Differentiation status` must cite `literature/differentiation.md` before execution. `unknown-not-yet-reviewed` is allowed only when the plan explicitly makes no novelty claim.
+If the plan says novel, new method, publishable, to our knowledge, or no baseline exists, `Research positioning` must cite `literature/positioning.md` and the plan must point to a comprehensive literature survey before execution. Lack of a novelty claim never exempts the plan from bounded but sufficient prior-work grounding.
 
 ## Plan section by mode
 
@@ -327,7 +356,7 @@ Mirror the entry in `decisions.md` for any branch except `NEXT_STEP`.
 - **No Divergence checkpoint.** A plan that only follows the user's preferred route can still be well formatted and still be weak research. Fill the checkpoint before execution.
 - **Portfolio made of parameter tweaks.** Three thresholds of the same signal are not three approaches. Record them as one primary route with a sweep, then add real alternatives or explicitly narrow the claim scope only after the later Research review records `PASS` for both judgments.
 - **Prior result treated as fact.** "Previous run was best" is an anchor, not a premise. Record what would revalidate it, what rework is required, or what claim condition remains only after the later Research review records `PASS` for both judgments.
-- **Novelty claimed before differentiation.** If the plan says novel, new method, publishable, or to our knowledge, cite or update `literature/differentiation.md` before execution. Otherwise state that no novelty claim is being made and classify the plan as replication, baseline strengthening, or engineering.
+- **Claim made before prior-work grounding.** If the plan says novel, new method, publishable, to our knowledge, or no baseline exists, cite or update `literature/positioning.md` and point to a comprehensive literature survey before execution. If the claim is not a novelty claim, the plan still needs bounded but sufficient prior-work grounding and must classify itself as replication, baseline strengthening, engineering, or another grounded position.
 - **Closing without research review.** A self-check is not enough. Before Claims, state-changing Decision, or report, one fresh research-review subagent must record `PASS` for both analysis sufficiency and result reliability.
 - **Splitting the two review questions across agents.** The requirement is one research-review subagent with both judgments, so the reviewer can connect analysis gaps to reliability and claim strength.
 - **Updating the Plan section after execution.** Plans get amended prospectively via `REFINE`. After-the-fact plan rewriting destroys the time-anchor — git diff will show the rewrite and any reviewer will catch it. Use the Planned vs Actual section instead.
