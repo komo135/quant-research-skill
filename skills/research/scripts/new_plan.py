@@ -12,9 +12,9 @@ Creates:
     experiments/<id>_<slug>/{code,configs,runs,notebooks}/
 
 The plan is NOT auto-committed. Commit it yourself once the Question / Objective,
-Divergence checkpoint, and Plan sections are filled in — that commit is the
-time-anchor for the plan. After execution, fill the Research review section
-before writing Claims, a state-changing Decision, or a report.
+Prior-work grounding, Divergence checkpoint, and Plan sections are filled in —
+that commit is the time-anchor for the plan. After execution, fill the Research
+review section before writing Claims, a state-changing Decision, or a report.
 """
 import argparse
 import subprocess
@@ -112,7 +112,7 @@ def main():
     print()
     print("Next steps:")
     print(
-        f"  1. Fill in the Question / Objective, Divergence checkpoint, and Plan sections of "
+        f"  1. Fill in the Question / Objective, Prior-work grounding, Divergence checkpoint, and Plan sections of "
         f"{plan_path.relative_to(project)}"
     )
     print(f"  2. git add plans/{plan_name}.md experiments/{plan_name}/")

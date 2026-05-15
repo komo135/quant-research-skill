@@ -1,3 +1,6 @@
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 
@@ -328,3 +331,45 @@ def test_research_docs_do_not_preserve_legacy_light_review_loopholes():
             "Novelty / differentiation thesis",
             "literature/differentiation.md",
         )
+
+
+def test_new_plan_guidance_includes_prior_work_grounding_before_plan_commit():
+    new_plan = read("skills/research/scripts/new_plan.py")
+
+    assert_mentions(new_plan, "Prior-work grounding")
+    assert_ordered_fragments(
+        new_plan,
+        "Question / Objective",
+        "Prior-work grounding",
+        "Divergence checkpoint",
+        "Plan",
+        "time-anchor",
+    )
+
+
+def test_new_project_seeds_positioning_with_required_fields():
+    script = ROOT / "skills" / "research" / "scripts" / "new_project.py"
+    required_fields = [
+        "What it establishes",
+        "Inherited assumption",
+        "Baseline / protocol use",
+        "Known limitation",
+        "Position of this work",
+        "Claim scope",
+    ]
+
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(tmp) / "project"
+        subprocess.run(
+            [sys.executable, str(script), str(target), "--name", "Positioning Seed Test"],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        positioning = (target / "literature" / "positioning.md").read_text(encoding="utf-8")
+
+    assert "literature/positioning.md" in positioning
+    for field in required_fields:
+        assert field in positioning
+    assert_absent(positioning, "Use the format from `references/literature_review.md`.")

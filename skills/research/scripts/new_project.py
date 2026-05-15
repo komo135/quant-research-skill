@@ -16,6 +16,23 @@ SKILL_ROOT = Path(__file__).resolve().parent.parent
 ASSETS = SKILL_ROOT / "assets"
 
 
+POSITIONING_SEED = """# How the work stands on prior work
+
+This is `literature/positioning.md`. Use it to record grounding, inheritance,
+baseline choice, known limitations, and claim scope for each relevant prior
+approach.
+
+## <Prior approach or source — cite papers.md entry>
+
+- What it establishes: <summary of the result, method, data, metric, or system>
+- Inherited assumption: <assumption this project or plan carries forward>
+- Baseline / protocol use: <baseline, control, metric, split, benchmark, or evaluation setup informed by this work>
+- Known limitation: <limitation relevant to current plans or claims>
+- Position of this work: <replication / baseline strengthening / extension / new method / system / other>
+- Claim scope: <what this grounding supports, narrows, or blocks>
+"""
+
+
 DIRECTORIES = [
     "plans",
     "literature",
@@ -57,7 +74,7 @@ def main():
         encoding="utf-8",
     )
     (target / "literature" / "positioning.md").write_text(
-        "# How the work stands on prior work\n\nThis is `literature/positioning.md`. Use the format from `references/literature_review.md`.\n",
+        POSITIONING_SEED,
         encoding="utf-8",
     )
 
