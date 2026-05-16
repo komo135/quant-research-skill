@@ -128,7 +128,7 @@ The audit produces:
 - At least three named assumptions considered.
 - A load-bearing assumption with downstream-check applied so the named assumption is not downstream of a deeper one.
 - An inversion candidate derived from that load-bearing assumption, or an explicit no-inversion reason.
-- An unknown-unknowns catalog that can narrow claim scope and trigger constraint-naming.
+- A blind-spot catalog prompt that is finalized after the anti-vacuity gate for surviving candidates, ties those candidates to mechanism failure paths, can narrow claim scope, and can trigger constraint-naming.
 - Optional reference-class forecasting as an overconfidence check — not used during generation.
 
 At least one candidate must use the load-bearing assumption or record why no inversion candidate is admissible under the task's constraints.

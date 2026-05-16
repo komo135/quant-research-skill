@@ -30,17 +30,24 @@ Output: ≥3 named assumptions, one marked as **load-bearing** with one-sentence
 
 The initial intuition often picks a culturally-load-bearing assumption (e.g., "the field winsorizes outliers because outliers are contaminants"). A culturally-visible assumption may be a downstream effect of a deeper foundational one (e.g., "the population variance is finite"). The downstream check forces depth comparison: of two assumptions, the one whose inversion makes the other automatically irrelevant is the deeper one.
 
-## Sub-protocol 1b: Unknown-unknowns catalog
+## Sub-protocol 1b: Blind-spot catalog
 
-Invoked between `Observation discovery pass` and `Hypothesis synthesis pass` (alongside 1a).
+Drafted during `Assumption audit pass`, then finalized after `Anti-vacuity gate` identifies surviving candidates and before `Hypothesis synthesis pass`.
+
+This is not a quota of adjacent topics. It is a candidate-scope control: a blind spot matters only if it could break a candidate's mechanism, narrow a claim, or force a repair before promotion.
 
 Prompt:
 
-> "List 3-5 knowledge areas adjacent to this problem that you might not adequately know. For each, name a specific kind of result or pattern that would be in that area but might not be in your context."
+> "For each surviving candidate, name one blind-spot area or `None with reason`: an adjacent knowledge area or missing result pattern that, if different from your current context, could break the candidate's mechanism or claim scope. For each candidate, state how it could break the mechanism, the claim-scope effect, and the required repair."
 
-Output: catalog stored in `plans/<id>.md` under `Idea portfolio.Unknown-unknowns`. Used for narrowing claim scope, not for retrieval.
+Output: a candidate-keyed catalog stored in `plans/<id>.md` under `Idea portfolio.Blind-spot catalog`. Each surviving candidate must record:
 
-The catalog is structurally honest: the agent admits what it might not know. It does not pretend to fix the gap. Where applicable it can prompt the user (or a separate retrieval step outside this skill) to supply the missing material.
+- `Blind-spot area`: adjacent knowledge area or missing result pattern, or `None with reason`
+- `How it could break the mechanism`: the failure path if the blind spot is real
+- `Claim-scope effect`: one of `conditions_not_tested: ...`, `narrowed_claim: ...`, `PARK: ...`, `ADJACENT: ...`, or `no_change: <reason>`
+- `Required repair`: one of `retrieval: ...`, `user_input: ...`, `evaluator_construction: ...`, `narrow_conditions: ...`, or `none_with_reason: <reason>`
+
+The catalog is structurally honest: the agent admits what it might not know. It does not pretend to fix the gap. Where applicable it can prompt the user or a separate retrieval step outside this skill to supply the missing material. A blind spot has no protocol value unless it changes promotion, claim scope, constraint-naming, or a required repair.
 
 ## Sub-protocol 1c: Reference-class forecasting (manual)
 
@@ -75,7 +82,7 @@ This recovers honest scoping of candidates that lack immediate evaluators. The p
 
 - **Cultural-anchor pick**: agent names "what the field does wrong" as load-bearing (e.g., "outliers are contaminants") rather than the deeper assumption that justifies that practice (e.g., "the population variance is finite"). The downstream check in 1a is the explicit counter; re-audit until the named assumption is not downstream of anything in scope.
 - **Audit-then-ignore**: agent runs 1a, names a load-bearing assumption, then proceeds to `Hypothesis synthesis pass` without including an inversion candidate in the synthesis. The audited assumption must enter `Hypothesis synthesis pass.Source observation` for at least one candidate.
-- **Unknown-unknowns as decoration**: agent lists adjacent knowledge areas but does not narrow claim scope or trigger constraint-naming based on them. The catalog has no effect unless used.
+- **Blind spots as decoration**: agent names adjacent areas but does not tie each survivor to a mechanism failure path, claim-scope effect, or required repair. The catalog has no effect unless used.
 - **Reference-class during generation**: agent runs 1c during ideation (not as an overconfidence check). This suppresses innovation. 1c is post-hoc only.
 - **Constraint-naming dishonest**: agent declares a no-evaluator constraint to escape rigor rather than to honestly scope a claim. The constraint phrasing is for cases where the evaluator genuinely does not exist; misuse degrades the protocol.
 

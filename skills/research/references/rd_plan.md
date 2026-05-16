@@ -91,10 +91,6 @@ The section is optional for ordinary plans that begin with an already chosen obj
 - Downstream-check result: <why it is not downstream of a deeper in-scope assumption>
 - Inversion candidate or no-inversion reason: <candidate that uses the inversion, or why none is admissible>
 
-### Unknown-unknowns
-- Catalog source: <assumption_audit.md Sub-protocol 1b run, including reference model challenged>
-- <unknown area>: <why this could hide a load-bearing constraint; affected candidates or claims; claim-scope effect>
-
 ### Anti-vacuity gate
 - <candidate>:
   - Substrate ids: <at least two substrate ids, or named missing-substrate constraint>
@@ -104,6 +100,13 @@ The section is optional for ordinary plans that begin with an already chosen obj
   - Counter-hypothesis: <alternative explanation with a different prediction under the minimal test>
   - Minimal disconfirming test: <smallest observation, comparison, ablation, derivation check, or evaluator result that would kill or narrow the candidate>
   - Verdict: <survives / killed; candidate is killed if any field is generic, circular, unavailable, or disconnected from substrate ids>
+
+### Blind-spot catalog
+- <candidate that survived anti-vacuity or was promoted>:
+  - Blind-spot area: <adjacent knowledge area or missing result pattern, or None with reason>
+  - How it could break the mechanism: <failure path if the blind spot is real>
+  - Claim-scope effect: <conditions_not_tested: ... / narrowed_claim: ... / PARK: ... / ADJACENT: ... / no_change: reason>
+  - Required repair: <retrieval: ... / user_input: ... / evaluator_construction: ... / narrow_conditions: ... / none_with_reason: reason>
 
 ### Hypothesis synthesis
 - <candidate that survived anti-vacuity>:

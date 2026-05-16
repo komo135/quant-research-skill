@@ -121,7 +121,7 @@ Boundaries that matter:
 ```
 1. scripts/new_plan.py creates plans/<id>_<slug>.md from a mode-specific template
 2. Write the Question / Objective. If the user asks for a research idea, research direction, hypothesis candidate, or "what should we try next," write an Idea portfolio using `references/ideation.md` before Prior-work grounding. If the main agent has already seen anchors, it must prepare a sanitized brief and dispatch a fresh de-anchoring subagent for seed material; it must not accept raw candidates directly.
-3. For ideation work, run substrate/operator generation, assumption audit, anti-vacuity gate, evaluator feedback, and `scripts/check_idea_portfolio.py` before promoting any candidate.
+3. For ideation work, run substrate/operator generation, assumption audit, anti-vacuity gate, blind-spot catalog, evaluator feedback, and `scripts/check_idea_portfolio.py` before promoting any candidate.
 4. Write the Prior-work grounding and Divergence checkpoint.
 5. Write the Plan section. git commit. (Plan is now time-anchored by git.)
 6. Execute. Save artifacts under experiments/<plan>/runs/<run_id>/.
@@ -173,7 +173,7 @@ If prior work is genuinely unknown, record the named constraint in the plan and 
 
 When the user asks for a research idea, research direction, hypothesis candidate, or "what should we try next," read `references/ideation.md` before Prior-work grounding. The first output is an Idea portfolio, not a Plan and not a claim.
 
-The order matters: generate seed material before applying prior-work grounding, but do not confuse seeds with ideas. Prior work is still mandatory before execution, but literature-first ideation tends to anchor the portfolio to safe extensions of prior approaches. If the main agent has already seen prior work names, SOTA methods, previous best approaches, user-preferred methods, or convenient dataset details, the main agent must not generate raw candidates itself after seeing anchors; in v2.4 this means it must not generate raw seeds itself either. It prepares a sanitized brief and dispatches a fresh de-anchoring subagent to generate seed material. The main agent then accepts candidates only through the substrate → generation operator → assumption audit → anti-vacuity gate → evaluator feedback path, and verifies the completed portfolio with `scripts/check_idea_portfolio.py`.
+The order matters: generate seed material before applying prior-work grounding, but do not confuse seeds with ideas. Prior work is still mandatory before execution, but literature-first ideation tends to anchor the portfolio to safe extensions of prior approaches. If the main agent has already seen prior work names, SOTA methods, previous best approaches, user-preferred methods, or convenient dataset details, the main agent must not generate raw candidates itself after seeing anchors; in v2.4 this means it must not generate raw seeds itself either. It prepares a sanitized brief and dispatches a fresh de-anchoring subagent to generate seed material. The main agent then accepts candidates only through the substrate → generation operator → assumption audit → anti-vacuity gate → blind-spot catalog → evaluator feedback path, and verifies the completed portfolio with `scripts/check_idea_portfolio.py`.
 
 ## Divergence checkpoint
 
@@ -224,16 +224,21 @@ The schema derives from Toulmin's argument model (1958) but is adapted for machi
 
 Reports are for humans. They live under `reports/<id>_<slug>/`. Each report is a snapshot — figures and tables ship inside the report directory so the report is self-contained.
 
-Required sections and allowed conditional sections are defined in `references/report_format.md`. The common required sections are:
+Reports are paper-grade evidence artifacts, not lightweight status notes. Required sections are defined in `references/report_format.md`; sections that do not apply still appear with a short `Not applicable:` rationale. The common required sections are:
 
 1. **Summary** — 1–2 paragraphs. A reader who reads only this should understand what was done, what was found, and what is next.
 2. **Background** — what was known before, what motivated the work.
-3. **Methods & Conditions** / **System description** / **Theory / Formulation** / **Derivation context** as applicable to category and mode — substantive enough for re-implementation or derivation review. Methods reproducibility lives here.
-4. **Results** / **Observations** / **Performance** as applicable — actual evidence, figures, tables, or derivational observations. Placeholders are not acceptable.
-5. **Limitations** — what alternatives remain plausible, what conditions were not tested.
-6. **Next action** — one of the 5 iteration decisions, or a specific request to the human reader.
+3. **Related Work** — how the work stands on directly relevant prior work, or `Not applicable:` with a reason.
+4. **Theory / Formulation** — derivation/formulation when load-bearing, or `Not applicable:` with a reason.
+5. **Methods & Conditions** / **System description** / **Derivation context** as applicable to category and mode — substantive enough for re-implementation or derivation review. Methods reproducibility lives here.
+6. **Results** / **Observations** / **Performance** as applicable — actual evidence, figures, tables, or derivational observations. Placeholders are not acceptable.
+7. **Ablation / Sensitivity** — component, robustness, limiting-case, or controlled-variation evidence, or `Not applicable:` with a reason.
+8. **Discussion** — interpretation distinct from Limitations.
+9. **Limitations** — what alternatives remain plausible, what conditions were not tested.
+10. **Next action** — one of the 5 iteration decisions, or a specific request to the human reader.
+11. **References** — source plan, artifacts, and one entry per cited work.
 
-Conditional sections such as **Related Work**, **Theory / Formulation**, **Ablation / Sensitivity**, **Discussion**, and **References** are required when their conditions in `references/report_format.md` apply. `scripts/check_report.py` enforces the common contract and figure integrity; the agent remains responsible for applying the conditional section rules.
+`scripts/check_report.py` enforces the paper-grade section contract, figure integrity, and the statistical reporting minimum for numeric outcome sections.
 
 Reports do not need env locks, commit hashes, or seed lists in the prose. Include material execution conditions when they affect interpretation, and treat seed information as a variability disclosure: stochastic claims should report variance, failures, and the number of seeds rather than relying on one fixed seed. One line pointing to `experiments/<plan>/runs/` is enough if a reader wants to dig into raw artifacts.
 
@@ -271,7 +276,7 @@ These are not formatting preferences. They are what makes other agents and human
 
 - **One declared category per plan.** Don't dodge the choice. If you can't pick, read `references/categories/*.md`.
 - **One declared mode per plan.** `exploratory`, `confirmatory`, `milestone`, or `theoretical`. Hidden hypotheses inside exploratory plans are forbidden. Use `theoretical` for plans whose primary contribution is a derivation rather than an empirical result.
-- **Substrate-driven Idea portfolio before prior-work anchoring when ideating.** If the task is research idea generation, hypothesis candidate generation, or "what should we try next," write substrate ids, generation operators, assumption audit, anti-vacuity gate, evaluator feedback, and de-anchored seed material using `references/ideation.md` before Prior-work grounding. If the main agent has seen anchors, use a sanitized brief and fresh de-anchoring subagent for seed material. Non-promoted ideas are parked, killed, or merged; they are not claims.
+- **Substrate-driven Idea portfolio before prior-work anchoring when ideating.** If the task is research idea generation, hypothesis candidate generation, or "what should we try next," write substrate ids, generation operators, assumption audit, anti-vacuity gate, blind-spot catalog, evaluator feedback, and de-anchored seed material using `references/ideation.md` before Prior-work grounding. If the main agent has seen anchors, use a sanitized brief and fresh de-anchoring subagent for seed material. Non-promoted ideas are parked, killed, or merged; they are not claims.
 - **Prior-work grounding and Divergence checkpoint exist before execution.** A plan may still commit to one route, but it must first ground the plan in prior work and expose alternatives, anchor risks, research positioning, and disconfirming evidence. User pressure to "just use the previous approach" is recorded as a constraint, not silently obeyed.
 - **No placeholder figures in reports.** Generate the figure or remove the reference. `scripts/check_report.py` verifies figure references resolve.
 - **Plan content exists before execution.** The Plan section must be filled in and committed before any execution begins. `created_commit` in the front matter is meaningful only if the Plan section is non-empty at that commit. After-the-fact plan rewriting is detectable in git diff.

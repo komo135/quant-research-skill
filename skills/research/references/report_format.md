@@ -2,34 +2,34 @@
 
 ## Purpose
 
-Reports are for humans. They live under `reports/<id>_<slug>/` and are the artifact a reader uses to make a decision or understand what was done — without opening the agent's plans, runs, or code.
+Reports are for humans. They live under `reports/<id>_<slug>/` and are the standalone evidence artifact a reader uses to make a decision or understand what was done — without opening the agent's plans, runs, or code.
 
 A report is a snapshot. Once written, it does not get retroactively rewritten when later work changes the picture. Subsequent work produces subsequent reports. Each report stands on its own.
 
-## Why reports are not papers
+## Paper-grade reports, not venue manuscripts
 
-The skill does not require paper-level formality (full Related Work survey, formal citations, LaTeX). Reports are summaries a non-author can act on. Two design consequences follow:
+The skill requires a **paper-grade report**: the evidence standard should be high enough that a non-author can evaluate the question, method, result, limitations, and next action from the report alone. It is not a venue manuscript: no LaTeX, venue-specific formatting, exhaustive survey, or publication packaging is required.
+
+Two design consequences follow:
 
 - **No environment locks or commit hashes in the prose.** Reports should describe material conditions, not environment locks: data identity, evaluation protocol, major tool/model versions, hardware class, external API/model version, or collection date only when those conditions could change the interpretation. A one-line pointer to `experiments/<plan>/runs/` is enough if a reader wants to dig into raw artifacts. This is methods reproducibility, not computational replicability.
-- **No exhaustive citation lists.** Cite the directly relevant prior work (methods, resources, controls, comparators, or foundations used) — typically a handful, not dozens.
+- **No exhaustive citation lists.** Cite the directly relevant prior work (methods, resources, controls, comparators, or foundations used) — typically a handful, not dozens. The Related Work section must position the work, not pad a bibliography.
 
 ## Required structure
 
-Every report has these sections, in this order. Category-specific shapes adjust the section contents but not the order.
+Every report has these sections, in this order. Category-specific shapes adjust the section contents but not the order. Sections that do not apply still appear with a short `Not applicable:` rationale; they are not silently omitted.
 
 1. **Summary**
 2. **Background**
-3. **Related Work** (required when the plan's `literature/positioning.md` entry contains substantive prior-work comparison; otherwise this section may be merged into Background)
-4. **Theory / Formulation** (required for `basic_research` with `mode: theoretical` and for any applied / experimental_development report whose claim rests on a mathematical or algorithmic derivation; otherwise omit)
+3. **Related Work**
+4. **Theory / Formulation** (required for `basic_research` with `mode: theoretical` and for any applied / experimental_development report whose claim rests on a mathematical or algorithmic derivation; otherwise include `Not applicable:`)
 5. **Methods & Conditions** (basic and applied) / **System description** (experimental development)
 6. **Results** (or Observations for basic research)
-7. **Ablation / Sensitivity** (required when the claim attributes an effect to a specific component, or when robustness across parameters/conditions is part of the claim; otherwise omit)
-8. **Discussion** (mechanism interpretation, why the results look the way they do; required when the report draws conclusions beyond raw numeric outcomes)
+7. **Ablation / Sensitivity**
+8. **Discussion**
 9. **Limitations**
 10. **Next action**
-11. **References** (formal bibliography — required when the report cites prior work; one entry per work cited in Background, Related Work, or Theory)
-
-Sections 3, 4, 7, 8 are conditionally required as stated; omit them only when the condition does not apply, and state the omission rationale in the Summary section in one line ("No Related Work section: this is a methods-only report with no comparative claim against prior work.").
+11. **References**
 
 ## Section requirements
 
@@ -49,9 +49,9 @@ What was known before, what motivated the work, and what existing work, resource
 
 Cite a handful of directly relevant prior works (from `literature/papers.md`). Do not pad with tangentially related citations.
 
-### Related Work (conditional)
+### Related Work
 
-Required when `literature/positioning.md` for this plan contains substantive prior-work comparison (e.g., the plan claims novelty, replication, baseline-strengthening, or method-family transition). Otherwise merge into Background.
+Required in every paper-grade report. When `literature/positioning.md` for this plan contains substantive prior-work comparison (e.g., the plan claims novelty, replication, baseline-strengthening, or method-family transition), summarize that positioning. If the plan makes no prior-work comparison, include a short `Not applicable:` rationale and still cite the plan-scoped grounding in Background.
 
 Content:
 - Summarize the position recorded in `literature/positioning.md` for the reader (do not duplicate the file's full content; cite it)
@@ -61,9 +61,9 @@ Content:
 
 This section exists because the plan-level positioning currently lives in `literature/positioning.md` (not visible to the report reader). The Related Work section surfaces it for the human-facing report so the reader can place the result in context without opening the plan.
 
-### Theory / Formulation (conditional)
+### Theory / Formulation
 
-Required for `basic_research` with `mode: theoretical` and for applied / experimental_development reports whose claim rests on a mathematical or algorithmic derivation that the reader needs to understand to interpret the result. Otherwise omit.
+Required for `basic_research` with `mode: theoretical` and for applied / experimental_development reports whose claim rests on a mathematical or algorithmic derivation that the reader needs to understand to interpret the result. Otherwise include `Not applicable:` with the reason.
 
 Content:
 - **Definitions**: notation, key objects, scope of validity
@@ -105,9 +105,9 @@ For basic research: figures and tables showing the phenomenon across the explore
 
 For experimental development: figures showing measured performance under stated conditions.
 
-### Ablation / Sensitivity (conditional)
+### Ablation / Sensitivity
 
-Required when the claim attributes an effect to a specific component, or when robustness across parameters/conditions is part of the claim. Otherwise omit.
+Required as a section in every paper-grade report. When the claim attributes an effect to a specific component, or when robustness across parameters/conditions is part of the claim, this section carries the evidence. Otherwise include `Not applicable:` and state why no component-causality or robustness claim is made.
 
 Content:
 - **Ablation table**: each row removes (or replaces) one component of the claimed-effective method; primary metric is reported for each row alongside the full-method baseline. The reader should be able to read off which component contributes what.
@@ -116,9 +116,9 @@ Content:
 
 This section exists as an independent block (not embedded in `claim.evidence`) so the reader can audit component-causality and robustness without parsing claim records.
 
-### Discussion (conditional)
+### Discussion
 
-Required when the report draws conclusions beyond raw numeric outcomes (mechanism interpretation, why-it-works, surprising findings, contradicted expectations). Omit only for purely descriptive Observations sections.
+Required in every paper-grade report. When the report draws conclusions beyond raw numeric outcomes, this section carries mechanism interpretation, why-it-works, surprising findings, and contradicted expectations. For purely descriptive Observations sections, state `Not applicable:` and explain that no mechanism interpretation is claimed.
 
 Content:
 - **Mechanism interpretation**: why does the observed result occur? What plausible causal chain or structural reason explains it? Cross-reference any Theory section.
@@ -144,9 +144,9 @@ One of:
 
 A report without a next action is incomplete. Even `CLOSE: completed` is a next action ("no further work on this plan").
 
-### References (conditional)
+### References
 
-Required when the report cites prior work in Background, Related Work, or Theory sections. Omit only when the report cites no prior work (rare; typically only for closed-world experimental_development reports).
+Required in every paper-grade report. Include at minimum the source plan and source artifacts; include one entry per prior work cited anywhere in the report body.
 
 Content:
 - One entry per work cited anywhere in the report body

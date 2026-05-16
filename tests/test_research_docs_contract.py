@@ -156,6 +156,47 @@ def test_report_templates_prompt_for_material_conditions():
         assert "not environment locks" in text, template
 
 
+def test_report_format_and_templates_define_paper_grade_contract():
+    report_format = read("skills/research/references/report_format.md")
+    readme = read("README.md")
+    template_dir = ROOT / "skills" / "research" / "assets" / "report"
+
+    assert_mentions(
+        report_format,
+        "paper-grade report",
+        "not a venue manuscript",
+        "standalone evidence artifact",
+        "Related Work",
+        "Ablation / Sensitivity",
+        "Discussion",
+        "References",
+    )
+    assert_mentions(readme, "paper-grade", "Related Work", "Ablation / Sensitivity", "Discussion", "References")
+
+    for template in template_dir.glob("*.template"):
+        text = template.read_text(encoding="utf-8")
+        assert_ordered_fragments(
+            text,
+            "## Summary",
+            "## Background",
+            "## Related Work",
+        )
+        assert_ordered_fragments(
+            text,
+            "## Ablation / Sensitivity",
+            "## Discussion",
+            "## Limitations",
+            "## Next action",
+            "## References",
+        )
+        assert_mentions(
+            text,
+            "Not applicable:",
+            "plan",
+            "source artifacts",
+        )
+
+
 def test_applied_report_keeps_material_conditions_in_methods_area():
     text = read("skills/research/assets/report/applied_research_report.md.template")
 
@@ -732,24 +773,52 @@ def test_new_plan_accepts_theoretical_mode_and_generates_theoretical_sections():
     assert "### Empirical sanity check" in plan
 
 
-def test_idea_portfolio_schema_and_templates_include_unknown_unknowns_bucket():
+def test_idea_portfolio_schema_and_templates_include_blind_spot_catalog():
     rd_plan = read("skills/research/references/rd_plan.md")
+    assumption_audit = read("skills/research/references/assumption_audit.md")
+    ideation = read("skills/research/references/ideation.md")
     template_dir = ROOT / "skills" / "research" / "assets" / "plan"
 
     assert_ordered_fragments(
         rd_plan,
         "## Idea portfolio",
-        "### Unknown-unknowns",
+        "### Anti-vacuity gate",
+        "### Blind-spot catalog",
+        "### Hypothesis synthesis",
         "## Prior-work grounding",
     )
+    assert_mentions(
+        assumption_audit,
+        "Blind-spot catalog",
+        "surviving candidate",
+        "How it could break the mechanism",
+        "Claim-scope effect",
+        "Required repair",
+    )
+    assert_mentions(
+        ideation,
+        "blind-spot catalog",
+        "narrow claim scope",
+        "trigger constraint-naming",
+    )
+    assert_absent(assumption_audit, "List 3-5", "3〜5", "Unknown-unknowns catalog")
 
     for template in template_dir.glob("*.template"):
         text = template.read_text(encoding="utf-8")
         assert_ordered_fragments(
             text,
             "## Idea portfolio",
-            "### Unknown-unknowns",
+            "### Anti-vacuity gate",
+            "### Blind-spot catalog",
+            "### Hypothesis synthesis",
             "## Prior-work grounding",
+        )
+        assert_mentions(
+            text,
+            "Blind-spot area",
+            "How it could break the mechanism",
+            "Claim-scope effect",
+            "Required repair",
         )
 
 
@@ -853,10 +922,6 @@ Find a better short-term reversal signal under existing data constraints.
 - Downstream-check result: not downstream of close-to-close measurement.
 - Inversion candidate: spread spike may mark temporary inventory pressure that resolves into reversal.
 
-### Unknown-unknowns
-
-- Market microstructure regimes: could hide a liquidity-provider constraint; narrows claim scope.
-
 ### Anti-vacuity gate
 
 - Candidate A:
@@ -867,6 +932,14 @@ Find a better short-term reversal signal under existing data constraints.
   - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
   - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
   - Verdict: survives
+
+### Blind-spot catalog
+
+- Candidate A:
+  - Blind-spot area: market microstructure regimes could hide liquidity-provider inventory rules not in context.
+  - How it could break the mechanism: spread compression may mark quote-stuffing cleanup rather than inventory-pressure relaxation.
+  - Claim-scope effect: narrowed_claim: narrow claims to venues and periods where spread compression follows real liquidity recovery.
+  - Required repair: retrieval: retrieve microstructure references or add venue-regime stratification before making a general claim.
 
 ### Hypothesis synthesis
 
@@ -926,6 +999,277 @@ Grounding deferred until evaluator-construction plan is opened.
     assert "Idea portfolio passes contract checks." in result.stdout
 
 
+def idea_portfolio_plan_with_blind_spot(blind_spot_block: str) -> str:
+    return f"""# Blind Spot Contract Plan
+
+## Question / Objective
+
+Find a better short-term reversal signal under existing data constraints.
+
+## Idea portfolio
+
+### Idea substrate
+
+- S1: Empirical observation - reversal edge decays after high spread intervals.
+- S2: Failure observation - volatility filter removes both noise and useful rebound cases.
+
+### Generation operators
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Operator: invert gating premise
+  - Changed premise: spread spikes mark rebound inventory pressure rather than only noise.
+
+### De-anchored candidates
+
+- Candidate A: Gate reversal only after spread compression following a spike.
+
+### Assumption audit
+
+- Reference model challenged: short-term reversal signal treats high spread as pure contamination.
+- Assumptions considered: finite liquidity recovery window; spread spike means noise; close-to-close return is enough.
+- Load-bearing assumption: spread spike means noise.
+- Downstream-check result: not downstream of close-to-close measurement.
+- Inversion candidate: Candidate A.
+
+### Anti-vacuity gate
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Changed premise: spread spikes can precede rebound, not just contaminate labels.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Predicted measurable effect: reversal IC improves in post-spike compression windows.
+  - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
+  - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
+  - Verdict: survives
+
+### Blind-spot catalog
+
+{blind_spot_block.strip()}
+
+### Hypothesis synthesis
+
+- Candidate A:
+  - Source observation: S1 and S2.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Proposed intervention: condition reversal on spread spike followed by compression.
+  - Predicted effect: higher reversal IC in the conditioned slice.
+  - Counter-hypothesis: the slice merely lowers volatility.
+  - Minimal disconfirming test: matched non-spike window comparison.
+
+### Evaluator feedback
+
+- Status: Skipped: executable evaluator unavailable in current workspace.
+- Required evaluator or artifact: walk-forward CLI.
+- Effect on promotion: candidate can only advance to an ADJACENT evaluator-construction plan.
+
+### Grounded pruning
+
+- Advance: Candidate A only as evaluator-construction plan.
+- Parked: None.
+- Killed: None.
+- Merged: None.
+
+### Information-gain scoring
+
+- Candidate A: high information gain but blocked.
+
+### Pre-execution divergence review
+
+- Portfolio breadth: limited.
+- Parameter sweep laundering: none.
+- Anti-anchor check: not literature-first.
+- Required repair before promotion: build evaluator.
+
+### Promotion decision
+
+- Promoted idea: Candidate A to ADJACENT evaluator-construction plan.
+- Non-promoted ideas: none.
+
+## Prior-work grounding
+
+Grounding deferred.
+"""
+
+
+def run_idea_portfolio_check(plan: str):
+    script = ROOT / "skills" / "research" / "scripts" / "check_idea_portfolio.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "plan.md"
+        path.write_text(plan, encoding="utf-8")
+        return subprocess.run(
+            [sys.executable, str(script), str(path)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+
+def test_check_idea_portfolio_rejects_empty_or_placeholder_blind_spot_fields():
+    plan = idea_portfolio_plan_with_blind_spot(
+        """
+- Candidate A:
+  - Blind-spot area:
+  - How it could break the mechanism: <failure path>
+  - Claim-scope effect: None
+  - Required repair: None with reason
+"""
+    )
+
+    result = run_idea_portfolio_check(plan)
+
+    assert result.returncode == 1
+    assert "blind-spot field 'Blind-spot area' is empty" in result.stdout
+    assert "blind-spot field 'How it could break the mechanism' is empty" in result.stdout
+    assert "blind-spot field 'Claim-scope effect' is empty" in result.stdout
+    assert "blind-spot field 'Required repair' is empty" in result.stdout
+
+
+def test_check_idea_portfolio_rejects_blind_spot_without_scope_or_repair_effect():
+    plan = idea_portfolio_plan_with_blind_spot(
+        """
+- Candidate A:
+  - Blind-spot area: market microstructure regime.
+  - How it could break the mechanism: spread compression could mean something else.
+  - Claim-scope effect: affects interpretation.
+  - Required repair: think harder.
+"""
+    )
+
+    result = run_idea_portfolio_check(plan)
+
+    assert result.returncode == 1
+    assert "Claim-scope effect must start with" in result.stdout
+    assert "Required repair must start with" in result.stdout
+
+
+def test_check_idea_portfolio_rejects_negated_or_vague_blind_spot_markers():
+    plan = idea_portfolio_plan_with_blind_spot(
+        """
+- Candidate A:
+  - Blind-spot area: market microstructure regime.
+  - How it could break the mechanism: spread compression could mean something else.
+  - Claim-scope effect: not narrow.
+  - Required repair: reference later.
+"""
+    )
+
+    result = run_idea_portfolio_check(plan)
+
+    assert result.returncode == 1
+    assert "Claim-scope effect must start with" in result.stdout
+    assert "Required repair must start with" in result.stdout
+
+
+def test_check_idea_portfolio_requires_survivors_to_have_blind_spot_records():
+    script = ROOT / "skills" / "research" / "scripts" / "check_idea_portfolio.py"
+
+    plan = """# Missing Blind Spot Plan
+
+## Question / Objective
+
+Find a better short-term reversal signal under existing data constraints.
+
+## Idea portfolio
+
+### Idea substrate
+
+- S1: Empirical observation - reversal edge decays after high spread intervals.
+- S2: Failure observation - volatility filter removes both noise and useful rebound cases.
+
+### Generation operators
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Operator: invert gating premise
+  - Changed premise: spread spikes mark rebound inventory pressure rather than only noise.
+
+### De-anchored candidates
+
+- Candidate A: Gate reversal only after spread compression following a spike.
+
+### Assumption audit
+
+- Reference model challenged: short-term reversal signal treats high spread as pure contamination.
+- Assumptions considered: finite liquidity recovery window; spread spike means noise; close-to-close return is enough.
+- Load-bearing assumption: spread spike means noise.
+- Downstream-check result: not downstream of close-to-close measurement.
+- Inversion candidate: Candidate A.
+
+### Anti-vacuity gate
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Changed premise: spread spikes can precede rebound, not just contaminate labels.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Predicted measurable effect: reversal IC improves in post-spike compression windows.
+  - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
+  - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
+  - Verdict: survives
+
+### Blind-spot catalog
+
+- Catalog source: assumption audit was run, but no candidate-specific blind-spot record was written.
+
+### Hypothesis synthesis
+
+- Candidate A:
+  - Source observation: S1 and S2.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Proposed intervention: condition reversal on spread spike followed by compression.
+  - Predicted effect: higher reversal IC in the conditioned slice.
+  - Counter-hypothesis: the slice merely lowers volatility.
+  - Minimal disconfirming test: matched non-spike window comparison.
+
+### Evaluator feedback
+
+- Status: Skipped: executable evaluator unavailable in current workspace.
+- Required evaluator or artifact: walk-forward CLI.
+- Effect on promotion: candidate can only advance to an ADJACENT evaluator-construction plan.
+
+### Grounded pruning
+
+- Advance: Candidate A only as evaluator-construction plan.
+- Parked: None.
+- Killed: None.
+- Merged: None.
+
+### Information-gain scoring
+
+- Candidate A: high information gain but blocked.
+
+### Pre-execution divergence review
+
+- Portfolio breadth: limited.
+- Parameter sweep laundering: none.
+- Anti-anchor check: not literature-first.
+- Required repair before promotion: build evaluator.
+
+### Promotion decision
+
+- Promoted idea: Candidate A to ADJACENT evaluator-construction plan.
+- Non-promoted ideas: none.
+
+## Prior-work grounding
+
+Grounding deferred.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "plan.md"
+        path.write_text(plan, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(path)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    assert result.returncode == 1
+    assert "missing blind-spot catalog block" in result.stdout
+
+
 def test_check_idea_portfolio_rejects_unfilled_template_portfolio():
     script = ROOT / "skills" / "research" / "scripts" / "check_idea_portfolio.py"
     template = read("skills/research/assets/plan/rd_plan_exploratory.md.template")
@@ -980,10 +1324,6 @@ Find a better short-term reversal signal under existing data constraints.
 - Downstream-check result: not downstream of close-to-close measurement.
 - Inversion candidate: Candidate A.
 
-### Unknown-unknowns
-
-- Market microstructure regimes: narrows claim scope.
-
 ### Anti-vacuity gate
 
 - Candidate A:
@@ -994,6 +1334,14 @@ Find a better short-term reversal signal under existing data constraints.
   - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
   - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
   - Verdict: killed
+
+### Blind-spot catalog
+
+- Candidate A:
+  - Blind-spot area: market microstructure regimes could hide venue-specific liquidity-provider constraints.
+  - How it could break the mechanism: compression after a spike may reflect quote mechanics rather than rebound inventory pressure.
+  - Claim-scope effect: narrowed_claim: narrow claims to tested venues and periods.
+  - Required repair: narrow_conditions: add venue-regime stratification or park the general claim.
 
 ### Hypothesis synthesis
 
@@ -1089,10 +1437,6 @@ Find a better short-term reversal signal under existing data constraints.
 - Downstream-check result: not downstream of close-to-close measurement.
 - Inversion candidate: Candidate A.
 
-### Unknown-unknowns
-
-- Market microstructure regimes: narrows claim scope.
-
 ### Anti-vacuity gate
 
 - Candidate A:
@@ -1103,6 +1447,14 @@ Find a better short-term reversal signal under existing data constraints.
   - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
   - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
   - Verdict: survives
+
+### Blind-spot catalog
+
+- Candidate A:
+  - Blind-spot area: market microstructure regimes could hide venue-specific liquidity-provider constraints.
+  - How it could break the mechanism: compression after a spike may reflect quote mechanics rather than rebound inventory pressure.
+  - Claim-scope effect: narrowed_claim: narrow claims to tested venues and periods.
+  - Required repair: narrow_conditions: add venue-regime stratification or park the general claim.
 
 ### Hypothesis synthesis
 
@@ -1197,10 +1549,6 @@ Find a better short-term reversal signal under existing data constraints.
 - Downstream-check result: not downstream of close-to-close measurement.
 - Inversion candidate: Candidate A.
 
-### Unknown-unknowns
-
-- Market microstructure regimes: narrows claim scope.
-
 ### Anti-vacuity gate
 
 - Candidate A:
@@ -1211,6 +1559,14 @@ Find a better short-term reversal signal under existing data constraints.
   - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
   - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
   - Verdict: not survives
+
+### Blind-spot catalog
+
+- Candidate A:
+  - Blind-spot area: market microstructure regimes could hide venue-specific liquidity-provider constraints.
+  - How it could break the mechanism: compression after a spike may reflect quote mechanics rather than rebound inventory pressure.
+  - Claim-scope effect: narrowed_claim: narrow claims to tested venues and periods.
+  - Required repair: narrow_conditions: add venue-regime stratification or park the general claim.
 
 ### Hypothesis synthesis
 
@@ -1302,6 +1658,265 @@ NEXT_STEP: continue the same plan after the reader reviews this evidence.
     assert "Missing required section: 'Background'" in result.stdout
 
 
+def test_check_report_rejects_reports_missing_paper_grade_sections():
+    script = ROOT / "skills" / "research" / "scripts" / "check_report.py"
+
+    report = """# Thin Report
+
+## Summary
+This report summarizes a complete analysis with enough substance for validation.
+
+## Background
+The work builds on a prior plan and an existing comparator.
+
+## Methods & Conditions
+The method is described in a way that a reader could re-implement.
+
+## Results
+The observed result is described with enough detail to avoid placeholder text.
+
+## Limitations
+The report leaves plausible alternatives and untested conditions explicitly open.
+
+## Next action
+NEXT_STEP: continue the same plan after the reader reviews this evidence.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        report_path = Path(tmp) / "report.md"
+        report_path.write_text(report, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(report_path)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "Missing required section: 'Related Work'" in result.stdout
+    assert "Missing required section: 'Theory / Formulation'" in result.stdout
+    assert "Missing required section: 'Ablation / Sensitivity'" in result.stdout
+    assert "Missing required section: 'Discussion'" in result.stdout
+    assert "Missing required section: 'References'" in result.stdout
+
+
+def test_check_report_rejects_numeric_results_without_statistical_reporting_minimum():
+    script = ROOT / "skills" / "research" / "scripts" / "check_report.py"
+
+    report = """# Underreported Numeric Report
+
+## Summary
+This report summarizes the numeric result and the next research action.
+
+## Background
+Prior formulations motivate the comparison and define the known constraints.
+
+## Related Work
+The report positions the work against the directly relevant comparator.
+
+## Methods & Conditions
+The method and material conditions are described for re-implementation.
+
+## Results
+The proposed method reached accuracy 0.84 while the baseline reached 0.80.
+
+## Ablation / Sensitivity
+Not applicable: no component-causality or robustness claim is made in this report.
+
+## Discussion
+The result is interpreted as an association-level comparison, not a causal conclusion.
+
+## Limitations
+The report names untested conditions and plausible alternative explanations.
+
+## Next action
+NEXT_STEP: continue the same plan with a variance-aware rerun.
+
+## References
+- Plan: plans/01_example.md
+- Source artifacts: experiments/01_example/runs/
+- Prior work: [Comparator 2024] from literature/papers.md.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        report_path = Path(tmp) / "report.md"
+        report_path.write_text(report, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(report_path)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "numeric Results must report" in result.stdout
+
+
+def test_check_report_rejects_precision_ci_false_positive_and_sample_size_only():
+    script = ROOT / "skills" / "research" / "scripts" / "check_report.py"
+
+    report = """# False Positive Numeric Report
+
+## Summary
+This report summarizes the numeric result and the next research action.
+
+## Background
+Prior formulations motivate the comparison and define the known constraints.
+
+## Related Work
+The report positions the work against the directly relevant comparator.
+
+## Theory / Formulation
+Not applicable: the applied claim does not rest on a derivation.
+
+## Methods & Conditions
+The method and material conditions are described for re-implementation.
+
+## Results
+| Metric | Value | Source |
+|---|---:|---|
+| precision | 0.84 | run output |
+
+The sample size was not recorded. n=1.
+
+## Ablation / Sensitivity
+Not applicable: no component-causality or robustness claim is made in this report.
+
+## Discussion
+The result is interpreted as an association-level comparison, not a causal conclusion.
+
+## Limitations
+The report names untested conditions and plausible alternative explanations.
+
+## Next action
+NEXT_STEP: continue the same plan with a variance-aware rerun.
+
+## References
+- Plan: plans/01_example.md
+- Source artifacts: experiments/01_example/runs/
+- Prior work: [Comparator 2024] from literature/papers.md.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        report_path = Path(tmp) / "report.md"
+        report_path.write_text(report, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(report_path)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "numeric Results must report" in result.stdout
+
+
+def test_check_report_rejects_outcome_without_figure_table_or_reason():
+    script = ROOT / "skills" / "research" / "scripts" / "check_report.py"
+
+    report = """# No Evidence Carrier Report
+
+## Summary
+This report summarizes the descriptive result and the next research action.
+
+## Background
+Prior formulations motivate the comparison and define the known constraints.
+
+## Related Work
+The report positions the work against the directly relevant comparator.
+
+## Theory / Formulation
+Not applicable: the applied claim does not rest on a derivation.
+
+## Methods & Conditions
+The method and material conditions are described for re-implementation.
+
+## Results
+The observed qualitative pattern is described in prose without a table or figure.
+
+## Ablation / Sensitivity
+Not applicable: no component-causality or robustness claim is made in this report.
+
+## Discussion
+The report explains the descriptive interpretation and avoids causal promotion.
+
+## Limitations
+The report names untested conditions and plausible alternative explanations.
+
+## Next action
+NEXT_STEP: continue the same plan with a generated figure.
+
+## References
+- Plan: plans/01_example.md
+- Source artifacts: experiments/01_example/runs/
+- Prior work: [Comparator 2024] from literature/papers.md.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        report_path = Path(tmp) / "report.md"
+        report_path.write_text(report, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(report_path)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "must include a figure, table, or 'No figure/table:' reason" in result.stdout
+
+
+def test_check_report_rejects_combined_section_headings():
+    script = ROOT / "skills" / "research" / "scripts" / "check_report.py"
+
+    report = """# Combined Heading Report
+
+## Summary
+This report summarizes the numeric result and the next research action.
+
+## Background
+Prior formulations motivate the comparison and define the known constraints.
+
+## Related Work and References
+The report tries to satisfy two required sections with one combined heading.
+
+## Theory / Formulation
+Not applicable: the applied claim does not rest on a derivation.
+
+## Methods & Conditions
+The method and material conditions are described for re-implementation.
+
+## Results
+No figure/table: the outcome is a qualitative audit finding without measured values.
+
+## Ablation / Sensitivity
+Not applicable: no component-causality or robustness claim is made in this report.
+
+## Discussion
+The report explains the descriptive interpretation and avoids causal promotion.
+
+## Limitations
+The report names untested conditions and plausible alternative explanations.
+
+## Next action
+NEXT_STEP: continue the same plan with separate bibliography entries.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        report_path = Path(tmp) / "report.md"
+        report_path.write_text(report, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(report_path)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "Missing required section: 'Related Work'" in result.stdout
+    assert "Missing required section: 'References'" in result.stdout
+
+
 def test_check_report_accepts_theoretical_report_shape():
     script = ROOT / "skills" / "research" / "scripts" / "check_report.py"
 
@@ -1313,6 +1928,9 @@ This report summarizes a derivational result and the next research action.
 ## Background
 Prior formulations motivate the derivation and define the known constraints.
 
+## Related Work
+This report positions the derivation against the directly relevant foundations.
+
 ## Theory / Formulation
 The formulation states the objects, assumptions, and result being derived.
 
@@ -1320,13 +1938,25 @@ The formulation states the objects, assumptions, and result being derived.
 The derivation route and limiting cases are described for independent review.
 
 ## Observations
-The limiting case checks and proof-state observations are recorded here.
+At k=0, the formulation reduces to the known boundary case without changing the proof state.
+No figure/table: theoretical limiting-case observation is summarized in prose; no measured artifact exists yet.
+
+## Ablation / Sensitivity
+Not applicable: no component-causality or robustness claim is made in this theoretical report.
+
+## Discussion
+The report explains why the limiting cases matter and what interpretation remains association-level or formal-only.
 
 ## Limitations
 The report names unevaluated assumptions and conditions not covered by the derivation.
 
 ## Next action
 NEXT_STEP: continue the same plan with a focused counterexample search.
+
+## References
+- Plan: plans/01_theoretical.md
+- Source artifacts: experiments/01_theoretical/runs/
+- Prior work: [Foundation 1948] from literature/papers.md.
 """
 
     with tempfile.TemporaryDirectory() as tmp:

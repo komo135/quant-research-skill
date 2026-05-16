@@ -70,13 +70,13 @@ Comprehensive literature survey is required for strong external novelty, publica
 
 ### Research ideation
 
-When a user asks for research ideas, research directions, hypothesis candidates, or "what should we try next," the `research` skill now uses `references/ideation.md` to create an **Idea portfolio** before prior-work grounding. If the main agent has already seen anchors, it prepares a sanitized brief and dispatches a fresh de-anchoring subagent for raw seed generation; this means any host-provided separate-context agent, not a specific Task tool. Raw seeds are not accepted ideas. The portfolio must record substrate ids, generation operators, changed premises, assumption audit, anti-vacuity gate results, evaluator feedback, grounded pruning, and information-gain scoring before one candidate can be promoted.
+When a user asks for research ideas, research directions, hypothesis candidates, or "what should we try next," the `research` skill now uses `references/ideation.md` to create an **Idea portfolio** before prior-work grounding. If the main agent has already seen anchors, it prepares a sanitized brief and dispatches a fresh de-anchoring subagent for raw seed generation; this means any host-provided separate-context agent, not a specific Task tool. Raw seeds are not accepted ideas. The portfolio must record substrate ids, generation operators, changed premises, assumption audit, anti-vacuity gate results, blind-spot catalog entries tied to surviving candidates, evaluator feedback, grounded pruning, and information-gain scoring before one candidate can be promoted.
 
 Only one candidate is promoted into a plan. Non-promoted ideas are recorded as `parked / killed / merged` and are not claims.
 
 ### Assumption audit and iterative ideation
 
-v2.3.0 adds `references/assumption_audit.md` between observation discovery and hypothesis synthesis. It surfaces background assumptions of the reference model being challenged, separate from the Divergence checkpoint's anchoring audit on imported prior work. The audit records load-bearing assumptions, downstream checks, unknown unknowns, reference-class forecasts, and named constraints for hypotheses that cannot currently be evaluated.
+v2.3.0 adds `references/assumption_audit.md` between observation discovery and hypothesis synthesis. It surfaces background assumptions of the reference model being challenged, separate from the Divergence checkpoint's anchoring audit on imported prior work. The audit records load-bearing assumptions, downstream checks, blind-spot catalog entries tied to candidate mechanisms and claim scope, reference-class forecasts, and named constraints for hypotheses that cannot currently be evaluated.
 
 v2.4.0 adds `references/iterative_ideation.md` for applied and experimental-development plans with an existing executable evaluator. It uses real shell / command-line execution for candidate scoring, explicitly forbids self-simulated fitness, and updates candidates with mutation, crossover, and wildcard variants before grounded pruning.
 
@@ -127,7 +127,7 @@ For stochastic work, seed variability matters more than a single fixed seed. The
 
 ### Reports for humans
 
-Z39.18-derived, lightweight structure with common required sections (Summary / Background / Limitations / Next action), plus category- or mode-specific evidence sections such as Methods & Conditions, System description, Theory / Formulation, Derivation context, Results, Observations, and Performance. Conditional sections include Related Work, Ablation / Sensitivity, Discussion, and References. v2.4.0 adds Figure-as-argument guidance and a Statistical reporting minimum for numeric evidence. Figures must actually exist — `scripts/check_report.py` verifies references resolve. Reports cite the plan for full re-implementation detail rather than duplicating Methods content.
+Z39.18-derived, paper-grade report structure with required Summary, Background, Related Work, Methods & Conditions or System description, Results/Observations/Performance, Ablation / Sensitivity, Discussion, Limitations, Next action, and References sections. Sections that do not apply still appear with a short `Not applicable:` rationale. v2.4.0 adds Figure-as-argument guidance and a Statistical reporting minimum for numeric evidence. Figures must actually exist — `scripts/check_report.py` verifies references resolve and rejects numeric outcome sections that omit sample size, variance/dispersion, CI, effect size, significance, or an explicit non-applicability reason. Reports cite the plan for full re-implementation detail rather than duplicating Methods content.
 
 ## Repository Layout
 
@@ -218,7 +218,7 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 | `new_project.py` | Initialize project directory with canonical layout |
 | `new_plan.py` | Create a plan from mode-specific template, capture git SHA |
 | `new_run.py` | Create a run directory with consistent naming |
-| `check_idea_portfolio.py` | Verify Idea portfolio substrate/operator/anti-vacuity/evaluator-feedback contract |
+| `check_idea_portfolio.py` | Verify Idea portfolio substrate/operator/anti-vacuity/blind-spot/evaluator-feedback contract |
 | `check_claims.py` | Verify claim record structure (5 required fields, vagueness heuristics) |
 | `check_report.py` | Verify report contract (figures resolve, required sections, non-placeholder) |
 | `draft_report.py` | Initialize a report directory from a plan |
@@ -237,7 +237,7 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.4.0** — keeps prior-work grounding as a first-class contract while adding assumption audit, theoretical plan/report support, iterative ideation for executable-evaluator settings, richer report sections, and statistical reporting minimums.
+**Version 2.4.0** — keeps prior-work grounding as a first-class contract while adding assumption audit, theoretical plan/report support, iterative ideation for executable-evaluator settings, paper-grade report sections, and statistical reporting minimums.
 
 <details>
 <summary>Changelog</summary>
@@ -249,9 +249,9 @@ Extends the v2 research protocol without adding new R&D categories.
 **Added / changed**
 
 - Added `theoretical` plan mode for derivational work using axioms, definitions, and limiting-case checks.
-- Replaced raw one-line ideation with a substrate-driven generation contract: substrate ids, generation operators, changed premises, anti-vacuity gate, evaluator feedback, and `check_idea_portfolio.py`.
+- Replaced raw one-line ideation with a substrate-driven generation contract: substrate ids, generation operators, changed premises, blind-spot entries, anti-vacuity gate, evaluator feedback, and `check_idea_portfolio.py`.
 - Added iterative ideation for applied and experimental-development plans with executable evaluators: real shell / command-line execution is mandatory and self-simulated fitness is forbidden.
-- Expanded report format with conditional Theory / Formulation, Related Work, Ablation / Sensitivity, Discussion, and References sections.
+- Expanded report format with paper-grade Theory / Formulation, Related Work, Ablation / Sensitivity, Discussion, and References sections.
 - Added Figure-as-argument guidance and a Statistical reporting minimum for numeric evidence.
 - Clarified that theoretical support is a mode/report shape under the existing `basic_research`, `applied_research`, and `experimental_development` categories.
 
@@ -264,7 +264,7 @@ Adds a pre-synthesis audit for assumptions behind the reference model being chal
 - Added `references/assumption_audit.md` between observation discovery and hypothesis synthesis.
 - Distinguished background assumption audit from the Divergence checkpoint's anchoring audit on imported prior work.
 - Added load-bearing assumption selection with downstream-check discipline.
-- Added unknown-unknowns catalog, manual reference-class forecasting, and constraint-naming for hypotheses with no current evaluator.
+- Added blind-spot catalog entries, manual reference-class forecasting, and constraint-naming for hypotheses with no current evaluator.
 
 ### v2.2.0 — Frascati definitions and research lifecycle
 

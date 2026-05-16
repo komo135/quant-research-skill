@@ -4,12 +4,15 @@
 Checks:
 - If an Idea portfolio is present and applicable, it contains the generation
   substrate, generation operators, assumption audit, anti-vacuity gate,
-  evaluator feedback, pruning, scoring, divergence review, and promotion record.
+  blind-spot catalog, evaluator feedback, pruning, scoring, divergence review,
+  and promotion record.
 - The substrate contains at least two named substrate ids.
 - Generation operators and the anti-vacuity gate contain the fields that keep
   candidates from being accepted as post-hoc prose.
 - Evaluator feedback records either real evaluator evidence or a named skip
   reason plus the effect on promotion.
+- Every surviving candidate has a blind-spot record that states a possible
+  mechanism failure path, claim-scope effect, and required repair.
 
 Exit code 0 if all checks pass, 1 if any issue is reported.
 
@@ -27,8 +30,8 @@ REQUIRED_SUBSECTIONS = [
     "Generation operators",
     "De-anchored candidates",
     "Assumption audit",
-    "Unknown-unknowns",
     "Anti-vacuity gate",
+    "Blind-spot catalog",
     "Hypothesis synthesis",
     "Evaluator feedback",
     "Grounded pruning",
@@ -51,6 +54,30 @@ ANTI_VACUITY_FIELDS = [
     "Counter-hypothesis",
     "Minimal disconfirming test",
     "Verdict",
+]
+
+BLIND_SPOT_FIELDS = [
+    "Blind-spot area",
+    "How it could break the mechanism",
+    "Claim-scope effect",
+    "Required repair",
+]
+
+CLAIM_SCOPE_EFFECT_PREFIXES = [
+    "conditions_not_tested",
+    "narrowed_claim",
+    "park",
+    "adjacent",
+    "no_change",
+]
+
+REQUIRED_REPAIR_PREFIXES = [
+    "retrieval",
+    "evaluator construction",
+    "evaluator_construction",
+    "user_input",
+    "narrow_conditions",
+    "none_with_reason",
 ]
 
 PLACEHOLDER_PATTERNS = [
@@ -111,6 +138,35 @@ def has_placeholder_only(body: str) -> bool:
     if not content_lines:
         return True
     return all(any(pattern.search(line) for pattern in PLACEHOLDER_PATTERNS) for line in content_lines)
+
+
+def is_bare_none_or_missing_reason(value: str) -> bool:
+    normalized = value.strip().lower()
+    stripped = normalized.strip(" .;:-")
+    if stripped in {"none", "n/a", "na", "not applicable"}:
+        return True
+
+    match = re.match(r"^none\s+with\s+reason\b(.*)$", normalized)
+    if match:
+        return not bool(match.group(1).strip(" .;:-"))
+    return False
+
+
+def is_meaningful_contract_value(value: str) -> bool:
+    return (
+        bool(value.strip())
+        and not has_placeholder_only(value)
+        and not is_bare_none_or_missing_reason(value)
+    )
+
+
+def has_allowed_prefixed_value(value: str, prefixes: list[str]) -> bool:
+    lowered = value.strip().lower()
+    for prefix in prefixes:
+        match = re.match(rf"^{re.escape(prefix.lower())}\s*:\s*(.+)$", lowered)
+        if match and is_meaningful_contract_value(match.group(1)):
+            return True
+    return False
 
 
 def check_required_subsections(sections: dict[str, str]) -> list[str]:
@@ -209,6 +265,34 @@ def check_candidate_refs(candidate: str, value: str, defined_ids: set[str]) -> l
     return issues
 
 
+def check_blind_spot_fields(candidate: str, fields: dict[str, str]) -> list[str]:
+    issues: list[str] = []
+
+    for field in BLIND_SPOT_FIELDS:
+        key = field.lower()
+        if key not in fields:
+            issues.append(f"  Candidate '{candidate}' blind-spot block missing '{field}'")
+            continue
+        if not is_meaningful_contract_value(fields[key]):
+            issues.append(
+                f"  Candidate '{candidate}' blind-spot field '{field}' is empty, placeholder-only, or bare None"
+            )
+
+    claim_scope = fields.get("claim-scope effect", "")
+    if is_meaningful_contract_value(claim_scope) and not has_allowed_prefixed_value(claim_scope, CLAIM_SCOPE_EFFECT_PREFIXES):
+        issues.append(
+            f"  Candidate '{candidate}' blind-spot Claim-scope effect must start with conditions_not_tested:, narrowed_claim:, PARK:, ADJACENT:, or no_change:"
+        )
+
+    repair = fields.get("required repair", "")
+    if is_meaningful_contract_value(repair) and not has_allowed_prefixed_value(repair, REQUIRED_REPAIR_PREFIXES):
+        issues.append(
+            f"  Candidate '{candidate}' blind-spot Required repair must start with retrieval:, user_input:, evaluator_construction:, narrow_conditions:, or none_with_reason:"
+        )
+
+    return issues
+
+
 def check_candidate_contract(sections: dict[str, str]) -> list[str]:
     issues: list[str] = []
     defined_ids = substrate_ids_from_section(sections)
@@ -216,12 +300,14 @@ def check_candidate_contract(sections: dict[str, str]) -> list[str]:
     generation_key = section_key(sections, "Generation operators")
     anti_key = section_key(sections, "Anti-vacuity gate")
     synthesis_key = section_key(sections, "Hypothesis synthesis")
+    blind_spot_key = section_key(sections, "Blind-spot catalog")
     pruning_key = section_key(sections, "Grounded pruning")
     promotion_key = section_key(sections, "Promotion decision")
 
     generation = parse_candidate_blocks(sections.get(generation_key or "", ""))
     anti = parse_candidate_blocks(sections.get(anti_key or "", ""))
     synthesis = parse_candidate_blocks(sections.get(synthesis_key or "", ""))
+    blind_spots = parse_candidate_blocks(sections.get(blind_spot_key or "", ""))
 
     if not generation:
         issues.append("  Generation operators must define at least one candidate block")
@@ -254,6 +340,11 @@ def check_candidate_contract(sections: dict[str, str]) -> list[str]:
     survived = {name for name, fields in anti.items() if normalize_verdict(fields.get("verdict", "")) == "survives"}
     known_candidates = set(generation) | set(anti) | set(synthesis)
 
+    for candidate, fields in blind_spots.items():
+        if candidate not in known_candidates:
+            issues.append(f"  Blind-spot candidate '{candidate}' has no candidate contract block")
+        issues.extend(check_blind_spot_fields(candidate, fields))
+
     def mentioned_candidates(text: str) -> set[str]:
         return {candidate for candidate in known_candidates if re.search(rf"\b{re.escape(candidate)}\b", text)}
 
@@ -283,6 +374,10 @@ def check_candidate_contract(sections: dict[str, str]) -> list[str]:
                     issues.append(f"  promoted candidate '{candidate}' did not survive anti-vacuity")
                 if pruning_key is not None and candidate not in advanced_candidates:
                     issues.append(f"  promoted candidate '{candidate}' was not advanced by grounded pruning")
+
+    for candidate in sorted(survived):
+        if candidate not in blind_spots:
+            issues.append(f"  survived candidate '{candidate}' missing blind-spot catalog block")
 
     return issues
 
