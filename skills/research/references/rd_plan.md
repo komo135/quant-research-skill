@@ -28,7 +28,7 @@ last_updated: YYYY-MM-DD
 <One paragraph stating what this plan investigates or builds.>
 
 ## Idea portfolio
-<Optional except when the user asked for research ideas, research directions, hypothesis candidates, or "what should we try next." Summarize de-anchored candidates generated from a sanitized brief by a fresh de-anchoring subagent, transformation axes from `references/ideation.md`, unknown-unknowns from `references/assumption_audit.md`, grounded pruning, information-gain scoring, and the one candidate promoted into this plan.>
+<Optional except when the user asked for research ideas, research directions, hypothesis candidates, or "what should we try next." Record the substrate-driven ideation contract from `references/ideation.md`: idea substrate, fresh de-anchored seed generation, generation operators, assumption audit, anti-vacuity gate, evaluator feedback, grounded pruning, information-gain scoring, and the one candidate promoted into this plan. Raw seeds are not accepted ideas.>
 
 ## Prior-work grounding
 <Bounded but sufficient grounding for the plan's question/objective, inherited assumptions, method choice, controls/comparators/evaluation protocol, baselines/evaluation protocol when the claim requires them, and known limitations. Cite `literature/papers.md` and `literature/positioning.md`. If prior work is genuinely unknown, record the named constraint and narrow or block relevant claims.>
@@ -62,44 +62,79 @@ last_updated: YYYY-MM-DD
 
 ## Idea portfolio section
 
-This section appears after `## Question / Objective` and before `## Prior-work grounding` when the user asks for research ideas, research directions, hypothesis candidates, or "what should we try next." It records the output of `references/ideation.md`, including the sanitized brief and fresh de-anchoring subagent used for raw candidate generation.
+This section appears after `## Question / Objective` and before `## Prior-work grounding` when the user asks for research ideas, research directions, hypothesis candidates, or "what should we try next." It records the output of `references/ideation.md`, including the idea substrate, sanitized brief, fresh de-anchoring subagent used for raw seed generation, generation operators, anti-vacuity gate, evaluator feedback, and promotion decision.
 
-The section is optional for ordinary plans that begin with an already chosen objective. It is required for ideation tasks because prior-work-first planning can anchor the agent to the literature's safest extensions before raw candidates exist.
+The section is optional for ordinary plans that begin with an already chosen objective. It is required for ideation tasks because prior-work-first planning can anchor the agent to the literature's safest extensions before raw seeds and substrate/operator candidates exist.
 
 ```markdown
 ## Idea portfolio
 
-### De-anchored candidates
-- Generator: <fresh de-anchoring subagent identifier; sanitized brief only>
-- <candidate>: <one sentence, generated before prior-work grounding>
+### Idea substrate
+- S1: <empirical / failure-mode / tension / baseline / constraint / literature / user-problem observation>
+- S2: <second substrate item>
+- S3: <third substrate item when available>
 
-### Transformation axes
-- <candidate>: <method / mechanism / data assumption / metric / evaluation protocol / system design / problem framing>
-
-### Hypothesis synthesis
+### Generation operators
 - <candidate>:
-  - Source observation: <observed phenomenon, failure mode, capability gap, empirical regularity, or theoretical tension>
-  - Mechanism conjecture: <proposed mechanism that would explain the observation or make the intervention plausible>
-  - Proposed intervention: <method, architecture, data change, metric change, evaluation change, system change, or framing change>
-  - Predicted effect: <measurable effect expected if the mechanism conjecture is right>
-  - Counter-hypothesis: <plausible alternative explanation under which the predicted effect should not appear>
-  - Minimal disconfirming test: <smallest test, ablation, comparison, or observation that would reject, narrow, or park the candidate>
+  - Substrate ids: <S1, S2, ...>
+  - Operator: <assumption inversion / failure-mode exploitation / bottleneck relocation / mechanism transfer / measurement reframing / counterfactual control / boundary-condition search / evaluator construction / problem reframing>
+  - Changed premise: <what this candidate changes about the current framing>
+
+### De-anchored candidates
+- Generator: <fresh de-anchoring subagent identifier; sanitized brief with substrate ids only>
+- <candidate>: <raw seed generated before prior-work grounding; not accepted until operator + anti-vacuity gate pass>
+
+### Assumption audit
+- Reference model challenged: <model, framing, baseline story, or implicit premise being challenged>
+- Assumptions considered: <at least three named assumptions>
+- Load-bearing assumption: <assumption selected after downstream-check>
+- Downstream-check result: <why it is not downstream of a deeper in-scope assumption>
+- Inversion candidate or no-inversion reason: <candidate that uses the inversion, or why none is admissible>
 
 ### Unknown-unknowns
 - Catalog source: <assumption_audit.md Sub-protocol 1b run, including reference model challenged>
 - <unknown area>: <why this could hide a load-bearing constraint; affected candidates or claims; claim-scope effect>
 
+### Anti-vacuity gate
+- <candidate>:
+  - Substrate ids: <at least two substrate ids, or named missing-substrate constraint>
+  - Changed premise: <what becomes false, weaker, conditional, or newly observable if the candidate is right>
+  - Mechanism conjecture: <why the changed premise would produce the predicted behavior>
+  - Predicted measurable effect: <observable measure expected to change>
+  - Counter-hypothesis: <alternative explanation with a different prediction under the minimal test>
+  - Minimal disconfirming test: <smallest observation, comparison, ablation, derivation check, or evaluator result that would kill or narrow the candidate>
+  - Verdict: <survives / killed; candidate is killed if any field is generic, circular, unavailable, or disconnected from substrate ids>
+
+### Hypothesis synthesis
+- <candidate that survived anti-vacuity>:
+  - Source observation: <substrate ids plus observed phenomenon, failure mode, capability gap, empirical regularity, or theoretical tension>
+  - Mechanism conjecture: <proposed mechanism that would explain the observation or make the intervention plausible>
+  - Proposed intervention: <method, architecture, data change, metric change, evaluation change, system change, or framing change>
+  - Predicted effect: <measurable effect expected if the mechanism conjecture is right>
+  - Counter-hypothesis: <plausible alternative explanation under which the predicted effect should not appear>
+  - Minimal disconfirming test: <smallest test, ablation, comparison, derivation check, or observation that would reject, narrow, or park the candidate>
+
+### Evaluator feedback
+- Status: <Ran: executable evaluator / Skipped: named reason>
+- Executable signature: <real command-line invocation or None if skipped>
+- Artifact: <stdout/stderr path, run directory, or None if skipped>
+- Fitness vector: <parseable score vector and uncertainty/variance if available; None if skipped>
+- Required evaluator or artifact: <what must exist before executable feedback is possible; None if ran>
+- Killed candidates: <candidate ids and real failure reasons; None if none>
+- Cycle-final winner: <candidate id and rationale; None if skipped>
+- Effect on promotion: <PARK / ADJACENT evaluator-construction plan / theoretical-only scope / advance with narrowed claim>
+
 ### Grounded pruning
 - Advance: <candidate promoted toward a plan and why>
 - Parked: <candidate blocked by missing survey, data, baseline, or condition>
-- Killed: <candidate that is duplicate, untestable, too costly, or not falsifiable>
+- Killed: <candidate that is duplicate, untestable, too costly, not falsifiable, or only a parameter sweep>
 - Merged: <candidates collapsed into another candidate>
 
 ### Information-gain scoring
 - <candidate>: <testability, measurement clarity, expected information gain, cost, prior-work distance, claim discipline>
 
 ### Pre-execution divergence review
-- Portfolio breadth: <whether candidates are meaningfully distributed across transformation axes>
+- Portfolio breadth: <whether candidates are meaningfully distributed across generation operators and difference axes>
 - Parameter sweep laundering: <whether any candidate is only a threshold, seed, model-size, or sweep variant>
 - Anti-anchor check: <whether literature-first, prior-work-first, winning-approach, convenient-data, or user-preference anchors narrowed the portfolio too early>
 - Required repair before promotion: <None, or candidate regeneration / merge / kill / park action>
@@ -459,7 +494,7 @@ Mirror the entry in `decisions.md` for any branch except `NEXT_STEP`.
 - **Confirmatory plan with no decision threshold.** The whole point of confirmatory is the threshold. State it explicitly.
 - **Exploratory plan with hidden hypothesis.** Writing "we expect X" without committing to a decision threshold converts exploration into informal confirmation. Either commit to confirmatory mode with an explicit threshold, or stay honestly exploratory with a variable space.
 - **No Divergence checkpoint.** A plan that only follows the user's preferred route can still be well formatted and still be weak research. Fill the checkpoint before execution.
-- **Literature-first ideation.** If the user asked for research ideas, do not summarize prior work before generating raw candidates. Use the Idea portfolio section, then apply Prior-work grounding.
+- **Literature-first ideation.** If the user asked for research ideas, do not summarize prior work before generating raw seeds and substrate/operator candidates. Use the Idea portfolio section, then apply Prior-work grounding.
 - **Portfolio made of parameter tweaks.** Three thresholds of the same signal are not three approaches. Record them as one primary route with a sweep, then add real alternatives or explicitly narrow the claim scope only after the later Research review records `PASS` for both judgments.
 - **Prior result treated as fact.** "Previous run was best" is an anchor, not a premise. Record what would revalidate it, what rework is required, or what claim condition remains only after the later Research review records `PASS` for both judgments.
 - **Claim made before prior-work grounding.** If the plan says novel, new method, publishable, to our knowledge, or no baseline exists, cite or update `literature/positioning.md` and point to a comprehensive literature survey before execution. If the claim is not a novelty claim, the plan still needs bounded but sufficient prior-work grounding and must classify itself as replication, baseline strengthening, engineering, or another grounded position.

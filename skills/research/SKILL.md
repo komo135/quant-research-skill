@@ -7,11 +7,11 @@ description: Use when conducting R&D work that needs claim discipline, planning 
 
 A protocol skill for agent-driven R&D. The job: keep research state honest while preserving research velocity. Use shared vocabulary so multiple sessions and tools can interoperate. Produce human-readable reports that someone outside the session can act on.
 
-## Skill role: regulator, not generator
+## Skill role: substrate-driven generator
 
-**Innovation generation is out of scope.** This skill regulates honesty of research — what is known vs. assumed, what is tested vs. extrapolated, what is claimed vs. supported. It does not generate paradigm-shift ideas. Innovation at the level of problem redefinition or framework change requires taste, access, time, and obsession that a markdown skill cannot supply. The skill keeps the agent honest about innovation when it happens; it does not produce innovation.
+This skill does not guarantee paradigm-shift ideas. It does, however, regulate and drive agent ideation by forcing candidates to be generated from named observations, constraints, explicit generation operators, and external or executable feedback. A one-line brainstorm is seed material, not an idea.
 
-This boundary is load-bearing. Past iterations of this skill's design tested cross-domain paper injection, multi-agent paradigm debate, and evaluator gates as candidate generation mechanisms; all were rejected after pressure testing (see `docs/superpowers/specs/2026-05-16-research-ideation-assumption-audit-design.md` for the trail). The retained ideation extension (`references/assumption_audit.md`) helps the agent name what it is assuming so that inversion candidates get a fair seat in the portfolio; it does not produce the inverted candidate.
+The load-bearing boundary is now: the skill can generate bounded research candidates only when it has an idea substrate. If the agent lacks observations, failure traces, constraints, prior-work tensions, or an evaluator path, the honest output is to gather substrate, build an evaluator, or park the candidate. It must not hide absence of substrate behind six plausible-sounding hypotheses.
 
 ## What this skill covers and what it does not
 
@@ -120,19 +120,20 @@ Boundaries that matter:
 
 ```
 1. scripts/new_plan.py creates plans/<id>_<slug>.md from a mode-specific template
-2. Write the Question / Objective. If the user asks for a research idea, research direction, hypothesis candidate, or "what should we try next," write an Idea portfolio using `references/ideation.md` before Prior-work grounding. If the main agent has already seen anchors, it must prepare a sanitized brief and dispatch a fresh de-anchoring subagent; it must not generate raw candidates itself.
-3. Write the Prior-work grounding and Divergence checkpoint.
-4. Write the Plan section. git commit. (Plan is now time-anchored by git.)
-5. Execute. Save artifacts under experiments/<plan>/runs/<run_id>/.
-6. ANALYZE — apply the EDA / result-analysis discipline (references/analysis.md).
+2. Write the Question / Objective. If the user asks for a research idea, research direction, hypothesis candidate, or "what should we try next," write an Idea portfolio using `references/ideation.md` before Prior-work grounding. If the main agent has already seen anchors, it must prepare a sanitized brief and dispatch a fresh de-anchoring subagent for seed material; it must not accept raw candidates directly.
+3. For ideation work, run substrate/operator generation, assumption audit, anti-vacuity gate, evaluator feedback, and `scripts/check_idea_portfolio.py` before promoting any candidate.
+4. Write the Prior-work grounding and Divergence checkpoint.
+5. Write the Plan section. git commit. (Plan is now time-anchored by git.)
+6. Execute. Save artifacts under experiments/<plan>/runs/<run_id>/.
+7. ANALYZE — apply the EDA / result-analysis discipline (references/analysis.md).
    Observations live in plans/<id>.md Observations and in experiments/<plan>/notebooks/.
-7. Write Actual section in plans/<id>.md. Compare planned vs actual.
-8. Dispatch exactly one research-review subagent before any load-bearing claim, state-changing decision, or human-facing report.
+8. Write Actual section in plans/<id>.md. Compare planned vs actual.
+9. Dispatch exactly one research-review subagent before any load-bearing claim, state-changing decision, or human-facing report.
    The review assesses analysis sufficiency and result reliability; record it in the Research review section.
-9. Record load-bearing claims using the structure in references/claim_structure.md.
+10. Record load-bearing claims using the structure in references/claim_structure.md.
    Observation → Interpretation → Claim is a staged progression — do not skip stages.
-10. Pick exactly one of the 5 iteration branches and record in decisions.md.
-11. If the result is human-facing, draft a report with scripts/draft_report.py.
+11. Pick exactly one of the 5 iteration branches and record in decisions.md.
+12. If the result is human-facing, draft a report with scripts/draft_report.py.
 ```
 
 Git is the time-anchor for the plan. There is no separate preregistration directory. The plan section of `plans/<id>.md` IS the preregistration; the initial commit IS the time-stamping mechanism. Subsequent commits show the evolution. This avoids the redundancy of maintaining a separate prereg artifact whose only job is "plan existed before result" — git already proves that. This is provenance and auditability for plan timing, not a substitute for the methodology description.
@@ -172,7 +173,7 @@ If prior work is genuinely unknown, record the named constraint in the plan and 
 
 When the user asks for a research idea, research direction, hypothesis candidate, or "what should we try next," read `references/ideation.md` before Prior-work grounding. The first output is an Idea portfolio, not a Plan and not a claim.
 
-The order matters: generate raw candidates before applying prior-work grounding. Prior work is still mandatory before execution, but literature-first ideation tends to anchor the portfolio to safe extensions of prior approaches. If the main agent has already seen prior work names, SOTA methods, previous best approaches, user-preferred methods, or convenient dataset details, the main agent must not generate raw candidates itself after seeing anchors. It prepares a sanitized brief and dispatches a fresh de-anchoring subagent to generate the raw candidate set. The Idea portfolio records those de-anchored candidates, transformation axes, grounded pruning, information-gain scoring, and which single candidate is promoted into a plan.
+The order matters: generate seed material before applying prior-work grounding, but do not confuse seeds with ideas. Prior work is still mandatory before execution, but literature-first ideation tends to anchor the portfolio to safe extensions of prior approaches. If the main agent has already seen prior work names, SOTA methods, previous best approaches, user-preferred methods, or convenient dataset details, the main agent must not generate raw candidates itself after seeing anchors; in v2.4 this means it must not generate raw seeds itself either. It prepares a sanitized brief and dispatches a fresh de-anchoring subagent to generate seed material. The main agent then accepts candidates only through the substrate → generation operator → assumption audit → anti-vacuity gate → evaluator feedback path, and verifies the completed portfolio with `scripts/check_idea_portfolio.py`.
 
 ## Divergence checkpoint
 
@@ -253,7 +254,7 @@ Reports do not need env locks, commit hashes, or seed lists in the prose. Includ
 |---|---|---|
 | Pick a category | `references/categories/<category>.md` | First action when starting a plan |
 | Plan schema | `references/rd_plan.md` | Writing or reviewing `plans/<id>.md` |
-| Research ideation | `references/ideation.md` | When asked for research ideas, research directions, hypothesis candidates, or "what should we try next" before Prior-work grounding; use a sanitized brief and fresh de-anchoring subagent if anchors are already visible |
+| Research ideation | `references/ideation.md` | When asked for research ideas, research directions, hypothesis candidates, or "what should we try next" before Prior-work grounding; use substrate ids, generation operators, anti-vacuity gate, evaluator feedback, and a sanitized brief/fresh de-anchoring subagent if anchors are already visible |
 | Assumption audit | `references/assumption_audit.md` | Between Observation discovery pass and Hypothesis synthesis pass — surfaces load-bearing background assumptions of the reference model being challenged (distinct from anchor audit at Divergence checkpoint). Includes constraint-naming protocol for un-evaluable hypotheses. |
 | Iterative ideation | `references/iterative_ideation.md` | Between Quality-diversity pass and Grounded pruning pass — ONLY when plan is applied/development AND a minimal executable evaluator exists. Real shell / command-line execution is mandatory; self-simulation is explicitly forbidden. |
 | Divergence checkpoint | `references/rd_plan.md` | Before execution, after Question / Objective and before committing the Plan |
@@ -270,7 +271,7 @@ These are not formatting preferences. They are what makes other agents and human
 
 - **One declared category per plan.** Don't dodge the choice. If you can't pick, read `references/categories/*.md`.
 - **One declared mode per plan.** `exploratory`, `confirmatory`, `milestone`, or `theoretical`. Hidden hypotheses inside exploratory plans are forbidden. Use `theoretical` for plans whose primary contribution is a derivation rather than an empirical result.
-- **Idea portfolio before prior-work anchoring when ideating.** If the task is research idea generation, hypothesis candidate generation, or "what should we try next," write de-anchored candidates using `references/ideation.md` before Prior-work grounding. If the main agent has seen anchors, use a sanitized brief and fresh de-anchoring subagent for raw candidates. Non-promoted ideas are parked, killed, or merged; they are not claims.
+- **Substrate-driven Idea portfolio before prior-work anchoring when ideating.** If the task is research idea generation, hypothesis candidate generation, or "what should we try next," write substrate ids, generation operators, assumption audit, anti-vacuity gate, evaluator feedback, and de-anchored seed material using `references/ideation.md` before Prior-work grounding. If the main agent has seen anchors, use a sanitized brief and fresh de-anchoring subagent for seed material. Non-promoted ideas are parked, killed, or merged; they are not claims.
 - **Prior-work grounding and Divergence checkpoint exist before execution.** A plan may still commit to one route, but it must first ground the plan in prior work and expose alternatives, anchor risks, research positioning, and disconfirming evidence. User pressure to "just use the previous approach" is recorded as a constraint, not silently obeyed.
 - **No placeholder figures in reports.** Generate the figure or remove the reference. `scripts/check_report.py` verifies figure references resolve.
 - **Plan content exists before execution.** The Plan section must be filled in and committed before any execution begins. `created_commit` in the front matter is meaningful only if the Plan section is non-empty at that commit. After-the-fact plan rewriting is detectable in git diff.

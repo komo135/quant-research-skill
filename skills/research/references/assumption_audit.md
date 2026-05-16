@@ -10,9 +10,9 @@ This file adds three sub-protocols invoked between `Observation discovery pass` 
 
 ## Skill role boundary
 
-This skill regulates innovation honesty. It does not generate innovation. The audit forces the agent to name what it is taking for granted so that candidates that invert a deep assumption get a fair seat in the portfolio. It does not generate the inverted candidate's mechanism, propose the replacement family, or build the missing evaluator — those are the agent's interpretive work.
+This file is one component of substrate-driven generation. The audit forces the agent to name what it is taking for granted so that candidates that invert a deep assumption get a fair seat in the portfolio. The accepted candidate still has to pass `references/ideation.md` with substrate ids, a generation operator, changed premise, anti-vacuity record, and evaluator feedback.
 
-L3-L4 paradigm-shift *generation* remains structurally outside the skill's scope (see `SKILL.md`). The audit keeps the agent honest about innovation when it happens; it does not produce innovation.
+L3-L4 paradigm-shift generation remains outside any markdown-only guarantee. This audit can help produce bounded inversion candidates, but it must not be used as a substitute for substrate, evidence, or evaluator feedback.
 
 ## Sub-protocol 1a: Load-bearing assumption audit
 
@@ -81,6 +81,6 @@ This recovers honest scoping of candidates that lack immediate evaluators. The p
 
 ## Sources
 
-- Spec: `docs/superpowers/specs/2026-05-16-research-ideation-assumption-audit-design.md`
 - Empirical basis: Si 2024 / Si 2025 (Ideation-Execution Gap), Zhang 2025 (MAD overvaluation), Kadavath 2022 (calibration), Lin 2022 (verbalized uncertainty)
-- TDD trail: 4 rounds of portfolio pressure-testing + 1 round of skill TDD with baseline vs treatment subagent comparison
+- Pressure-test summary: cross-domain paper injection, multi-agent paradigm debate, and evaluator-gate variants were rejected because they either reintroduced anchors, relied on unenforceable markdown self-restraint, or selected for evaluator-rich problems too early.
+- Retained role: assumption audit supplies load-bearing assumption and inversion admission discipline; `references/ideation.md` turns that into a substrate/operator/anti-vacuity generation contract.

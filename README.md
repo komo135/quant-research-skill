@@ -70,7 +70,7 @@ Comprehensive literature survey is required for strong external novelty, publica
 
 ### Research ideation
 
-When a user asks for research ideas, research directions, hypothesis candidates, or "what should we try next," the `research` skill now uses `references/ideation.md` to create an **Idea portfolio** before prior-work grounding. If the main agent has already seen anchors, it prepares a sanitized brief and dispatches a fresh de-anchoring subagent for raw candidate generation; this means any host-provided separate-context agent, not a specific Task tool. The portfolio starts with those de-anchored raw candidates, records which axis each candidate changes, then applies grounding and information-gain scoring.
+When a user asks for research ideas, research directions, hypothesis candidates, or "what should we try next," the `research` skill now uses `references/ideation.md` to create an **Idea portfolio** before prior-work grounding. If the main agent has already seen anchors, it prepares a sanitized brief and dispatches a fresh de-anchoring subagent for raw seed generation; this means any host-provided separate-context agent, not a specific Task tool. Raw seeds are not accepted ideas. The portfolio must record substrate ids, generation operators, changed premises, assumption audit, anti-vacuity gate results, evaluator feedback, grounded pruning, and information-gain scoring before one candidate can be promoted.
 
 Only one candidate is promoted into a plan. Non-promoted ideas are recorded as `parked / killed / merged` and are not claims.
 
@@ -218,6 +218,7 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 | `new_project.py` | Initialize project directory with canonical layout |
 | `new_plan.py` | Create a plan from mode-specific template, capture git SHA |
 | `new_run.py` | Create a run directory with consistent naming |
+| `check_idea_portfolio.py` | Verify Idea portfolio substrate/operator/anti-vacuity/evaluator-feedback contract |
 | `check_claims.py` | Verify claim record structure (5 required fields, vagueness heuristics) |
 | `check_report.py` | Verify report contract (figures resolve, required sections, non-placeholder) |
 | `draft_report.py` | Initialize a report directory from a plan |
@@ -248,6 +249,7 @@ Extends the v2 research protocol without adding new R&D categories.
 **Added / changed**
 
 - Added `theoretical` plan mode for derivational work using axioms, definitions, and limiting-case checks.
+- Replaced raw one-line ideation with a substrate-driven generation contract: substrate ids, generation operators, changed premises, anti-vacuity gate, evaluator feedback, and `check_idea_portfolio.py`.
 - Added iterative ideation for applied and experimental-development plans with executable evaluators: real shell / command-line execution is mandatory and self-simulated fitness is forbidden.
 - Expanded report format with conditional Theory / Formulation, Related Work, Ablation / Sensitivity, Discussion, and References sections.
 - Added Figure-as-argument guidance and a Statistical reporting minimum for numeric evidence.
@@ -284,7 +286,7 @@ Adds a research ideation protocol that separates candidate generation from groun
 **Added / changed**
 
 - Research ideation now starts with a de-anchored Idea portfolio before prior-work grounding.
-- When anchors are already visible to the main agent, it must prepare a sanitized brief and dispatch a fresh de-anchoring subagent for raw candidate generation.
+- When anchors are already visible to the main agent, it must prepare a sanitized brief and dispatch a fresh de-anchoring subagent for raw seed generation; later versions require substrate/operator/anti-vacuity checks before a seed is accepted as a candidate.
 - Prior-work grounding remains mandatory before execution; ideation produces candidates, not execution-ready plans.
 - Only one candidate is promoted into a plan after grounding and information-gain scoring; non-promoted ideas are recorded as `parked / killed / merged` and are not claims.
 

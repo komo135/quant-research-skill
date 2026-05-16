@@ -8,7 +8,7 @@ Single-pass ideation (Idea portfolio → promote one candidate) tends to lock in
 
 ## Skill role boundary
 
-This skill regulates innovation honesty. It does not generate innovation. The iterative protocol provides structured evolutionary feedback on candidates; the candidates themselves come from `references/ideation.md` and `references/assumption_audit.md`. The protocol's value is preventing single-pass lock-in and forcing real-fitness ranking when an evaluator exists.
+This protocol provides structured evolutionary feedback on candidates; the candidates themselves come from `references/ideation.md` and `references/assumption_audit.md` after substrate ids, generation operators, changed premises, and anti-vacuity checks are recorded. The protocol's value is preventing single-pass lock-in and forcing real-fitness ranking when an evaluator exists.
 
 L3-L4 paradigm-shift generation remains structurally outside the skill's scope (see `SKILL.md`).
 
@@ -142,4 +142,4 @@ Record in `plans/<id>.md`:
   - RED agent produced 18 literary-estimate fitness values, self-quoted as "literary estimates dressed as measurements"
   - GREEN agent invoked the command-line evaluator path 11 times, captured real "no_CLI/no_data" failure, marked all candidates `killed`, and explicitly rejected 3 rationalization paths
 - Empirical basis: Si 2024/2025 (Ideation-Execution Gap), AlphaEvolve / Google Co-Scientist (evaluator-grounded evolutionary search). F is a markdown-skill protocolization of the evaluator-grounded approach for domains where minimal executable evaluator exists.
-- Design spec: `docs/superpowers/specs/2026-05-16-research-ideation-assumption-audit-design.md` (Phase I extension)
+- Design basis: evaluator-grounded evolution is retained only after `references/ideation.md` has produced substrate/operator/anti-vacuity candidates and only when a real executable evaluator exists.

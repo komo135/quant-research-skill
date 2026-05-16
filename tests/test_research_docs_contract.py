@@ -327,6 +327,30 @@ def test_ideation_reference_requires_hypothesis_synthesis_not_just_candidate_lis
     )
 
 
+def test_ideation_reference_defines_generation_substrate_and_antivacuity_gate():
+    ideation = read("skills/research/references/ideation.md")
+
+    assert_ordered_fragments(
+        ideation,
+        "Idea substrate pass",
+        "Generation operator pass",
+        "Anti-vacuity gate",
+        "Hypothesis synthesis pass",
+        "Evaluator feedback pass",
+        "Grounded pruning pass",
+    )
+    assert_mentions(
+        ideation,
+        "candidate must cite at least two substrate ids",
+        "operator",
+        "changed premise",
+        "predicted measurable effect",
+        "minimal disconfirming test",
+        "kill the candidate",
+        "not post-hoc prose",
+    )
+
+
 def test_ideation_reference_defines_observation_discovery_before_hypothesis_synthesis():
     ideation = read("skills/research/references/ideation.md")
 
@@ -402,8 +426,10 @@ def test_plan_schema_records_hypothesis_synthesis_in_idea_portfolio():
     assert_ordered_fragments(
         rd_plan,
         "## Idea portfolio",
+        "### Idea substrate",
+        "### Generation operators",
         "### De-anchored candidates",
-        "### Transformation axes",
+        "### Anti-vacuity gate",
         "### Hypothesis synthesis",
         "Source observation",
         "Mechanism conjecture",
@@ -411,6 +437,7 @@ def test_plan_schema_records_hypothesis_synthesis_in_idea_portfolio():
         "Predicted effect",
         "Counter-hypothesis",
         "Minimal disconfirming test",
+        "### Evaluator feedback",
         "### Grounded pruning",
     )
 
@@ -724,6 +751,523 @@ def test_idea_portfolio_schema_and_templates_include_unknown_unknowns_bucket():
             "### Unknown-unknowns",
             "## Prior-work grounding",
         )
+
+
+def test_idea_portfolio_schema_and_templates_include_generation_contract():
+    rd_plan = read("skills/research/references/rd_plan.md")
+    template_dir = ROOT / "skills" / "research" / "assets" / "plan"
+
+    for text in [rd_plan] + [p.read_text(encoding="utf-8") for p in template_dir.glob("*.template")]:
+        assert_ordered_fragments(
+            text,
+            "## Idea portfolio",
+            "### Idea substrate",
+            "### Generation operators",
+            "### Assumption audit",
+            "### Anti-vacuity gate",
+            "### Evaluator feedback",
+            "### Grounded pruning",
+        )
+        assert_mentions(
+            text,
+            "substrate ids",
+            "changed premise",
+            "candidate is killed",
+            "executable evaluator",
+            "Skipped:",
+        )
+
+
+def test_check_idea_portfolio_rejects_vacuous_candidate_list():
+    script = ROOT / "skills" / "research" / "scripts" / "check_idea_portfolio.py"
+
+    plan = """# Vacuous Plan
+
+## Question / Objective
+
+Find a better short-term reversal signal.
+
+## Idea portfolio
+
+### De-anchored candidates
+
+- Candidate A: Try a better filter.
+- Candidate B: Use volatility.
+
+### Grounded pruning
+
+- Advance: Candidate A sounds promising.
+
+## Prior-work grounding
+
+Placeholder.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "plan.md"
+        path.write_text(plan, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(path)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    assert result.returncode == 1
+    assert "Missing required Idea portfolio subsection" in result.stdout
+
+
+def test_check_idea_portfolio_accepts_substrate_operator_and_feedback_contract():
+    script = ROOT / "skills" / "research" / "scripts" / "check_idea_portfolio.py"
+
+    plan = """# Non-vacuous Plan
+
+## Question / Objective
+
+Find a better short-term reversal signal under existing data constraints.
+
+## Idea portfolio
+
+### Idea substrate
+
+- S1: Empirical observation - reversal edge decays after high spread intervals.
+- S2: Failure observation - volatility filter removes both noise and useful rebound cases.
+- S3: Baseline observation - current close-to-close return explains only the previous bar.
+
+### Generation operators
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Operator: invert gating premise
+  - Changed premise: spread spikes mark rebound inventory pressure rather than only noise.
+
+### De-anchored candidates
+
+- Candidate A: Gate reversal only after spread compression following a spike.
+
+### Assumption audit
+
+- Reference model challenged: short-term reversal signal treats high spread as pure contamination.
+- Assumptions considered: finite liquidity recovery window; spread spike means noise; close-to-close return is enough.
+- Load-bearing assumption: spread spike means noise.
+- Downstream-check result: not downstream of close-to-close measurement.
+- Inversion candidate: spread spike may mark temporary inventory pressure that resolves into reversal.
+
+### Unknown-unknowns
+
+- Market microstructure regimes: could hide a liquidity-provider constraint; narrows claim scope.
+
+### Anti-vacuity gate
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Changed premise: spread spikes can precede rebound, not just contaminate labels.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Predicted measurable effect: reversal IC improves in post-spike compression windows.
+  - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
+  - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
+  - Verdict: survives
+
+### Hypothesis synthesis
+
+- Candidate A:
+  - Source observation: S1 and S2.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Proposed intervention: condition reversal on spread spike followed by compression.
+  - Predicted effect: higher reversal IC in the conditioned slice.
+  - Counter-hypothesis: the slice merely lowers volatility.
+  - Minimal disconfirming test: matched non-spike window comparison.
+
+### Evaluator feedback
+
+- Status: Skipped: executable evaluator unavailable in current workspace.
+- Required evaluator or artifact: walk-forward CLI that accepts signal definition and emits IC, turnover, variance.
+- Effect on promotion: candidate can only advance to an ADJACENT evaluator-construction plan.
+
+### Grounded pruning
+
+- Advance: Candidate A only as evaluator-construction plan.
+- Parked: None.
+- Killed: None.
+- Merged: None.
+
+### Information-gain scoring
+
+- Candidate A: testability medium; measurement clear; information gain high; cost medium; prior-work distance medium; claim discipline strong.
+
+### Pre-execution divergence review
+
+- Portfolio breadth: one surviving candidate because other candidates failed anti-vacuity.
+- Parameter sweep laundering: none.
+- Anti-anchor check: not literature-first.
+- Required repair before promotion: build evaluator.
+
+### Promotion decision
+
+- Promoted idea: Candidate A to ADJACENT evaluator-construction plan.
+- Non-promoted ideas: none.
+
+## Prior-work grounding
+
+Grounding deferred until evaluator-construction plan is opened.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "plan.md"
+        path.write_text(plan, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(path)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Idea portfolio passes contract checks." in result.stdout
+
+
+def test_check_idea_portfolio_rejects_unfilled_template_portfolio():
+    script = ROOT / "skills" / "research" / "scripts" / "check_idea_portfolio.py"
+    template = read("skills/research/assets/plan/rd_plan_exploratory.md.template")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "plan.md"
+        path.write_text(template, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(path)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    assert result.returncode == 1
+    assert "placeholder-only" in result.stdout or "Missing required" in result.stdout
+
+
+def test_check_idea_portfolio_rejects_inconsistent_candidate_contract():
+    script = ROOT / "skills" / "research" / "scripts" / "check_idea_portfolio.py"
+
+    plan = """# Inconsistent Plan
+
+## Question / Objective
+
+Find a better short-term reversal signal under existing data constraints.
+
+## Idea portfolio
+
+### Idea substrate
+
+- S1: Empirical observation - reversal edge decays after high spread intervals.
+- S2: Failure observation - volatility filter removes both noise and useful rebound cases.
+
+### Generation operators
+
+- Candidate A:
+  - Substrate ids: S1, S999
+  - Operator: invert gating premise
+  - Changed premise: spread spikes mark rebound inventory pressure rather than only noise.
+
+### De-anchored candidates
+
+- Candidate A: Gate reversal only after spread compression following a spike.
+- Candidate B: Try a better filter.
+
+### Assumption audit
+
+- Reference model challenged: short-term reversal signal treats high spread as pure contamination.
+- Assumptions considered: finite liquidity recovery window; spread spike means noise; close-to-close return is enough.
+- Load-bearing assumption: spread spike means noise.
+- Downstream-check result: not downstream of close-to-close measurement.
+- Inversion candidate: Candidate A.
+
+### Unknown-unknowns
+
+- Market microstructure regimes: narrows claim scope.
+
+### Anti-vacuity gate
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Changed premise: spread spikes can precede rebound, not just contaminate labels.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Predicted measurable effect: reversal IC improves in post-spike compression windows.
+  - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
+  - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
+  - Verdict: killed
+
+### Hypothesis synthesis
+
+- Candidate B:
+  - Source observation: S1.
+  - Mechanism conjecture: better filtering might help.
+  - Proposed intervention: use a better filter.
+  - Predicted effect: better results.
+  - Counter-hypothesis: no effect.
+  - Minimal disconfirming test: check results.
+
+### Evaluator feedback
+
+- Status: Skipped: executable evaluator unavailable in current workspace.
+- Required evaluator or artifact: walk-forward CLI.
+- Effect on promotion: no candidate can advance.
+
+### Grounded pruning
+
+- Advance: Candidate B anyway.
+- Parked: None.
+- Killed: Candidate A.
+- Merged: None.
+
+### Information-gain scoring
+
+- Candidate B: vague.
+
+### Pre-execution divergence review
+
+- Portfolio breadth: weak.
+- Parameter sweep laundering: possible.
+- Anti-anchor check: not checked.
+- Required repair before promotion: none.
+
+### Promotion decision
+
+- Promoted idea: Candidate B to plan.
+- Non-promoted ideas: Candidate A killed.
+
+## Prior-work grounding
+
+Grounding deferred.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "plan.md"
+        path.write_text(plan, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(path)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    assert result.returncode == 1
+    assert "undefined substrate id" in result.stdout
+    assert "promoted candidate" in result.stdout
+
+
+def test_check_idea_portfolio_requires_promoted_candidate_to_be_advanced():
+    script = ROOT / "skills" / "research" / "scripts" / "check_idea_portfolio.py"
+
+    plan = """# Parked Promotion Plan
+
+## Question / Objective
+
+Find a better short-term reversal signal under existing data constraints.
+
+## Idea portfolio
+
+### Idea substrate
+
+- S1: Empirical observation - reversal edge decays after high spread intervals.
+- S2: Failure observation - volatility filter removes both noise and useful rebound cases.
+
+### Generation operators
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Operator: invert gating premise
+  - Changed premise: spread spikes mark rebound inventory pressure rather than only noise.
+
+### De-anchored candidates
+
+- Candidate A: Gate reversal only after spread compression following a spike.
+
+### Assumption audit
+
+- Reference model challenged: short-term reversal signal treats high spread as pure contamination.
+- Assumptions considered: finite liquidity recovery window; spread spike means noise; close-to-close return is enough.
+- Load-bearing assumption: spread spike means noise.
+- Downstream-check result: not downstream of close-to-close measurement.
+- Inversion candidate: Candidate A.
+
+### Unknown-unknowns
+
+- Market microstructure regimes: narrows claim scope.
+
+### Anti-vacuity gate
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Changed premise: spread spikes can precede rebound, not just contaminate labels.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Predicted measurable effect: reversal IC improves in post-spike compression windows.
+  - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
+  - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
+  - Verdict: survives
+
+### Hypothesis synthesis
+
+- Candidate A:
+  - Source observation: S1 and S2.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Proposed intervention: condition reversal on spread spike followed by compression.
+  - Predicted effect: higher reversal IC in the conditioned slice.
+  - Counter-hypothesis: the slice merely lowers volatility.
+  - Minimal disconfirming test: matched non-spike window comparison.
+
+### Evaluator feedback
+
+- Status: Skipped: executable evaluator unavailable in current workspace.
+- Required evaluator or artifact: walk-forward CLI.
+- Effect on promotion: no candidate can advance.
+
+### Grounded pruning
+
+- Advance: None.
+- Parked: Candidate A until evaluator exists.
+- Killed: None.
+- Merged: None.
+
+### Information-gain scoring
+
+- Candidate A: high information gain but blocked.
+
+### Pre-execution divergence review
+
+- Portfolio breadth: limited by evaluator absence.
+- Parameter sweep laundering: none.
+- Anti-anchor check: not literature-first.
+- Required repair before promotion: build evaluator.
+
+### Promotion decision
+
+- Promoted idea: Candidate A to plan.
+- Non-promoted ideas: none.
+
+## Prior-work grounding
+
+Grounding deferred.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "plan.md"
+        path.write_text(plan, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(path)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    assert result.returncode == 1
+    assert "not advanced" in result.stdout
+
+
+def test_check_idea_portfolio_rejects_non_exact_survival_verdict():
+    script = ROOT / "skills" / "research" / "scripts" / "check_idea_portfolio.py"
+
+    plan = """# Bad Verdict Plan
+
+## Question / Objective
+
+Find a better short-term reversal signal under existing data constraints.
+
+## Idea portfolio
+
+### Idea substrate
+
+- S1: Empirical observation - reversal edge decays after high spread intervals.
+- S2: Failure observation - volatility filter removes both noise and useful rebound cases.
+
+### Generation operators
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Operator: invert gating premise
+  - Changed premise: spread spikes mark rebound inventory pressure rather than only noise.
+
+### De-anchored candidates
+
+- Candidate A: Gate reversal only after spread compression following a spike.
+
+### Assumption audit
+
+- Reference model challenged: short-term reversal signal treats high spread as pure contamination.
+- Assumptions considered: finite liquidity recovery window; spread spike means noise; close-to-close return is enough.
+- Load-bearing assumption: spread spike means noise.
+- Downstream-check result: not downstream of close-to-close measurement.
+- Inversion candidate: Candidate A.
+
+### Unknown-unknowns
+
+- Market microstructure regimes: narrows claim scope.
+
+### Anti-vacuity gate
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Changed premise: spread spikes can precede rebound, not just contaminate labels.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Predicted measurable effect: reversal IC improves in post-spike compression windows.
+  - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
+  - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
+  - Verdict: not survives
+
+### Hypothesis synthesis
+
+- Candidate A:
+  - Source observation: S1 and S2.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Proposed intervention: condition reversal on spread spike followed by compression.
+  - Predicted effect: higher reversal IC in the conditioned slice.
+  - Counter-hypothesis: the slice merely lowers volatility.
+  - Minimal disconfirming test: matched non-spike window comparison.
+
+### Evaluator feedback
+
+- Status: Skipped: executable evaluator unavailable in current workspace.
+- Required evaluator or artifact: walk-forward CLI.
+- Effect on promotion: no candidate can advance.
+
+### Grounded pruning
+
+- Advance: Candidate A.
+- Parked: None.
+- Killed: None.
+- Merged: None.
+
+### Information-gain scoring
+
+- Candidate A: high information gain.
+
+### Pre-execution divergence review
+
+- Portfolio breadth: limited.
+- Parameter sweep laundering: none.
+- Anti-anchor check: not literature-first.
+- Required repair before promotion: none.
+
+### Promotion decision
+
+- Promoted idea: Candidate A to plan.
+- Non-promoted ideas: none.
+
+## Prior-work grounding
+
+Grounding deferred.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "plan.md"
+        path.write_text(plan, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(path)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    assert result.returncode == 1
+    assert "verdict must be exactly" in result.stdout
 
 
 def test_check_report_rejects_reports_without_background_section():
