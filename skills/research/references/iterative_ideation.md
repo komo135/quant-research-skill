@@ -46,7 +46,7 @@ If a candidate cannot be expressed as a runnable command, PARK it with named con
 
 #### Step 1 — MANDATORY real command-line execution (NOT simulation)
 
-For each candidate, invoke the executable signature through a real shell / command-line runner. Capture stdout/stderr. Parse fitness vector (e.g., Sharpe, IC, hit rate, variance).
+For each candidate, invoke the executable signature through a real shell / command-line runner. Capture `logs/stdout.log` and `logs/stderr.log`, update `run_manifest.json`, and persist the parseable fitness vector as a durable artifact such as `outputs/fitness.json`, `tables/fitness.csv`, or an `intermediate/` diagnostic. Parse fitness from the artifact, not from terminal scrollback. stdout is not evidence; a print-only evaluator run is not admissible feedback.
 
 **Agent simulating fitness is EXPLICITLY FORBIDDEN.** Specifically forbidden:
 - Estimating fitness from prior knowledge of mechanism ("Sharpe ≈ 1.5 based on the literature")
@@ -59,7 +59,7 @@ If script execution fails (no data, missing args, runtime error, etc.), mark the
 
 #### Step 2 — Fitness analysis (separate-context analysis agent)
 
-Dispatch a separate-context analysis agent with input = REAL fitness numbers from command stdout ONLY, plus the candidates' mechanism signatures. The analysis agent has NO prior expectations from the main agent.
+Dispatch a separate-context analysis agent with input = REAL fitness numbers from run artifacts, plus the `run_manifest.json`, relevant `logs/stdout.log` excerpts for debugging context, and the candidates' mechanism signatures. The analysis agent has NO prior expectations from the main agent. Console output may point to files, but the durable artifact is the evidence.
 
 The analysis agent returns:
 - Top-2 candidates by fitness vector dominance (primary metric, then variance, then turnover-adjusted variant)
@@ -104,18 +104,19 @@ Cycle-final top candidate (by fitness vector dominance) is promoted to the plan'
 Record in `plans/<id>.md`:
 - The executable signature (shell / command-line invocation) — for reproducibility
 - The fitness vector and any confidence interval / variance
+- The run directory and durable artifact path used for the fitness vector
 - A one-sentence rationale for why this candidate dominated cycle-finals
 
-**Fitness scores from intermediate cycles are ephemeral.** They are NOT written to `decisions.md` or `project_state.md`. Only the final promoted candidate's fitness becomes durable. This avoids back-leak that would contaminate the next plan's ideation.
+**Fitness scores from intermediate cycles are run-local evidence, not project-level memory.** They must remain as durable artifacts inside the relevant run directories so the cycle is auditable, but they are NOT copied into `decisions.md` or `project_state.md`. Only the final promoted candidate's fitness becomes part of the durable plan narrative. This avoids back-leak that would contaminate the next plan's ideation while preserving auditability of the current cycle.
 
 ## Anti-failure-mode design (lessons from TDD)
 
 | Failure mode | F v2 design counter |
 |---|---|
 | **AlphaEvolve trap** (protocol silently selects for evaluator-rich problems across the project) | Scope restriction in this file: only applies when executable evaluator already exists. For domains without, use assumption_audit + ADJACENT-plan for evaluator construction. |
-| **Rubric leakage** (gate criteria leak into ideation prompt) | Fitness is computed in command output and parsed by a separate-context analysis agent (Step 2). Main agent prompt has no PASS criteria. |
+| **Rubric leakage** (gate criteria leak into ideation prompt) | Fitness is computed by command execution, persisted as a durable artifact, and parsed by a separate-context analysis agent (Step 2). Main agent prompt has no PASS criteria. |
 | **Self-simulation** (agent estimates fitness from prior) | Cycle N Step 1 explicitly forbids simulation. Candidate-level `killed` classification is mandatory if execution fails. TDD GREEN-run agent rejected 3 named rationalization paths under this clause. |
-| **Back-leak via durable state** | Fitness scores are ephemeral; only final promoted candidate's fitness goes to durable plan record. |
+| **Back-leak via durable state** | Intermediate fitness artifacts stay in run directories; only final promoted candidate's fitness goes to durable plan record. |
 | **Friction overflow** | Hard cap: 2-3 cycles × 6 candidates × 1 evaluator call <= 18 command-line executions per plan. |
 | **Mutation as parameter sweep** | Step 3 explicitly requires axis change; threshold/seed/window tweaks are disallowed. |
 | **Wildcard as control** | Step 5 mandates max-cosine-distance heuristic, not random. |
@@ -124,6 +125,7 @@ Record in `plans/<id>.md`:
 
 - **Invoking the protocol when no executable evaluator exists**: scope violation. Symptom: every candidate is marked `killed` in Cycle 1 (TDD GREEN run reproduced this exactly when the quant-research scripts turned out to be CLI-less). The honest deliverable is "the harness does not exist, ADJACENT plan needed to build it" — not fabricated fitness.
 - **Synthesizing toy data to keep command execution alive**: the toy `run_pipeline` returns real Sharpe numbers, but they measure the toy, not the candidate. This is the most seductive failure mode and is explicitly named in Cycle N Step 1's forbidden list.
+- **Print-only evaluator scripts**: a command that only prints metrics has not produced valid feedback. Use `scripts/check_run_artifacts.py`; if no durable artifact exists, mark the candidate blocked or killed rather than ranking it from stdout.
 - **Re-defining "executable signature" loosely**: e.g., counting `python script.py` (no args, exits silently) as evaluation. The signature must produce a parseable fitness output.
 - **Mutation-as-parameter-tweak**: agent produces variants that change a threshold from 2.0 to 2.5. This is sensitivity_grid territory, not mutation.
 - **Skipping Step 2 separate-context analysis**: main agent reads fitness numbers and runs the analysis itself. This re-introduces rubric leakage. The separate context is what severs the loop.

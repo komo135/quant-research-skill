@@ -176,7 +176,7 @@ If an executable evaluator exists and the category is `applied_research` or `exp
 
 - Status: Ran: <evaluator name>
 - Executable signature: <real command-line invocation or sequence>
-- Artifact: <stdout/stderr path, run directory, or other result artifact>
+- Artifact: <run directory plus durable artifact path; stdout alone is not evidence>
 - Fitness vector: <parseable score vector and uncertainty/variance if available>
 - Killed candidates: <candidate ids and real failure reasons>
 - Cycle-final winner: <candidate id and why it dominated>

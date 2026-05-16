@@ -120,7 +120,7 @@ The section is optional for ordinary plans that begin with an already chosen obj
 ### Evaluator feedback
 - Status: <Ran: executable evaluator / Skipped: named reason>
 - Executable signature: <real command-line invocation or None if skipped>
-- Artifact: <stdout/stderr path, run directory, or None if skipped>
+- Artifact: <run directory plus durable artifact path; stdout alone is not evidence; None if skipped>
 - Fitness vector: <parseable score vector and uncertainty/variance if available; None if skipped>
 - Required evaluator or artifact: <what must exist before executable feedback is possible; None if ran>
 - Killed candidates: <candidate ids and real failure reasons; None if none>
@@ -344,6 +344,8 @@ When no empirical evaluator exists, `Limitations` (in the eventual report) recor
 ## Actual execution section
 
 Updated after work runs:
+
+Research scripts must leave evidence, not just console text. A print-only execution is incomplete because stdout is not evidence. Each completed run should have a `run_manifest.json` with `status: completed` and manifest-listed artifacts, captured `logs/stdout.log` and `logs/stderr.log`, and at least one non-log durable artifact in `outputs/`, `tables/`, `figures/`, or `intermediate/`. Run `scripts/check_run_artifacts.py` before using a run as the basis for Observations, Research review, Claims, or a report.
 
 ```markdown
 ### Runs

@@ -773,6 +773,229 @@ def test_new_plan_accepts_theoretical_mode_and_generates_theoretical_sections():
     assert "### Empirical sanity check" in plan
 
 
+def test_research_scripts_must_persist_durable_artifacts_not_only_print():
+    skill = read("skills/research/SKILL.md")
+    analysis = read("skills/research/references/analysis.md")
+    rd_plan = read("skills/research/references/rd_plan.md")
+    iterative = read("skills/research/references/iterative_ideation.md")
+    project_readme = read("skills/research/assets/project/README.md.template")
+
+    for text in [skill, analysis, rd_plan, iterative, project_readme]:
+        assert_mentions(
+            text,
+            "print-only",
+            "stdout is not evidence",
+            "run_manifest.json",
+            "logs/stdout.log",
+            "intermediate",
+            "durable artifact",
+        )
+
+
+def test_new_run_creates_durable_artifact_scaffold():
+    new_plan = ROOT / "skills" / "research" / "scripts" / "new_plan.py"
+    new_run = ROOT / "skills" / "research" / "scripts" / "new_run.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(tmp) / "project"
+        target.mkdir()
+        subprocess.run(
+            [
+                sys.executable,
+                str(new_plan),
+                str(target),
+                "--id",
+                "07",
+                "--slug",
+                "artifact-contract",
+                "--category",
+                "applied_research",
+                "--mode",
+                "exploratory",
+            ],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        result = subprocess.run(
+            [sys.executable, str(new_run), str(target), "--plan", "07", "--slug", "artifact-contract", "--seed", "3"],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+        assert result.returncode == 0, result.stderr
+        run_dir = target / "experiments" / "07_artifact-contract" / "runs" / "07__001__seed3"
+        manifest = (run_dir / "run_manifest.json").read_text(encoding="utf-8")
+        readme = (run_dir / "README.md").read_text(encoding="utf-8")
+
+        for relative in [
+            "logs/stdout.log",
+            "logs/stderr.log",
+            "intermediate",
+            "outputs",
+            "tables",
+            "figures",
+            "run_manifest.json",
+        ]:
+            assert (run_dir / relative).exists(), relative
+        assert_mentions(manifest, "initialized", "command", "artifacts")
+        assert_mentions(readme, "print-only", "stdout is not evidence", "check_run_artifacts.py")
+
+
+def test_check_run_artifacts_rejects_print_only_run():
+    script = ROOT / "skills" / "research" / "scripts" / "check_run_artifacts.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        run_dir = Path(tmp) / "run"
+        (run_dir / "logs").mkdir(parents=True)
+        (run_dir / "logs" / "stdout.log").write_text("accuracy 0.84\n", encoding="utf-8")
+        (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
+        (run_dir / "run_manifest.json").write_text(
+            '{"run_id":"run","plan":"01_demo","status":"completed","command":"python eda.py"}',
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [sys.executable, str(script), str(run_dir)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "stdout is not evidence" in result.stdout
+    assert "No durable artifact" in result.stdout
+
+
+def test_check_run_artifacts_requires_manifest_artifact_list():
+    script = ROOT / "skills" / "research" / "scripts" / "check_run_artifacts.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        run_dir = Path(tmp) / "run"
+        (run_dir / "logs").mkdir(parents=True)
+        (run_dir / "outputs").mkdir()
+        (run_dir / "logs" / "stdout.log").write_text("wrote outputs/metrics.json\n", encoding="utf-8")
+        (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
+        (run_dir / "outputs" / "metrics.json").write_text('{"accuracy": 0.84, "n": 128}', encoding="utf-8")
+        (run_dir / "run_manifest.json").write_text(
+            '{"run_id":"run","plan":"01_demo","status":"completed","command":"python eda.py --run-dir run","artifacts":[]}',
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [sys.executable, str(script), str(run_dir)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "run_manifest.json artifacts must list" in result.stdout
+
+
+def test_check_run_artifacts_rejects_unlisted_or_non_evidence_manifest_artifact():
+    script = ROOT / "skills" / "research" / "scripts" / "check_run_artifacts.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        run_dir = Path(tmp) / "run"
+        (run_dir / "logs").mkdir(parents=True)
+        (run_dir / "outputs").mkdir()
+        (run_dir / "logs" / "stdout.log").write_text("accuracy 0.84\n", encoding="utf-8")
+        (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
+        (run_dir / "outputs" / "metrics.json").write_text('{"accuracy": 0.84, "n": 128}', encoding="utf-8")
+        (run_dir / "README.md").write_text("not evidence\n", encoding="utf-8")
+        (run_dir / "run_manifest.json").write_text(
+            '{"run_id":"run","plan":"01_demo","status":"completed","command":"python eda.py --run-dir run","artifacts":["README.md"]}',
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [sys.executable, str(script), str(run_dir)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "Manifest artifact is not in a durable artifact location" in result.stdout
+    assert "No manifest-listed durable artifact" in result.stdout
+
+
+def test_check_run_artifacts_rejects_stdout_transcript_as_artifact():
+    script = ROOT / "skills" / "research" / "scripts" / "check_run_artifacts.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        run_dir = Path(tmp) / "run"
+        (run_dir / "logs").mkdir(parents=True)
+        (run_dir / "outputs").mkdir()
+        (run_dir / "logs" / "stdout.log").write_text("accuracy 0.84\n", encoding="utf-8")
+        (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
+        (run_dir / "outputs" / "stdout_copy.txt").write_text("accuracy 0.84\n", encoding="utf-8")
+        (run_dir / "run_manifest.json").write_text(
+            '{"run_id":"run","plan":"01_demo","status":"completed","command":"python eda.py --run-dir run","artifacts":["outputs/stdout_copy.txt"]}',
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [sys.executable, str(script), str(run_dir)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "console transcript" in result.stdout
+    assert "No manifest-listed durable artifact" in result.stdout
+
+
+def test_check_run_artifacts_requires_completed_status():
+    script = ROOT / "skills" / "research" / "scripts" / "check_run_artifacts.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        run_dir = Path(tmp) / "run"
+        (run_dir / "logs").mkdir(parents=True)
+        (run_dir / "outputs").mkdir()
+        (run_dir / "logs" / "stdout.log").write_text("wrote outputs/metrics.json\n", encoding="utf-8")
+        (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
+        (run_dir / "outputs" / "metrics.json").write_text('{"accuracy": 0.84, "n": 128}', encoding="utf-8")
+        (run_dir / "run_manifest.json").write_text(
+            '{"run_id":"run","plan":"01_demo","status":"failed","command":"python eda.py --run-dir run","artifacts":["outputs/metrics.json"]}',
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [sys.executable, str(script), str(run_dir)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "run_manifest.json status must be 'completed'" in result.stdout
+
+
+def test_check_run_artifacts_accepts_manifest_logs_and_artifact():
+    script = ROOT / "skills" / "research" / "scripts" / "check_run_artifacts.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        run_dir = Path(tmp) / "run"
+        (run_dir / "logs").mkdir(parents=True)
+        (run_dir / "outputs").mkdir()
+        (run_dir / "logs" / "stdout.log").write_text("wrote outputs/metrics.json\n", encoding="utf-8")
+        (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
+        (run_dir / "outputs" / "metrics.json").write_text('{"accuracy": 0.84, "n": 128}', encoding="utf-8")
+        (run_dir / "run_manifest.json").write_text(
+            '{"run_id":"run","plan":"01_demo","status":"completed","command":"python eda.py --run-dir run","artifacts":["outputs/metrics.json"]}',
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [sys.executable, str(script), str(run_dir)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Run artifacts pass contract checks." in result.stdout
+
+
 def test_idea_portfolio_schema_and_templates_include_blind_spot_catalog():
     rd_plan = read("skills/research/references/rd_plan.md")
     assumption_audit = read("skills/research/references/assumption_audit.md")

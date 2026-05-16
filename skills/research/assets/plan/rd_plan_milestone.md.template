@@ -78,7 +78,7 @@ last_updated: YYYY-MM-DD
 
 - Status: <Ran: executable evaluator / Skipped: named reason>
 - Executable signature: <real command-line invocation or None if skipped>
-- Artifact: <stdout/stderr path, run directory, or None if skipped>
+- Artifact: <run directory plus durable artifact path; stdout alone is not evidence; None if skipped>
 - Fitness vector: <parseable score vector and uncertainty/variance if available; None if skipped>
 - Required evaluator or artifact: <what must exist before executable feedback is possible; None if ran>
 - Killed candidates: <candidate ids and real failure reasons; None if none>

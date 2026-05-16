@@ -21,16 +21,19 @@ The load-bearing boundary is now: the skill can generate bounded research candid
 - Research-level reproducibility — methods description, data identification, statistical setup. Enough that another researcher can re-implement the work based on the prose.
 - Claim structure — explicit alternatives and conditions, not buried in prose.
 - Material execution conditions — only the conditions that can affect interpretation, such as data identity, split dates, evaluation protocol, major model/tool versions, hardware class, external API/model version, or collection date.
+- Minimal run evidence — completed research scripts must leave a `run_manifest.json` with `status: completed` and manifest-listed artifacts, `logs/stdout.log`, `logs/stderr.log`, and at least one non-log durable artifact such as metrics, tables, figures, diagnostics, or intermediate outputs.
 
 **Not covered (agent's discretion, not audited as reproducibility evidence by this skill):**
 
 - Experiment-level replicability infrastructure: env locks, commit pinning, seed databases, container files.
-- The exact layout of `experiments/<plan>/runs/<run_id>/`.
+- The exact experiment tracker schema beyond the minimal evidence scaffold in `experiments/<plan>/runs/<run_id>/`.
 - Code style, build systems, dependency management.
 
 This separation matters. If the skill audited experiment-level artifacts, agents would spend their effort producing perfect env.lock files instead of doing good research. Replicability of the *scripts* is a personal-tooling concern; reproducibility of the *research* — what someone else can reproduce from your description — is what this skill enforces.
 
 Provenance is still useful, but it is an audit pointer, not the source of reproducibility. A commit hash, run directory, or environment lock can help locate what happened in this project; it does not replace a clear method, data description, evaluation protocol, and statistical setup. Likewise, claim-to-artifact consistency is an integrity check: reported values must match the cited artifacts, but that check verifies evidence honesty rather than making the method reproducible by itself.
+
+For research scripts, stdout is not evidence. A print-only run is not analyzable after the session disappears: every EDA, evaluator, or result-analysis script must persist a `run_manifest.json` with `status: completed` and manifest-listed artifact paths, captured `logs/stdout.log` / `logs/stderr.log`, and at least one durable artifact under `outputs/`, `tables/`, `figures/`, or `intermediate/`. The artifact schema is flexible, but the evidence cannot exist only in terminal text.
 
 This distinction follows Drummond (2009) and Goodman et al. (2016): methods reproducibility is not the same as computational replicability. We enforce the former.
 
@@ -98,7 +101,7 @@ When this skill says "subagent", it means a fresh agent analysis in a separate c
 │   └── <plan_id>_<slug>/
 │       ├── code/                      # plan-specific scripts (agent's freedom)
 │       ├── configs/
-│       ├── runs/                      # execution artifacts (agent's freedom)
+│       ├── runs/                      # execution artifacts with minimal evidence scaffold
 │       │   └── <plan_id>__<n>__seed<N>/
 │       └── notebooks/
 │
@@ -114,7 +117,7 @@ Boundaries that matter:
 
 - `lib/` is shared. Tests required. Promotion from `experiments/<plan>/code/` requires a `decisions.md` entry, a test, and a docstring. This prevents experiment-specific code from quietly becoming load-bearing infrastructure.
 - `experiments/<plan>/` is owned by one plan. Other plans must not import from it. To share, promote to `lib/` first. This prevents cross-plan zombie dependencies.
-- `runs/` artifacts have no required schema. Put what helps you. The skill does not audit them.
+- `runs/` artifacts have a minimal audit scaffold: `run_manifest.json` with `status: completed` and manifest-listed artifacts, `logs/stdout.log`, `logs/stderr.log`, and at least one non-log durable artifact. Beyond that scaffold, put what helps the investigation.
 
 ## The Plan → Execute → Analyze → Compare → Report cycle
 
@@ -124,8 +127,8 @@ Boundaries that matter:
 3. For ideation work, run substrate/operator generation, assumption audit, anti-vacuity gate, blind-spot catalog, evaluator feedback, and `scripts/check_idea_portfolio.py` before promoting any candidate.
 4. Write the Prior-work grounding and Divergence checkpoint.
 5. Write the Plan section. git commit. (Plan is now time-anchored by git.)
-6. Execute. Save artifacts under experiments/<plan>/runs/<run_id>/.
-7. ANALYZE — apply the EDA / result-analysis discipline (references/analysis.md).
+6. Execute. Save artifacts under experiments/<plan>/runs/<run_id>/. A print-only script run is incomplete: stdout is not evidence, and `scripts/check_run_artifacts.py` should pass before observations are promoted.
+7. ANALYZE — apply the EDA / result-analysis discipline (references/analysis.md), using durable artifact files rather than terminal-only output.
    Observations live in plans/<id>.md Observations and in experiments/<plan>/notebooks/.
 8. Write Actual section in plans/<id>.md. Compare planned vs actual.
 9. Dispatch exactly one research-review subagent before any load-bearing claim, state-changing decision, or human-facing report.
@@ -280,6 +283,7 @@ These are not formatting preferences. They are what makes other agents and human
 - **Prior-work grounding and Divergence checkpoint exist before execution.** A plan may still commit to one route, but it must first ground the plan in prior work and expose alternatives, anchor risks, research positioning, and disconfirming evidence. User pressure to "just use the previous approach" is recorded as a constraint, not silently obeyed.
 - **No placeholder figures in reports.** Generate the figure or remove the reference. `scripts/check_report.py` verifies figure references resolve.
 - **Plan content exists before execution.** The Plan section must be filled in and committed before any execution begins. `created_commit` in the front matter is meaningful only if the Plan section is non-empty at that commit. After-the-fact plan rewriting is detectable in git diff.
+- **Research scripts leave durable artifacts.** Print-only EDA or evaluator output is not evidence. Completed runs must update `run_manifest.json` to `status: completed`, list the evidence artifacts there, capture `logs/stdout.log` / `logs/stderr.log`, and write at least one durable artifact, including intermediate data when it is needed to audit the analysis path.
 - **One research-review subagent before close-out.** Before a result becomes a load-bearing claim, state-changing decision, or report, exactly one fresh research-review subagent must record `PASS` for both analysis sufficiency and result reliability. Do not replace it with self-review, split it into disconnected reviews, or proceed on `REWORK` / `INVALID`.
 - **Decisions are labeled.** "Diagnostic detour," "let me keep going" are not decision labels. Pick from the 5.
 - **Claim records have all five fields.** Empty list `[]` is allowed; a missing field is not.

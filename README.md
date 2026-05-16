@@ -5,7 +5,7 @@ A Claude Code and Codex plugin providing two skills for **agent-driven R&D**:
 - **`research`** — protocol skill for R&D work across the three Frascati categories: basic research (new knowledge about underlying foundations without a particular application in view), applied research (new knowledge directed toward a specific practical aim or objective), and experimental development (new or improved products/processes plus additional knowledge). Enforces vocabulary, plan/claim structure, iteration discipline, analysis methodology, and human-readable reports.
 - **`quant-research`** — domain extension layered on `research` for time-series and statistically rigorous quantitative R&D. Adds methodology for time-series cross-validation, multiple-testing corrections, leakage detection, and statistical robustness.
 
-The core rule: **research-level reproducibility (someone can re-implement from your description) is enforced; experiment-level replicability (someone can rerun your exact code) is the agent's discretion.** This separation, following [Drummond (2009)](https://cogprints.org/7691/7/icmle09.pdf) and [Goodman et al. (2016)](https://www.science.org/doi/10.1126/scitranslmed.aaf5027), keeps agents focused on doing good research rather than on producing perfect env.lock files. Reports record material conditions, not environment locks: data identity, split dates, evaluation protocol, major model/tool versions, hardware class, external API/model version, or collection date only when those conditions affect interpretation.
+The core rule: **research-level reproducibility (someone can re-implement from your description) is enforced; experiment-level replicability (someone can rerun your exact code) is the agent's discretion.** This separation, following [Drummond (2009)](https://cogprints.org/7691/7/icmle09.pdf) and [Goodman et al. (2016)](https://www.science.org/doi/10.1126/scitranslmed.aaf5027), keeps agents focused on doing good research rather than on producing perfect env.lock files. Reports record material conditions, not environment locks: data identity, split dates, evaluation protocol, major model/tool versions, hardware class, external API/model version, or collection date only when those conditions affect interpretation. Research scripts still need evidence: stdout is not evidence, so completed runs keep a manifest with `status: completed`, logs, and at least one manifest-listed durable artifact.
 
 ## Who this is for
 
@@ -51,8 +51,8 @@ Plan modes are `exploratory`, `confirmatory`, `milestone`, and `theoretical`. Th
 3. For ideation work, run assumption audit before hypothesis synthesis; use iterative ideation only when its executable-evaluator preconditions hold.
 4. Write Prior-work grounding and the Divergence checkpoint.
 5. Write Plan section. git commit. (Plan is time-anchored.)
-6. Execute. Save artifacts under experiments/{plan}/runs/{run_id}/.
-7. ANALYZE — apply the discipline in references/analysis.md.
+6. Execute. Save artifacts under experiments/{plan}/runs/{run_id}/, including run_manifest.json, logs, and at least one manifest-listed non-log durable artifact.
+7. ANALYZE — apply the discipline in references/analysis.md; print-only results do not support observations or claims.
 8. Write Actual section + Planned-vs-Actual comparison.
 9. Dispatch exactly one research-review subagent (a fresh separate-context analysis agent, not a host-specific Task tool) to evaluate analysis sufficiency and result reliability.
 10. Record load-bearing claims using the Toulmin-derived structure.
@@ -79,6 +79,8 @@ Only one candidate is promoted into a plan. Non-promoted ideas are recorded as `
 v2.3.0 adds `references/assumption_audit.md` between observation discovery and hypothesis synthesis. It surfaces background assumptions of the reference model being challenged, separate from the Divergence checkpoint's anchoring audit on imported prior work. The audit records load-bearing assumptions, downstream checks, blind-spot catalog entries tied to candidate mechanisms and claim scope, reference-class forecasts, and named constraints for hypotheses that cannot currently be evaluated.
 
 v2.4.0 adds `references/iterative_ideation.md` for applied and experimental-development plans with an existing executable evaluator. It uses real shell / command-line execution for candidate scoring, explicitly forbids self-simulated fitness, and updates candidates with mutation, crossover, and wildcard variants before grounded pruning.
+
+Executable feedback must persist to run artifacts. A command that only prints a fitness number is not valid evaluator feedback until the run directory contains `run_manifest.json`, `logs/stdout.log`, `logs/stderr.log`, and a durable artifact such as `outputs/fitness.json`, `tables/fitness.csv`, or an `intermediate/` diagnostic.
 
 ### Divergence checkpoint
 
@@ -149,7 +151,7 @@ research-skill/
 │   │   │   ├── report_format.md
 │   │   │   └── literature_review.md
 │   │   ├── assets/{project,plan,report}/*.template
-│   │   └── scripts/{new_project,new_plan,new_run,check_claims,check_report,draft_report}.py
+│   │   └── scripts/{new_project,new_plan,new_run,check_run_artifacts,check_claims,check_report,draft_report}.py
 │   └── quant-research/
 │       ├── SKILL.md
 │       ├── references/shared/
@@ -200,7 +202,7 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 ├── lib/                             # shared curated code (tests required)
 ├── experiments/{plan}/              # per-plan isolation
 │   ├── code/ configs/ notebooks/
-│   └── runs/{plan}__{n}__seed{N}/   # raw artifacts (no required schema)
+│   └── runs/{plan}__{n}__seed{N}/   # run_manifest, logs, and durable artifacts
 ├── data/{raw,processed}/
 └── reports/{id}_{slug}/             # human-facing snapshots
     ├── report.md
@@ -217,7 +219,8 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 |---|---|
 | `new_project.py` | Initialize project directory with canonical layout |
 | `new_plan.py` | Create a plan from mode-specific template, capture git SHA |
-| `new_run.py` | Create a run directory with consistent naming |
+| `new_run.py` | Create a run directory with manifest, logs, and artifact folders |
+| `check_run_artifacts.py` | Reject print-only runs and verify manifest/logs/non-log artifacts |
 | `check_idea_portfolio.py` | Verify Idea portfolio substrate/operator/anti-vacuity/blind-spot/evaluator-feedback contract |
 | `check_claims.py` | Verify claim record structure (5 required fields, vagueness heuristics) |
 | `check_report.py` | Verify report contract (figures resolve, required sections, non-placeholder) |
