@@ -15,6 +15,12 @@ Treat the plan as the only starting context. Do not rely on parent-agent summari
 
 This skill owns analysis only. Do not write final claims, do not choose iteration decisions, and do not draft human-facing reports.
 
+## Required Reference
+
+Before judging claim-readiness, read `skills/research/references/analysis.md` from this plugin. Apply its artifact contract, disclosure floor, analysis depth stop rule, Observation → Interpretation → Claim staging, and Pearl ladder constraint.
+
+Minimum evidence rule: stdout is not evidence. A completed run needs `run_manifest.json`, captured logs, and at least one manifest-listed non-log durable artifact under `outputs/`, `tables/`, `figures/`, or `intermediate/`. If the plan points only to terminal text or missing files, record `context_missing` and do not mark the result `ready`.
+
 ## Workflow
 
 1. **Read the plan**  
@@ -28,6 +34,14 @@ This skill owns analysis only. Do not write final claims, do not choose iteratio
 
 4. **Return**  
    Return a plan-ready `## Result analysis` section. Use artifact paths, numeric values, table/figure references, and missing-context entries that a research-review agent can inspect.
+
+## Claim-readiness verdicts
+
+- `ready`: the applicable disclosure floor is met, evidence is durable and artifact-grounded, alternatives and untested conditions are named, and no missing context or reliability issue blocks the planned claim strength.
+- `not_ready`: the result may be usable later, but required analysis, artifacts, comparators, variance, controls, robustness checks, or context are missing and repairable.
+- `invalid_evidence`: a script bug, data defect, leakage, invalid procedure, broken comparator, corrupted artifact, or unrecoverable provenance gap may have distorted the result. The affected result is not claim evidence until repaired and rerun.
+
+Do not mark causal, mechanism, or counterfactual claim-readiness from association-only evidence. Pearl ladder applies: diagnostic correlation is not enough for intervention or counterfactual claims.
 
 ## Output Shape
 

@@ -520,6 +520,44 @@ def test_result_analysis_skill_exists_and_stages_outputs_without_claim_authority
     )
 
 
+def test_result_analysis_skill_requires_analysis_reference_and_artifact_contract():
+    skill = read("skills/research-result-analysis/SKILL.md")
+
+    assert_mentions(
+        skill,
+        "skills/research/references/analysis.md",
+        "artifact contract",
+        "stdout is not evidence",
+        "manifest-listed non-log durable artifact",
+        "disclosure floor",
+        "analysis depth",
+        "Observation → Interpretation → Claim",
+        "Pearl",
+    )
+
+
+def test_result_analysis_skill_defines_claim_readiness_verdicts():
+    skill = read("skills/research-result-analysis/SKILL.md")
+
+    assert_ordered_fragments(
+        skill,
+        "Claim-readiness verdicts",
+        "`ready`",
+        "`not_ready`",
+        "`invalid_evidence`",
+    )
+    assert_mentions(
+        skill,
+        "applicable disclosure floor is met",
+        "repairable",
+        "script bug",
+        "data defect",
+        "leakage",
+        "invalid procedure",
+        "broken comparator",
+    )
+
+
 def test_result_analysis_prompt_preserves_subagent_output_before_review():
     prompt = read("skills/research/references/result_analysis_subagent_prompt.md")
     analysis = read("skills/research/references/analysis.md")
