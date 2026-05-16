@@ -15,6 +15,10 @@ last_updated: YYYY-MM-DD
 
 <One paragraph stating what artifact will be built and what it is for.>
 
+## Idea portfolio
+
+<Not applicable: objective already chosen. If this plan began from research ideas, research directions, hypothesis candidates, or "what should we try next," summarize the sanitized brief, fresh de-anchoring subagent, de-anchored candidates from `references/ideation.md`, transformation axes, grounded pruning, information-gain scoring, pre-execution divergence review, and the one candidate promoted into this plan.>
+
 ## Prior-work grounding
 
 ### Grounding scope

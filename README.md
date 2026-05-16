@@ -43,15 +43,16 @@ Categories are not a one-way pipeline ([Kline & Rosenberg 1986](https://fenix.is
 
 ```
 1. new_plan.py creates plans/{id}_{slug}.md (mode-specific template)
-2. Write Question / Objective, Prior-work grounding, and the Divergence checkpoint.
-3. Write Plan section. git commit. (Plan is time-anchored.)
-4. Execute. Save artifacts under experiments/{plan}/runs/{run_id}/.
-5. ANALYZE — apply the discipline in references/analysis.md.
-6. Write Actual section + Planned-vs-Actual comparison.
-7. Dispatch exactly one research-review subagent to evaluate analysis sufficiency and result reliability.
-8. Record load-bearing claims using the Toulmin-derived structure.
-9. Pick one of 5 iteration branches: NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE.
-10. If human-facing, draft a report.
+2. Write Question / Objective. If ideating, write the Research ideation Idea portfolio before prior-work grounding.
+3. Write Prior-work grounding and the Divergence checkpoint.
+4. Write Plan section. git commit. (Plan is time-anchored.)
+5. Execute. Save artifacts under experiments/{plan}/runs/{run_id}/.
+6. ANALYZE — apply the discipline in references/analysis.md.
+7. Write Actual section + Planned-vs-Actual comparison.
+8. Dispatch exactly one research-review subagent to evaluate analysis sufficiency and result reliability.
+9. Record load-bearing claims using the Toulmin-derived structure.
+10. Pick one of 5 iteration branches: NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE.
+11. If human-facing, draft a report.
 ```
 
 ### Prior-work grounding
@@ -61,6 +62,12 @@ Every new plan records first-class prior-work grounding before the Plan section.
 Projects use `literature/{papers.md,positioning.md}`. `positioning.md` records how the work stands on prior work: grounding, inheritance, baseline choice, known limitations, and claim scope. Differences or novelty can be recorded there when claimed, but novelty is not the default purpose.
 
 Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims. That is separate from the plan-scoped prior-work grounding every plan needs.
+
+### Research ideation
+
+When a user asks for research ideas, research directions, hypothesis candidates, or "what should we try next," the `research` skill now uses `references/ideation.md` to create an **Idea portfolio** before prior-work grounding. If the main agent has already seen anchors, it prepares a sanitized brief and dispatches a fresh de-anchoring subagent for raw candidate generation. The portfolio starts with those de-anchored raw candidates, records which axis each candidate changes, then applies grounding and information-gain scoring.
+
+Only one candidate is promoted into a plan. Non-promoted ideas are recorded as `parked / killed / merged` and are not claims.
 
 ### Divergence checkpoint
 
@@ -125,6 +132,7 @@ research-skill/
 │   │   │   ├── categories/{basic_research,applied_research,experimental_development}.md
 │   │   │   ├── analysis.md
 │   │   │   ├── claim_structure.md
+│   │   │   ├── ideation.md
 │   │   │   ├── iteration_loop.md
 │   │   │   ├── rd_plan.md
 │   │   │   ├── report_format.md

@@ -1,3 +1,4 @@
+import re
 import subprocess
 import sys
 import tempfile
@@ -250,6 +251,165 @@ def test_plan_schema_makes_prior_work_grounding_first_class_not_novelty_optional
         "Novelty / differentiation thesis",
         "unknown-not-yet-reviewed",
         "literature/differentiation.md",
+    )
+
+
+def test_research_skill_routes_research_idea_generation_to_ideation_reference():
+    skill = read("skills/research/SKILL.md")
+    rd_plan = read("skills/research/references/rd_plan.md")
+
+    assert_mentions(
+        skill,
+        "research idea",
+        "hypothesis candidate",
+        "what should we try next",
+        "references/ideation.md",
+        "fresh de-anchoring subagent",
+        "sanitized brief",
+        "must not generate raw candidates itself",
+        "before Prior-work grounding",
+    )
+    assert_ordered_fragments(
+        rd_plan,
+        "Idea portfolio",
+        "Prior-work grounding",
+        "Divergence checkpoint",
+        "## Plan",
+    )
+
+
+def test_ideation_reference_defines_deanchoring_before_grounded_pruning():
+    ideation = read("skills/research/references/ideation.md")
+
+    assert_ordered_fragments(
+        ideation,
+        "De-anchoring pass",
+        "Transformation pass",
+        "Quality-diversity pass",
+        "Grounded pruning pass",
+        "Information-gain scoring",
+        "Pre-execution divergence review",
+        "Plan promotion",
+    )
+    assert_mentions(
+        ideation,
+        "do not read prior work first",
+        "prior work is applied after raw candidates exist",
+        "method / mechanism / data assumption / metric / evaluation protocol / system design / problem framing",
+        "failed idea",
+        "not a claim",
+        "parked / killed / merged",
+    )
+
+
+def test_research_skill_docs_are_english_only():
+    checked_paths = [
+        ROOT / "skills" / "research" / "SKILL.md",
+        *sorted((ROOT / "skills" / "research" / "references").rglob("*.md")),
+        *sorted((ROOT / "skills" / "research" / "assets").rglob("*.template")),
+    ]
+
+    offenders = []
+    for path in checked_paths:
+        text = path.read_text(encoding="utf-8")
+        if re.search(r"[\u3040-\u30ff\u3400-\u9fff]", text):
+            offenders.append(str(path.relative_to(ROOT)))
+
+    assert not offenders, f"Japanese/CJK text found in skill docs: {offenders}"
+
+
+def test_ideation_uses_fresh_subagent_for_deanchored_raw_candidates():
+    ideation = read("skills/research/references/ideation.md")
+
+    assert_ordered_fragments(
+        ideation,
+        "Sanitized brief",
+        "Fresh de-anchoring subagent",
+        "Raw candidate generation",
+        "Grounded pruning pass",
+    )
+    assert_mentions(
+        ideation,
+        "The main agent must not generate raw candidates itself after seeing anchors.",
+        "prior work names",
+        "SOTA",
+        "previous best approaches",
+        "user-preferred method",
+        "convenient dataset details",
+    )
+
+
+def test_plan_templates_include_idea_portfolio_before_prior_work_grounding():
+    template_dir = ROOT / "skills" / "research" / "assets" / "plan"
+
+    for template in template_dir.glob("*.template"):
+        text = template.read_text(encoding="utf-8")
+        assert_ordered_fragments(
+            text,
+            "## Question / Objective",
+            "## Idea portfolio",
+            "## Prior-work grounding",
+            "## Divergence checkpoint",
+            "## Plan",
+        )
+        assert_mentions(
+            text,
+            "Not applicable: objective already chosen",
+            "research ideas",
+            "hypothesis candidates",
+            "what should we try next",
+            "references/ideation.md",
+            "sanitized brief",
+            "fresh de-anchoring subagent",
+        )
+
+
+def test_new_plan_guidance_mentions_idea_portfolio_before_prior_work_grounding():
+    new_plan = read("skills/research/scripts/new_plan.py")
+
+    assert_ordered_fragments(
+        new_plan,
+        "Question / Objective",
+        "Idea portfolio",
+        "Prior-work grounding",
+        "Divergence checkpoint",
+        "Plan",
+        "time-anchor",
+    )
+
+
+def test_idea_portfolio_records_pre_execution_divergence_review():
+    rd_plan = read("skills/research/references/rd_plan.md")
+
+    assert_ordered_fragments(
+        rd_plan,
+        "fresh de-anchoring subagent",
+        "### Pre-execution divergence review",
+        "parameter sweep",
+        "literature-first",
+        "prior-work",
+        "not claims",
+    )
+
+
+def test_readme_documents_research_ideation_before_prior_work_grounding():
+    readme = read("README.md")
+
+    assert_ordered_fragments(
+        readme,
+        "Question / Objective",
+        "Research ideation",
+        "Idea portfolio",
+        "prior-work grounding",
+    )
+    assert_mentions(
+        readme,
+        "research ideas",
+        "hypothesis candidates",
+        "what should we try next",
+        "de-anchored",
+        "parked / killed / merged",
+        "ideation.md",
     )
 
 
