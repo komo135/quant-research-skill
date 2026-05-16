@@ -70,6 +70,23 @@ Record the anchors intentionally excluded from raw seed generation:
 
 The ledger is not input to raw seed generation. It exists so later grounded pruning can check whether the portfolio collapsed back toward anchors.
 
+### Hypothesis-generation handoff
+
+When anchoring risk is high, the user explicitly asks for de-anchored hypotheses, or a fresh perspective would materially improve breadth, dispatch a fresh separate-context hypothesis-generation agent. This is allowed during ideation; it is not Plan review or Result analysis.
+
+The anchor-stripped seed brief is the only generation brief. Pass substrate ids, sanitized substrate descriptions, hard constraints, required output shape, and the instruction to produce multiple working hypotheses from current observations. The Excluded-anchor ledger is not input to the generator. It remains with the main agent so the main agent can later audit anchor leakage.
+
+The generator must produce multiple working hypotheses, not a list of different methods. If the user requests web or literature, or if current observations are too narrow to supply mechanism breadth, retrieval is required unless access is unavailable; use it to import abstract observations, cross-domain mechanisms, or known failure patterns, not named approaches as anchors. Each hypothesis must include:
+
+- Source observation: <substrate ids and observed phenomenon, failure mode, tension, baseline limit, or constraint>
+- Mechanism conjecture: <what mechanism could explain the observation or make an intervention plausible>
+- Predicted effect: <observable effect if the mechanism is right>
+- Counter-hypothesis: <plausible alternative that predicts a different result>
+- Minimal disconfirming test: <smallest observation, comparison, ablation, derivation check, or evaluator result that would kill or narrow it>
+- Web or literature retrieval notes: <abstract observations, cross-domain mechanisms, or missing-context note; no paper-title or SOTA-method anchors in raw hypotheses>
+
+The generator should consider the opposite of the visible favorite, foreground assumptions that may be false, transfer mechanisms across domains only at the abstract mechanism level, and include at least one candidate that changes the measurement or evaluator when the current evaluator may hide the phenomenon.
+
 ### Raw candidate generation
 
 Raw candidate generation is raw seed generation. The output is an unpruned seed set that preserves breadth before operator conversion, anti-vacuity, and grounded pruning.
@@ -77,6 +94,20 @@ Raw candidate generation is raw seed generation. The output is an unpruned seed 
 Each raw seed may be one sentence. At this stage, do not reject seeds for reviewability, overlap with known work, ease of implementation, or fit with available datasets.
 
 Apply grounded pruning only after raw seed generation, generation operator conversion, anti-vacuity, and evaluator feedback. If additional raw seeds are needed after anchors are visible, repeat the anchor-stripped seed brief and excluded-anchor ledger before generating them.
+
+### Main-agent intake
+
+Do not accept generator output as authority. The main research agent owns the portfolio and must convert the generator's output into research state.
+
+For each generated hypothesis, record an intake decision:
+
+- Authority check: <why this is seed material, not a claim, plan, or decision>
+- Observation trace check: <substrate ids it truly traces to, or missing-substrate constraint>
+- Mechanism review: <whether the mechanism is explanatory, merely a method swap, or post-hoc prose>
+- Decision: <advance / park / kill / merge / regenerate>
+- Next-plan action: <promote toward current plan / open ADJACENT evaluator-construction plan / gather substrate / run grounded pruning / no plan>
+
+Regenerate when the output is only method names, parameter sweeps, literature extensions, benchmark-shaped ideas, or candidates with no mechanism. Park when the mechanism is plausible but substrate, evaluator, data, or prior-work grounding is missing. Kill candidates that cannot be disconfirmed or only restate the favorite approach. Merge candidates that share the same mechanism and minimal test.
 
 ### Transformation pass
 

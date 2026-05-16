@@ -38,6 +38,21 @@ last_updated: YYYY-MM-DD
 - Excluded-anchor ledger: <prior-work names, SOTA systems, previous best approaches, user-preferred methods, convenient datasets, or None>
 - <candidate>: <raw seed generated before prior-work grounding; not accepted until operator + anti-vacuity gate pass>
 
+### Hypothesis-generation handoff
+
+- Agent: <fresh separate-context hypothesis-generation agent, or Not used with reason>
+- Starting context: <anchor-stripped seed brief is the only generation brief; Excluded-anchor ledger is not input>
+- Web/literature retrieval: <used for abstract observations or cross-domain mechanisms / skipped with reason>
+- Output contract: <multiple working hypotheses with source observation, mechanism conjecture, predicted effect, counter-hypothesis, minimal disconfirming test, and retrieval notes>
+
+### Main-agent intake
+
+- Authority check: <generator output is seed material, not accepted authority, claim, plan, or decision>
+- Observation trace check: <which substrate ids each hypothesis truly traces to, or missing-substrate constraint>
+- Mechanism review: <whether each mechanism explains observations, merely swaps methods, or is post-hoc prose>
+- Decision: <advance / park / kill / merge / regenerate for each hypothesis>
+- Next-plan action: <promote toward current plan / open ADJACENT evaluator-construction plan / gather substrate / run grounded pruning / no plan>
+
 ### Assumption audit
 
 - Reference model challenged: <model, framing, baseline story, or implicit premise being challenged>

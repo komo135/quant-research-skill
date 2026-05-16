@@ -3,9 +3,9 @@
 
 Checks:
 - If an Idea portfolio is present and applicable, it contains the generation
-  substrate, generation operators, assumption audit, anti-vacuity gate,
-  blind-spot catalog, evaluator feedback, pruning, scoring, divergence review,
-  and promotion record.
+  substrate, hypothesis-generation handoff, main-agent intake, generation
+  operators, assumption audit, anti-vacuity gate, blind-spot catalog,
+  evaluator feedback, pruning, scoring, divergence review, and promotion record.
 - The substrate contains at least two named substrate ids.
 - Generation operators and the anti-vacuity gate contain the fields that keep
   candidates from being accepted as post-hoc prose.
@@ -29,6 +29,8 @@ REQUIRED_SUBSECTIONS = [
     "Idea substrate",
     "Generation operators",
     "De-anchored candidates",
+    "Hypothesis-generation handoff",
+    "Main-agent intake",
     "Assumption audit",
     "Anti-vacuity gate",
     "Blind-spot catalog",
@@ -44,6 +46,21 @@ GENERATION_FIELDS = [
     "Substrate ids",
     "Operator",
     "Changed premise",
+]
+
+HANDOFF_FIELDS = [
+    "Agent",
+    "Starting context",
+    "Web/literature retrieval",
+    "Output contract",
+]
+
+MAIN_INTAKE_FIELDS = [
+    "Authority check",
+    "Observation trace check",
+    "Mechanism review",
+    "Decision",
+    "Next-plan action",
 ]
 
 ANTI_VACUITY_FIELDS = [
@@ -432,6 +449,8 @@ def check_portfolio(text: str) -> list[str]:
     issues.extend(check_required_subsections(sections))
     issues.extend(check_substrate(sections))
     issues.extend(check_fields(sections, "Generation operators", GENERATION_FIELDS))
+    issues.extend(check_fields(sections, "Hypothesis-generation handoff", HANDOFF_FIELDS))
+    issues.extend(check_fields(sections, "Main-agent intake", MAIN_INTAKE_FIELDS))
     issues.extend(check_fields(sections, "Anti-vacuity gate", ANTI_VACUITY_FIELDS))
     issues.extend(check_candidate_contract(sections))
     issues.extend(check_anti_vacuity_verdict(sections))

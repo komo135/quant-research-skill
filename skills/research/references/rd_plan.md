@@ -28,7 +28,7 @@ last_updated: YYYY-MM-DD
 <One paragraph stating what this plan investigates or builds.>
 
 ## Idea portfolio
-<Optional except when the user asked for research ideas, research directions, hypothesis candidates, or "what should we try next." Record the substrate-driven ideation contract from `references/ideation.md`: idea substrate, de-anchored seed generation, generation operators, assumption audit, anti-vacuity gate, evaluator feedback, grounded pruning, information-gain scoring, and the one candidate promoted into this plan. Raw seeds are not accepted ideas.>
+<Optional except when the user asked for research ideas, research directions, hypothesis candidates, or "what should we try next." Record the substrate-driven ideation contract from `references/ideation.md`: idea substrate, de-anchored seed generation, hypothesis-generation handoff or a Not-used reason, main-agent intake, generation operators, assumption audit, anti-vacuity gate, evaluator feedback, grounded pruning, information-gain scoring, and the one candidate promoted into this plan. Raw seeds are not accepted ideas.>
 
 ## Prior-work grounding
 <Bounded but sufficient grounding for the plan's question/objective, inherited assumptions, method choice, controls/comparators/evaluation protocol, baselines/evaluation protocol when the claim requires them, and known limitations. Cite `literature/papers.md` and `literature/positioning.md`. If prior work is genuinely unknown, record the named constraint and narrow or block relevant claims.>
@@ -65,7 +65,7 @@ last_updated: YYYY-MM-DD
 
 ## Idea portfolio section
 
-This section appears after `## Question / Objective` and before `## Prior-work grounding` when the user asks for research ideas, research directions, hypothesis candidates, or "what should we try next." It records the output of `references/ideation.md`, including the idea substrate, anchor-stripped seed brief, excluded-anchor ledger, raw seed generation, generation operators, anti-vacuity gate, evaluator feedback, and promotion decision.
+This section appears after `## Question / Objective` and before `## Prior-work grounding` when the user asks for research ideas, research directions, hypothesis candidates, or "what should we try next." It records the output of `references/ideation.md`, including the idea substrate, anchor-stripped seed brief, excluded-anchor ledger, hypothesis-generation handoff or a Not-used reason, main-agent intake, raw seed generation, generation operators, anti-vacuity gate, evaluator feedback, and promotion decision.
 
 The section is optional for ordinary plans that begin with an already chosen objective. It is required for ideation tasks because prior-work-first planning can anchor the agent to the literature's safest extensions before raw seeds and substrate/operator candidates exist.
 
@@ -87,6 +87,19 @@ The section is optional for ordinary plans that begin with an already chosen obj
 - Seed brief: <anchor-stripped brief with substrate ids only>
 - Excluded-anchor ledger: <prior-work names, SOTA systems, previous best approaches, user-preferred methods, convenient datasets, or None>
 - <candidate>: <raw seed generated before prior-work grounding; not accepted until operator + anti-vacuity gate pass>
+
+### Hypothesis-generation handoff
+- Agent: <fresh separate-context hypothesis-generation agent, or Not used with reason>
+- Starting context: <anchor-stripped seed brief is the only generation brief; Excluded-anchor ledger is not input>
+- Web/literature retrieval: <used for abstract observations or cross-domain mechanisms / skipped with reason>
+- Output contract: <multiple working hypotheses with source observation, mechanism conjecture, predicted effect, counter-hypothesis, minimal disconfirming test, and retrieval notes>
+
+### Main-agent intake
+- Authority check: <generator output is seed material, not accepted authority, claim, plan, or decision>
+- Observation trace check: <which substrate ids each hypothesis truly traces to, or missing-substrate constraint>
+- Mechanism review: <whether each mechanism explains observations, merely swaps methods, or is post-hoc prose>
+- Decision: <advance / park / kill / merge / regenerate for each hypothesis>
+- Next-plan action: <promote toward current plan / open ADJACENT evaluator-construction plan / gather substrate / run grounded pruning / no plan>
 
 ### Assumption audit
 - Reference model challenged: <model, framing, baseline story, or implicit premise being challenged>

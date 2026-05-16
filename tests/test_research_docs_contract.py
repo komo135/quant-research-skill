@@ -342,6 +342,34 @@ def test_ideation_reference_defines_deanchoring_before_grounded_pruning():
     )
 
 
+def test_ideation_reference_defines_hypothesis_generation_handoff_and_main_intake():
+    ideation = read("skills/research/references/ideation.md")
+
+    assert_ordered_fragments(
+        ideation,
+        "De-anchoring pass",
+        "Hypothesis-generation handoff",
+        "Main-agent intake",
+        "Assumption audit pass",
+        "Anti-vacuity gate",
+        "Grounded pruning pass",
+        "Plan promotion",
+    )
+    assert_mentions(
+        ideation,
+        "fresh separate-context",
+        "anchor-stripped seed brief is the only generation brief",
+        "Excluded-anchor ledger is not input",
+        "multiple working hypotheses",
+        "current observations",
+        "web or literature retrieval notes",
+        "If the user requests web or literature",
+        "Do not accept generator output as authority",
+        "advance / park / kill / merge / regenerate",
+        "next-plan action",
+    )
+
+
 def test_ideation_reference_requires_hypothesis_synthesis_not_just_candidate_listing():
     ideation = read("skills/research/references/ideation.md")
 
@@ -608,6 +636,8 @@ def test_plan_schema_records_hypothesis_synthesis_in_idea_portfolio():
         "### Idea substrate",
         "### Generation operators",
         "### De-anchored candidates",
+        "### Hypothesis-generation handoff",
+        "### Main-agent intake",
         "### Anti-vacuity gate",
         "### Hypothesis synthesis",
         "Source observation",
@@ -619,6 +649,35 @@ def test_plan_schema_records_hypothesis_synthesis_in_idea_portfolio():
         "### Evaluator feedback",
         "### Grounded pruning",
     )
+
+
+def test_plan_schema_and_templates_record_handoff_and_main_intake_contract():
+    rd_plan = read("skills/research/references/rd_plan.md")
+    template_dir = ROOT / "skills" / "research" / "assets" / "plan"
+
+    for text in [rd_plan] + [p.read_text(encoding="utf-8") for p in template_dir.glob("*.template")]:
+        assert_ordered_fragments(
+            text,
+            "## Idea portfolio",
+            "### De-anchored candidates",
+            "### Hypothesis-generation handoff",
+            "Agent",
+            "Starting context",
+            "Output contract",
+            "### Main-agent intake",
+            "Authority check",
+            "Observation trace check",
+            "Mechanism review",
+            "Decision",
+            "Next-plan action",
+            "### Anti-vacuity gate",
+        )
+        assert_mentions(
+            text,
+            "fresh separate-context hypothesis-generation agent",
+            "generator output is seed material",
+            "regenerate",
+        )
 
 
 def test_iteration_loop_defines_approach_transition_criteria():
@@ -1276,6 +1335,21 @@ Find a better short-term reversal signal under existing data constraints.
 
 - Candidate A: Gate reversal only after spread compression following a spike.
 
+### Hypothesis-generation handoff
+
+- Agent: fresh separate-context hypothesis-generation agent.
+- Starting context: anchor-stripped seed brief is the only generation brief; Excluded-anchor ledger is not input.
+- Web/literature retrieval: skipped with reason - substrate is already sufficient for raw hypothesis generation.
+- Output contract: multiple working hypotheses with source observation, mechanism conjecture, predicted effect, counter-hypothesis, minimal disconfirming test, and retrieval notes.
+
+### Main-agent intake
+
+- Authority check: generator output is seed material, not accepted authority, claim, plan, or decision.
+- Observation trace check: Candidate A traces to S1 and S2.
+- Mechanism review: Candidate A explains spread-spike failures rather than merely swapping methods.
+- Decision: advance Candidate A after anti-vacuity and evaluator feedback; regenerate any parameter-sweep-only alternatives.
+- Next-plan action: open ADJACENT evaluator-construction plan before intervention claims.
+
 ### Assumption audit
 
 - Reference model challenged: short-term reversal signal treats high spread as pure contamination.
@@ -1359,6 +1433,109 @@ Grounding deferred until evaluator-construction plan is opened.
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "Idea portfolio passes contract checks." in result.stdout
+
+
+def test_check_idea_portfolio_requires_handoff_and_main_intake_sections():
+    plan = """# Missing Handoff Plan
+
+## Question / Objective
+
+Find a better short-term reversal signal under existing data constraints.
+
+## Idea portfolio
+
+### Idea substrate
+
+- S1: Empirical observation - reversal edge decays after high spread intervals.
+- S2: Failure observation - volatility filter removes both noise and useful rebound cases.
+
+### Generation operators
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Operator: invert gating premise
+  - Changed premise: spread spikes mark rebound inventory pressure rather than only noise.
+
+### De-anchored candidates
+
+- Candidate A: Gate reversal only after spread compression following a spike.
+
+### Assumption audit
+
+- Reference model challenged: short-term reversal signal treats high spread as pure contamination.
+- Assumptions considered: finite liquidity recovery window; spread spike means noise; close-to-close return is enough.
+- Load-bearing assumption: spread spike means noise.
+- Downstream-check result: not downstream of close-to-close measurement.
+- Inversion candidate: Candidate A.
+
+### Anti-vacuity gate
+
+- Candidate A:
+  - Substrate ids: S1, S2
+  - Changed premise: spread spikes can precede rebound, not just contaminate labels.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Predicted measurable effect: reversal IC improves in post-spike compression windows.
+  - Counter-hypothesis: apparent rebound is just lower volatility after filtering.
+  - Minimal disconfirming test: compare post-spike compression windows against matched non-spike windows.
+  - Verdict: survives
+
+### Blind-spot catalog
+
+- Candidate A:
+  - Blind-spot area: market microstructure regimes could hide venue-specific liquidity-provider constraints.
+  - How it could break the mechanism: compression after a spike may reflect quote mechanics rather than rebound inventory pressure.
+  - Claim-scope effect: narrowed_claim: narrow claims to tested venues and periods.
+  - Required repair: narrow_conditions: add venue-regime stratification or park the general claim.
+
+### Hypothesis synthesis
+
+- Candidate A:
+  - Source observation: S1 and S2.
+  - Mechanism conjecture: transient inventory pressure relaxes after spread compression.
+  - Proposed intervention: condition reversal on spread spike followed by compression.
+  - Predicted effect: higher reversal IC in the conditioned slice.
+  - Counter-hypothesis: the slice merely lowers volatility.
+  - Minimal disconfirming test: matched non-spike window comparison.
+
+### Evaluator feedback
+
+- Status: Skipped: executable evaluator unavailable in current workspace.
+- Required evaluator or artifact: walk-forward CLI.
+- Effect on promotion: Candidate A can advance only after evaluator construction.
+
+### Grounded pruning
+
+- Advance: Candidate A only as evaluator-construction plan.
+- Parked: None.
+- Killed: None.
+- Merged: None.
+
+### Information-gain scoring
+
+- Candidate A: high information gain but blocked.
+
+### Pre-execution divergence review
+
+- Portfolio breadth: limited.
+- Parameter sweep laundering: none.
+- Anti-anchor check: not literature-first.
+- Required repair before promotion: build evaluator.
+
+### Promotion decision
+
+- Promoted idea: Candidate A to ADJACENT evaluator-construction plan.
+- Non-promoted ideas: none.
+
+## Prior-work grounding
+
+Grounding deferred.
+"""
+
+    result = run_idea_portfolio_check(plan)
+
+    assert result.returncode == 1
+    assert "Missing required Idea portfolio subsection: 'Hypothesis-generation handoff'" in result.stdout
+    assert "Missing required Idea portfolio subsection: 'Main-agent intake'" in result.stdout
 
 
 def idea_portfolio_plan_with_blind_spot(blind_spot_block: str) -> str:

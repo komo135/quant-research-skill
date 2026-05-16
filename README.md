@@ -73,7 +73,7 @@ Comprehensive literature survey is required for strong external novelty, publica
 
 ### Research ideation
 
-When a user asks for research ideas, research directions, hypothesis candidates, or "what should we try next," the `research` skill uses `references/ideation.md` to create an **Idea portfolio** before prior-work grounding. If anchors are already visible, it writes an anchor-stripped seed brief and an excluded-anchor ledger before raw seed generation. Raw seeds are not accepted ideas. The portfolio must record substrate ids, generation operators, changed premises, assumption audit, anti-vacuity gate results, blind-spot catalog entries tied to surviving candidates, evaluator feedback, grounded pruning, and information-gain scoring before one candidate can be promoted.
+When a user asks for research ideas, research directions, hypothesis candidates, or "what should we try next," the `research` skill uses `references/ideation.md` to create an **Idea portfolio** before prior-work grounding. If anchors are already visible, it writes an anchor-stripped seed brief and an excluded-anchor ledger before raw seed generation. When anchoring risk is high, ideation may dispatch a fresh separate-context hypothesis-generation agent from that brief; the main agent then records intake instead of accepting the output as authority. Raw seeds are not accepted ideas. The portfolio must record substrate ids, hypothesis-generation handoff or a Not-used reason, main-agent intake, generation operators, changed premises, assumption audit, anti-vacuity gate results, blind-spot catalog entries tied to surviving candidates, evaluator feedback, grounded pruning, and information-gain scoring before one candidate can be promoted.
 
 Only one candidate is promoted into a plan. Non-promoted ideas are recorded as `parked / killed / merged` and are not claims.
 
@@ -230,7 +230,7 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 | `new_plan.py` | Create a plan from mode-specific template, capture git SHA |
 | `new_run.py` | Create a run directory with manifest, logs, and artifact folders |
 | `check_run_artifacts.py` | Reject print-only runs and verify manifest/logs/non-log artifacts |
-| `check_idea_portfolio.py` | Verify Idea portfolio substrate/operator/anti-vacuity/blind-spot/evaluator-feedback contract |
+| `check_idea_portfolio.py` | Verify Idea portfolio substrate/handoff/intake/operator/anti-vacuity/blind-spot/evaluator-feedback contract |
 | `check_claims.py` | Verify claim record structure (5 required fields, vagueness heuristics) |
 | `check_report.py` | Verify report contract (figures resolve, required sections, non-placeholder) |
 | `draft_report.py` | Initialize a report directory from a plan |
@@ -256,7 +256,7 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ### v2.6.0 (current) — plan review and explanation-centered result analysis
 
-Splits pre-execution design review and post-execution result analysis into the only two fresh separate-context subagent gates.
+Splits pre-execution design review and post-execution result analysis into the two mandatory fresh separate-context gates around execution. Ideation can also use a fresh hypothesis-generation handoff, but that output is seed material until main-agent intake, pruning, and plan promotion adjudicate it.
 
 **Added / changed**
 
@@ -264,7 +264,7 @@ Splits pre-execution design review and post-execution result analysis into the o
 - Removed the post-result review gate from the active lifecycle.
 - Refocused `research-result-analysis` from readiness verdicts to explaining why the result happened: candidate explanations, evidence for/against, procedure/artifact explanations, live alternatives, and discriminating next analyses.
 - Kept document checks as regression guards; behavioral quality is validated with pressure scenarios against the skills.
-- Reworked ideation so raw seed generation uses an anchor-stripped seed brief and excluded-anchor ledger, not a separate de-anchoring subagent.
+- Reworked ideation so de-anchored hypothesis generation uses an anchor-stripped seed brief, excluded-anchor ledger, optional fresh hypothesis-generation handoff, and explicit main-agent intake.
 
 ### v2.5.0 — independent result analysis quality gates
 
