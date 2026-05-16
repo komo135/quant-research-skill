@@ -456,15 +456,14 @@ def test_research_skill_and_project_seed_positioning_not_differentiation():
     assert_absent(new_project, "differentiation.md")
 
 
-def test_readme_and_plugin_metadata_are_v204_prior_work_grounding_release():
+def test_readme_and_plugin_metadata_describe_prior_work_grounding():
     readme = read("README.md")
     codex_plugin = read(".codex-plugin/plugin.json")
     claude_plugin = read(".claude-plugin/plugin.json")
     marketplace = read(".claude-plugin/marketplace.json")
 
     for text in [readme, codex_plugin, claude_plugin, marketplace]:
-        assert_mentions(text, "2.0.4", "prior-work grounding")
-        assert_absent(text, '"version": "2.0.3"')
+        assert_mentions(text, "prior-work grounding")
 
     assert_mentions(readme, "literature/{papers.md,positioning.md}")
     assert_absent(readme, "literature/{papers.md,differentiation.md}")
