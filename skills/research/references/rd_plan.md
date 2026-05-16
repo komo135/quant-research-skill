@@ -27,6 +27,9 @@ last_updated: YYYY-MM-DD
 ## Question / Objective
 <One paragraph stating what this plan investigates or builds.>
 
+## Idea portfolio
+<Optional except when the user asked for research ideas, research directions, hypothesis candidates, or "what should we try next." Summarize de-anchored candidates generated from a sanitized brief by a fresh de-anchoring subagent, transformation axes from `references/ideation.md`, grounded pruning, information-gain scoring, and the one candidate promoted into this plan.>
+
 ## Prior-work grounding
 <Bounded but sufficient grounding for the plan's question/objective, inherited assumptions, method choice, baselines/evaluation protocol, and known limitations. Cite `literature/papers.md` and `literature/positioning.md`. If prior work is genuinely unknown, record the named constraint and narrow or block relevant claims.>
 
@@ -57,9 +60,41 @@ last_updated: YYYY-MM-DD
 - Related literature: <see literature/papers.md entries>
 ```
 
-## Divergence checkpoint section
+## Idea portfolio section
 
-This section appears in every mode after `## Prior-work grounding` and before `## Plan`. Fill it before execution. Its purpose is to prevent research from prematurely converging on "the approach that worked last time," "the approach the user requested," or "the dataset already at hand."
+This section appears after `## Question / Objective` and before `## Prior-work grounding` when the user asks for research ideas, research directions, hypothesis candidates, or "what should we try next." It records the output of `references/ideation.md`, including the sanitized brief and fresh de-anchoring subagent used for raw candidate generation.
+
+The section is optional for ordinary plans that begin with an already chosen objective. It is required for ideation tasks because prior-work-first planning can anchor the agent to the literature's safest extensions before raw candidates exist.
+
+```markdown
+## Idea portfolio
+
+### De-anchored candidates
+- Generator: <fresh de-anchoring subagent identifier; sanitized brief only>
+- <candidate>: <one sentence, generated before prior-work grounding>
+
+### Transformation axes
+- <candidate>: <method / mechanism / data assumption / metric / evaluation protocol / system design / problem framing>
+
+### Grounded pruning
+- Advance: <candidate promoted toward a plan and why>
+- Parked: <candidate blocked by missing survey, data, baseline, or condition>
+- Killed: <candidate that is duplicate, untestable, too costly, or not falsifiable>
+- Merged: <candidates collapsed into another candidate>
+
+### Information-gain scoring
+- <candidate>: <testability, measurement clarity, expected information gain, cost, prior-work distance, claim discipline>
+
+### Pre-execution divergence review
+- Portfolio breadth: <whether candidates are meaningfully distributed across transformation axes>
+- Parameter sweep laundering: <whether any candidate is only a threshold, seed, model-size, or sweep variant>
+- Anti-anchor check: <whether literature-first, prior-work-first, winning-approach, convenient-data, or user-preference anchors narrowed the portfolio too early>
+- Required repair before promotion: <None, or candidate regeneration / merge / kill / park action>
+
+### Promotion decision
+- Promoted idea: <the single candidate that becomes this plan>
+- Non-promoted ideas: <parked / killed / merged reasons; these are not claims>
+```
 
 ## Prior-work grounding section
 
@@ -354,6 +389,7 @@ Mirror the entry in `decisions.md` for any branch except `NEXT_STEP`.
 - **Confirmatory plan with no decision threshold.** The whole point of confirmatory is the threshold. State it explicitly.
 - **Exploratory plan with hidden hypothesis.** Writing "we expect X" without committing to a decision threshold converts exploration into informal confirmation. Either commit to confirmatory mode with an explicit threshold, or stay honestly exploratory with a variable space.
 - **No Divergence checkpoint.** A plan that only follows the user's preferred route can still be well formatted and still be weak research. Fill the checkpoint before execution.
+- **Literature-first ideation.** If the user asked for research ideas, do not summarize prior work before generating raw candidates. Use the Idea portfolio section, then apply Prior-work grounding.
 - **Portfolio made of parameter tweaks.** Three thresholds of the same signal are not three approaches. Record them as one primary route with a sweep, then add real alternatives or explicitly narrow the claim scope only after the later Research review records `PASS` for both judgments.
 - **Prior result treated as fact.** "Previous run was best" is an anchor, not a premise. Record what would revalidate it, what rework is required, or what claim condition remains only after the later Research review records `PASS` for both judgments.
 - **Claim made before prior-work grounding.** If the plan says novel, new method, publishable, to our knowledge, or no baseline exists, cite or update `literature/positioning.md` and point to a comprehensive literature survey before execution. If the claim is not a novelty claim, the plan still needs bounded but sufficient prior-work grounding and must classify itself as replication, baseline strengthening, engineering, or another grounded position.
