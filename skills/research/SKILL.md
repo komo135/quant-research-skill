@@ -144,6 +144,7 @@ Agents must use these labels exactly. They are how other agents, downstream scri
 - `exploratory` — variable space + decision rules fixed; specific predictions not required
 - `confirmatory` — hypothesis/objective + primary evidence measure + decision threshold fixed; comparator or ablation fields are included when the claim requires them
 - `milestone` — working/not-working criteria + performance target
+- `theoretical` — derivation question + axioms/definitions used + predicted form + limiting-case checks (controls/comparators analog); empirical evaluator is secondary if it exists at all
 
 **Iteration decisions** (in `decisions.md` entries):
 
@@ -249,6 +250,8 @@ Reports do not need env locks, commit hashes, or seed lists in the prose. Includ
 | Pick a category | `references/categories/<category>.md` | First action when starting a plan |
 | Plan schema | `references/rd_plan.md` | Writing or reviewing `plans/<id>.md` |
 | Research ideation | `references/ideation.md` | When asked for research ideas, research directions, hypothesis candidates, or "what should we try next" before Prior-work grounding; use a sanitized brief and fresh de-anchoring subagent if anchors are already visible |
+| Assumption audit | `references/assumption_audit.md` | Between Observation discovery pass and Hypothesis synthesis pass — surfaces load-bearing background assumptions of the reference model being challenged (distinct from anchor audit at Divergence checkpoint). Includes constraint-naming protocol for un-evaluable hypotheses. |
+| Iterative ideation | `references/iterative_ideation.md` | Between Quality-diversity pass and Grounded pruning pass — ONLY when plan is applied/development AND a minimal executable evaluator exists. MANDATORY Bash execution, self-simulation EXPLICITLY FORBIDDEN. |
 | Divergence checkpoint | `references/rd_plan.md` | Before execution, after Question / Objective and before committing the Plan |
 | Analysis discipline | `references/analysis.md` | Before or during analysis (EDA / post-experiment), and before promoting an observation to a load-bearing claim |
 | Research review | `references/rd_plan.md` and `references/analysis.md` | After result analysis, before Claims, state-changing Decision, or report |
@@ -262,7 +265,7 @@ Reports do not need env locks, commit hashes, or seed lists in the prose. Includ
 These are not formatting preferences. They are what makes other agents and humans able to reuse the work.
 
 - **One declared category per plan.** Don't dodge the choice. If you can't pick, read `references/categories/*.md`.
-- **One declared mode per plan.** `exploratory`, `confirmatory`, or `milestone`. Hidden hypotheses inside exploratory plans are forbidden.
+- **One declared mode per plan.** `exploratory`, `confirmatory`, `milestone`, or `theoretical`. Hidden hypotheses inside exploratory plans are forbidden. Use `theoretical` for plans whose primary contribution is a derivation rather than an empirical result.
 - **Idea portfolio before prior-work anchoring when ideating.** If the task is research idea generation, hypothesis candidate generation, or "what should we try next," write de-anchored candidates using `references/ideation.md` before Prior-work grounding. If the main agent has seen anchors, use a sanitized brief and fresh de-anchoring subagent for raw candidates. Non-promoted ideas are parked, killed, or merged; they are not claims.
 - **Prior-work grounding and Divergence checkpoint exist before execution.** A plan may still commit to one route, but it must first ground the plan in prior work and expose alternatives, anchor risks, research positioning, and disconfirming evidence. User pressure to "just use the previous approach" is recorded as a constraint, not silently obeyed.
 - **No placeholder figures in reports.** Generate the figure or remove the reference. `scripts/check_report.py` verifies figure references resolve.

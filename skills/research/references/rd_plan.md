@@ -15,7 +15,7 @@ Why one file instead of separate prereg + plan: separate files would impose redu
 plan_id: <id>
 slug: <short-kebab-case-slug>
 category: basic_research | applied_research | experimental_development
-mode: exploratory | confirmatory | milestone
+mode: exploratory | confirmatory | milestone | theoretical
 status: planned | in_progress | completed | parked | killed | replaced
 created_at: YYYY-MM-DD
 created_commit: <git sha — auto-filled by new_plan.py>
@@ -249,6 +249,55 @@ Fix the acceptance criteria.
 ### Compute / time envelope
 - <resource envelope: runs, samples, hardware time, deadline, or other execution constraint>
 ```
+
+### Mode: theoretical
+
+For pure conceptual / derivational work where the claim rests on a formal derivation rather than empirical observation (e.g., a new closed-form result, a proof of equivalence between two formulations, a derived bound). Use this mode for `basic_research_theoretical` plans and for any applied / experimental_development plan whose primary contribution is a mathematical or algorithmic derivation rather than an empirical result.
+
+Empirical verification (when it exists) is treated as a secondary check (limiting-case match), not as the primary evidence.
+
+```markdown
+### Derivation question
+- <one sentence stating what is to be proved, derived, bounded, or characterized>
+
+### Axioms / definitions / prior theorems used
+- <axiom or definition 1>: <statement, source if from external work>
+- <axiom or definition 2>: ...
+- <prior theorem 1>: <statement, source>
+- <prior theorem 2>: ...
+
+### Proposed derivation sketch
+- <high-level chain of reasoning the derivation will follow>
+- <key lemmas or sub-results expected>
+- <techniques the derivation will rely on (e.g., induction on N, change of variables, fixed-point argument)>
+
+### Predicted form of result
+- <expected shape of the result: closed-form expression, asymptotic bound, equivalence statement, etc.>
+- <units and scope where applicable>
+
+### Limiting-case checks
+- <known case 1 the result must reduce to>: <expected reduction>
+- <known case 2>: ...
+- These are the analog of "controls/comparators" for theoretical work; the derivation must recover known correct behavior in stated limits.
+
+### Empirical sanity check (if applicable)
+- <one observable consequence the derivation predicts that could be checked against existing data or simulation>
+- <state explicitly if no such check is available; this triggers the assumption_audit constraint-naming protocol for the resulting claim>
+
+### Failure modes to watch
+- <derivation step where an assumption could silently fail>
+- <known pathological case where the result might break>
+- <symmetry or invariance that must be preserved and how it will be checked>
+
+### Time / page envelope
+- <budget for the derivation work itself; for long derivations, plan checkpoint reviews>
+```
+
+The Research review subagent (`Research review` section) is required for theoretical plans before any load-bearing claim, with adapted judgment criteria:
+- **Analysis sufficiency** → "does the derivation chain close the question without gaps, and are limiting-case checks consistent?"
+- **Result reliability** → "are the axioms / definitions / prior theorems used correctly, and is the predicted form actually established by the derivation?"
+
+When no empirical evaluator exists, `Limitations` (in the eventual report) records this via the `references/assumption_audit.md` constraint-naming protocol (e.g., "no decisive empirical evaluator at the present state of knowledge").
 
 ## Actual execution section
 

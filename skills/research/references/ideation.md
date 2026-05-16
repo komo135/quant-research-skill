@@ -106,6 +106,17 @@ Keep paper titles, author names, and named methods out of sanitized briefs and r
 
 Do not select only the highest-scoring candidate. Keep at least one representative candidate for each meaningful difference axis, and merge similar candidates. The goal is not single-best optimization, but a portfolio of high-quality candidates across distinct niches.
 
+### Iterative ideation pass (conditional)
+
+When ALL of the following hold, invoke `references/iterative_ideation.md` between `Quality-diversity pass` and `Grounded pruning pass`:
+1. Plan category is `applied_research` or `experimental_development`
+2. A minimal executable evaluator exists for the domain (e.g., a runnable Bash command that returns parseable fitness)
+3. Per-candidate execution time fits within the session budget
+
+The iterative protocol uses the quality-diversity-balanced 6 candidates as Cycle 0, runs 1-2 cycles of MANDATORY Bash execution + mutation/crossover/wildcard with self-simulation forbidden, and replaces the portfolio with the evolved set before `Grounded pruning pass` continues.
+
+When preconditions are not met (basic research, no executable evaluator, blocked data), skip this pass. Single-pass ideation is honest in those cases; simulated fitness is forbidden by `references/iterative_ideation.md` because it produces "literary estimates dressed as measurements" (TDD finding).
+
 ### Grounded pruning pass
 
 Apply prior-work grounding here for the first time. Check existing research, standard baselines, known limitations, evaluation protocols, and whether a comprehensive literature survey is needed. Classify each candidate as one of:
