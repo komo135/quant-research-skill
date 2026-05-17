@@ -27,7 +27,7 @@ Examples of work that triggers the skill:
 
 It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-## Core design (v2.6.0)
+## Core design (v2.6.1)
 
 ### R&D categories (Frascati 2015)
 
@@ -255,12 +255,25 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.6.0** — adds independent plan review before execution and refocuses result analysis on why the result happened, while keeping prior-work grounding, assumption audit, theoretical mode, paper-grade reports, and statistical reporting minimums.
+**Version 2.6.1** — requires plan-scoped literature survey evidence, citation-use mapping, verifiable retrieval-unavailable constraints, and mid-execution literature updates, while keeping independent plan review, explanation-centered result analysis, assumption audit, theoretical mode, paper-grade reports, and statistical reporting minimums.
 
 <details>
 <summary>Changelog</summary>
 
-### v2.6.0 (current) — plan review and explanation-centered result analysis
+### v2.6.1 (current) — plan-scoped literature survey evidence
+
+Makes prior-work grounding first-class in every research plan before execution.
+
+**Added / changed**
+
+- Required Survey evidence before the Plan section: search date, queries/sources, selection rationale, negative findings, and retrieval-unavailable constraints.
+- Added a Citation-use map so each cited work states its concrete role in the plan, instead of appearing only in a bibliography.
+- Defined `literature/papers.md` and `literature/positioning.md` `Used in plan as` fields as a project-level role union; the plan's Citation-use map is the plan-specific source of truth.
+- Made retrieval-unavailable constraints verifiable: attempted source/tool, failure evidence, and claim-scope narrowing are required.
+- Added Mid-execution literature updates for unfamiliar methods, unexpected results, new comparators, contradictions, or missing-baseline signals.
+- Made missing or merely formal Survey evidence / Citation-use mapping a Plan review blocker.
+
+### v2.6.0 — plan review and explanation-centered result analysis
 
 Splits pre-execution design review and post-execution result analysis into the two mandatory fresh separate-context gates around execution. Ideation can also use a fresh hypothesis-generation handoff, but that output is seed material until main-agent intake, pruning, and plan promotion adjudicate it.
 
