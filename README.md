@@ -27,7 +27,7 @@ Examples of work that triggers the skill:
 
 It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-## Core design (v2.7.0)
+## Core design (v2.7.1)
 
 ### R&D categories (Frascati 2015)
 
@@ -105,7 +105,7 @@ This keeps agents from silently accepting "just improve last time's best approac
 
 ### Plan review subagent
 
-Before execution, the plan-review handoff uses `research-plan-review` and passes only the plan path. The reviewer checks the research design before any results exist: category/mode fit, mechanism hypothesis or principle, prediction or expected output, planned discriminating test, controls/comparators or limiting cases, evidence route, artifact plan, scope, and constraints. It returns `execute_as_written`, `revise_before_execution`, or `block_execution`.
+Before execution, the plan-review handoff uses `research-plan-review` and passes only the plan path. The reviewer is a stop gate for plans that should not run: it first checks whether the hypothesis rests on a wrong, unsupported, or unverified premise, then checks whether the hypothesis validation method can actually test the hypothesis and distinguish it from plausible alternatives. Mechanically runnable, cheap, deadline-driven, or demo-visible plans still receive `block_execution` when the premise or validation route is broken. It returns `execute_as_written`, `revise_before_execution`, or `block_execution`.
 
 This verdict asymmetry is intentional. Plan review happens before execution, so it may recommend whether the design is informative enough to run. Result analysis happens after evidence exists and before claims / decisions, so it explains what happened and why but does not assess claim readiness, deployment, or iteration decisions.
 
@@ -258,12 +258,22 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.7.0** — replaces active idea generation with mechanism hypothesis records, while keeping pre-result planning boundaries, prior-work grounding, independent plan review, explanation-centered result analysis, assumption audit, theoretical mode, paper-grade reports, and statistical reporting minimums.
+**Version 2.7.1** — keeps the v2.7 mechanistic hypothesis protocol and tightens plan review into a premise and hypothesis-validation stop gate before execution.
 
 <details>
 <summary>Changelog</summary>
 
-### v2.7.0 (current) — mechanistic hypothesis generation
+### v2.7.1 (current) — premise-gated plan review
+
+Tightens `research-plan-review` so reviewers stop plans built on wrong, unsupported, or unverified premises, or on validation methods that cannot test the stated hypothesis.
+
+**Added / changed**
+
+- Reframed plan review as a pre-execution stop gate for broken premises and invalid hypothesis validation methods.
+- Updated plan review output templates to center `Premise check`, `Hypothesis validation method`, and `Stop decision`.
+- Preserved narrowed observation, measurement-construction, and exploratory plans when their claim scope is explicit.
+
+### v2.7.0 — mechanistic hypothesis generation
 
 Replaces active research idea generation with a mechanism-first record that makes assumptions, analysis lenses, competing hypotheses, predictions, tests, evidence needs, and commit / park / kill decisions explicit before planning.
 
