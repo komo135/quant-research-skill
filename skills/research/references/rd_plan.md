@@ -40,7 +40,7 @@ last_updated: YYYY-MM-DD
 <Mode-specific structure — see below.>
 
 ## Plan review
-<Plan review section produced by running `research-plan-review` in the current research session. The plan path is the review scope; extra session context is not evidence. Required before execution.>
+<Returned section from a fresh separate-context plan-review subagent using `research-plan-review`. The plan path is the only starting context. Required before execution.>
 
 ## Actual execution
 <What was done. Updated as runs accumulate. Record any mid-execution literature update when an unfamiliar method, unexpected result, new comparator, contradiction with prior work, or missing-baseline signal appears.>
@@ -325,7 +325,7 @@ Empirical verification (when it exists) is treated as a secondary check (limitin
 - <budget for the derivation work itself; for long derivations, plan checkpoint reviews>
 ```
 
-The Plan review section is required for theoretical plans before execution, with adapted design criteria:
+The Plan review subagent (`Plan review` section) is required for theoretical plans before execution, with adapted design criteria:
 - **Derivation design** → "does the planned derivation route address the question with named axioms, definitions, prior theorems, and likely failure points?"
 - **Discriminating checks** → "are limiting-case checks, counterexample searches, or empirical sanity checks sufficient to expose a broken derivation route?"
 
@@ -333,17 +333,17 @@ When no empirical evaluator exists, `Limitations` (in the eventual report) recor
 
 ## Plan review section
 
-Before execution, run the `research-plan-review` skill in the current research session. Use the plan path as the review scope. Do not dispatch a subagent for Plan review. The reviewer evaluates research design before any results exist.
+Before execution, dispatch a fresh separate-context plan-review subagent with the `research-plan-review` skill. Pass only the plan path as the starting context. The reviewer evaluates research design before any results exist.
 
 Plan review may return an execution recommendation because it is a pre-execution design gate. That recommendation is not a claim-readiness verdict; readiness, claims, decisions, and reports remain outside plan review.
 
-Record the review output in the plan:
+Record the subagent output in the plan:
 
 ```markdown
 ## Plan review
 
 ### Reviewer
-- Agent: <current research agent>
+- Agent: <fresh separate-context plan-review subagent>
 - Skill: research-plan-review
 - Plan reviewed: <plan path>
 - Reviewed at: <YYYY-MM-DD>
@@ -569,7 +569,7 @@ Mirror the entry in `decisions.md` for any branch except `NEXT_STEP`.
 - **Portfolio made of parameter tweaks.** Three thresholds of the same signal are not three approaches. Record them as one primary route with a sweep, then add real alternatives or explicitly narrow the claim scope to the tested route.
 - **Prior result treated as fact.** "Previous run was best" is an anchor, not a premise. Record what would revalidate it, what rework is required, or what claim condition remains after Result analysis explains the new outcome.
 - **Claim made before prior-work grounding.** If the plan says novel, new method, publishable, to our knowledge, or no baseline exists, cite or update `literature/positioning.md` and point to a comprehensive literature survey before execution. If the claim is not a novelty claim, the plan still needs bounded but sufficient prior-work grounding and must classify itself as replication, baseline strengthening, engineering, or another grounded position.
-- **Executing without Plan review.** A plan can be well formatted and still be a bad research design. Before execution, run `research-plan-review` in the current research session using the plan path as the review scope.
+- **Executing without Plan review.** A plan can be well formatted and still be a bad research design. Before execution, a fresh separate-context plan-review subagent using `research-plan-review` must review the plan path.
 - **Closing without Result analysis.** Before Claims, state-changing Decision, or report, a fresh separate-context result-analysis subagent using `research-result-analysis` must explain what happened and why from the plan path and artifacts.
 - **Treating result analysis as a decision gate.** Result analysis decomposes explanations; it does not write final claims, assess readiness, or choose the iteration branch.
 - **Updating the Plan section after execution.** Plans get amended prospectively via `REFINE`. After-the-fact plan rewriting destroys the time-anchor — git diff will show the rewrite and any reviewer will catch it. Use the Planned vs Actual section instead.

@@ -7,7 +7,7 @@ description: Use when reviewing an R&D plan before execution, especially to test
 
 ## Overview
 
-In-process review for a drafted research plan before execution. Run this skill in the current research session; do not dispatch a subagent for Plan review. The plan path is the review scope, and extra session context is not evidence. The reviewer checks whether the design can answer the research question and separate plausible alternatives through a planned discriminating test.
+Independent review for a drafted research plan before execution. The plan path is the starting context; the reviewer checks whether the design can answer the research question and separate plausible alternatives through a planned discriminating test.
 
 This skill reviews design only. Do not execute the plan, do not analyze results, and do not write final claims.
 
@@ -41,7 +41,7 @@ Plan review covers **pre-result commitments** only: question/objective, mechanis
 ## Plan review
 
 ### Reviewer
-- Agent: <current research agent>
+- Agent: <fresh separate-context plan-review subagent>
 - Skill: research-plan-review
 - Plan reviewed: <plan path>
 - Reviewed at: <YYYY-MM-DD>

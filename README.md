@@ -3,7 +3,7 @@
 A Claude Code and Codex plugin providing four skills for **agent-driven R&D**:
 
 - **`research`** — protocol skill for R&D work across the three Frascati categories: basic research (new knowledge about underlying foundations without a particular application in view), applied research (new knowledge directed toward a specific practical aim or objective), and experimental development (new or improved products/processes plus additional knowledge). Enforces vocabulary, plan/claim structure, iteration discipline, analysis methodology, and human-readable reports.
-- **`research-plan-review`** — in-process plan-review skill used before execution. It reviews the research design from the plan path: mechanism hypothesis or principle, prediction or expected output, discriminating test, controls/comparators or limiting cases, evidence route, and execution blockers.
+- **`research-plan-review`** — independent plan-review skill used before execution. It starts from a plan path only and reviews the research design: mechanism hypothesis or principle, prediction or expected output, discriminating test, controls/comparators or limiting cases, evidence route, and execution blockers.
 - **`research-result-analysis`** — independent result-analysis skill used by a fresh separate-context result-analysis subagent. It starts from a plan path only, reconstructs evidence from referenced artifacts, and explains what happened and why through candidate explanations, evidence for/against, procedure/artifact explanations, live alternatives, and discriminating next analyses without writing final claims or decisions.
 - **`quant-research`** — domain extension layered on `research` for time-series and statistically rigorous quantitative R&D. Adds methodology for time-series cross-validation, multiple-testing corrections, leakage detection, and statistical robustness.
 
@@ -53,7 +53,7 @@ Plan modes are `exploratory`, `confirmatory`, `milestone`, and `theoretical`. Th
 3. For hypothesis-generation work, run research situation diagnosis, analysis lens comparison, mechanistic analysis, and `check_mechanism_hypothesis_record.py` before planning from the record.
 4. Run a plan-scoped literature survey, then write Prior-work grounding and the Divergence checkpoint before the Plan section.
 5. Write Plan section.
-6. Plan review — run `research-plan-review` in the current research session using the plan path as the review scope. Repair blockers before execution.
+6. Plan review — dispatch a fresh separate-context plan-review subagent using `research-plan-review` and pass only the plan path. Repair blockers before execution.
 7. git commit. (Plan plus Plan review are time-anchored.)
 8. Execute. Save artifacts under experiments/{plan}/runs/{run_id}/, including run_manifest.json, logs, and at least one manifest-listed non-log durable artifact. Record a mid-execution literature update if an unfamiliar method, unexpected result, new comparator, contradiction with prior work, or missing-baseline signal appears.
 9. Write Actual section + Planned-vs-Actual comparison.
@@ -103,9 +103,9 @@ Every plan now records a pre-execution checkpoint before committing to a route:
 
 This keeps agents from silently accepting "just improve last time's best approach" as a complete research plan.
 
-### Plan review
+### Plan review subagent
 
-Before execution, the current research session runs `research-plan-review` from the plan path. The reviewer checks the research design before any results exist: category/mode fit, mechanism hypothesis or principle, prediction or expected output, planned discriminating test, controls/comparators or limiting cases, evidence route, artifact plan, scope, and constraints. It returns `execute_as_written`, `revise_before_execution`, or `block_execution`.
+Before execution, the plan-review handoff uses `research-plan-review` and passes only the plan path. The reviewer checks the research design before any results exist: category/mode fit, mechanism hypothesis or principle, prediction or expected output, planned discriminating test, controls/comparators or limiting cases, evidence route, artifact plan, scope, and constraints. It returns `execute_as_written`, `revise_before_execution`, or `block_execution`.
 
 This verdict asymmetry is intentional. Plan review happens before execution, so it may recommend whether the design is informative enough to run. Result analysis happens after evidence exists and before claims / decisions, so it explains what happened and why but does not assess claim readiness, deployment, or iteration decisions.
 
@@ -258,7 +258,7 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.7.0** — replaces active idea generation with mechanism hypothesis records, while keeping pre-result planning boundaries, prior-work grounding, in-process plan review, explanation-centered result analysis, assumption audit, theoretical mode, paper-grade reports, and statistical reporting minimums.
+**Version 2.7.0** — replaces active idea generation with mechanism hypothesis records, while keeping pre-result planning boundaries, prior-work grounding, independent plan review, explanation-centered result analysis, assumption audit, theoretical mode, paper-grade reports, and statistical reporting minimums.
 
 <details>
 <summary>Changelog</summary>

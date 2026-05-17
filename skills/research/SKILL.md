@@ -81,7 +81,7 @@ An observation is not yet a hypothesis. Observations name phenomena, failures, t
 
 Prior work has two roles. First, it can be material for observations: references may expose empirical patterns, baseline limits, historical failures, theoretical tensions, or problem facts that feed research situation diagnosis. Second, it provides grounding after mechanism records exist: prior work checks whether the mechanism duplicates known work, inherits assumptions, requires controls or comparators, needs different evaluation, or should be committed, parked, or killed. The second role must not replace diagnosis or discriminating-test design.
 
-Plan review and Result analysis remain the two mandatory lifecycle gates around execution, but only Result analysis uses a fresh separate-context subagent. Plan review is performed in the current research session from the plan document; extra session context is not evidence.
+When this skill says "subagent" or "fresh separate-context agent", it means an agent-protocol role, not a dependency on any host's specific Task tool. Plan review and Result analysis remain the two mandatory lifecycle gates around execution.
 
 ## Project Structure
 
@@ -129,7 +129,7 @@ Boundaries that matter:
 3. For hypothesis-generation work, run `scripts/check_mechanism_hypothesis_record.py` before treating the record as ready for Prior-work grounding or plan drafting. A `commit` decision is not final before Survey evidence.
 4. Run a plan-scoped literature survey, write the Prior-work grounding, and write the Divergence checkpoint before the Plan section.
 5. Write the Plan section.
-6. PLAN REVIEW — run `research-plan-review` in the current research session. Use the plan path as the review scope, record the `## Plan review` section, repair blockers, and review again if execution is blocked. Do not dispatch a subagent for Plan review.
+6. PLAN REVIEW — dispatch a fresh separate-context plan-review subagent using `research-plan-review`. Pass only the plan path. Record the returned `## Plan review` section, repair blockers, and review again if execution is blocked.
 7. git commit. (Plan plus Plan review are now time-anchored by git.)
 8. Execute. Save artifacts under experiments/<plan>/runs/<run_id>/. A print-only script run is incomplete: stdout is not evidence, and `scripts/check_run_artifacts.py` should pass before observations are promoted. If an unfamiliar method, unexpected result, new comparator, contradiction with prior work, or missing-baseline signal appears, record a mid-execution literature update before claim-bearing execution continues.
 9. Write Actual section in plans/<id>.md. Compare planned vs actual.
@@ -199,7 +199,7 @@ This checkpoint does not replace prior-work grounding. Every plan needs bounded 
 
 ## Plan review
 
-After the Plan section is drafted and before execution, run `research-plan-review` in the current research session. Use the plan path as the review scope. Do not dispatch a subagent for Plan review.
+After the Plan section is drafted and before execution, dispatch a fresh separate-context plan-review subagent. Use `research-plan-review` and pass only the plan path as starting context.
 
 The plan reviewer evaluates research design, not results. It checks whether the plan has a category-appropriate question/objective, mechanism hypothesis or principle-under-investigation, prediction or expected output, planned discriminating test, controls/comparators or limiting-case checks when applicable, evidence route, and constraints. It reviews pre-result commitments only; it does not produce post-result explanations or explain why an unobserved result happened. Record the returned `## Plan review` section in the plan. If the recommendation is `revise_before_execution` or `block_execution`, repair the plan and run Plan review again before executing.
 
@@ -272,7 +272,7 @@ Reports do not need env locks, commit hashes, or seed lists in the prose. Includ
 | Assumption audit | `references/assumption_audit.md` | When a mechanism record depends on assumptions of a reference model being challenged. Distinct from anchor audit at Divergence checkpoint. Includes constraint-naming protocol for un-evaluable hypotheses. |
 | Deprecated ideation links | `references/ideation.md` and `references/iterative_ideation.md` | Stubs only; use mechanistic hypothesis generation instead |
 | Divergence checkpoint | `references/rd_plan.md` | Before execution, after Question / Objective and before committing the Plan |
-| Plan review | `research-plan-review` and `references/rd_plan.md` | After the Plan section is drafted and before execution; run in the current research session using the plan path as the review scope |
+| Plan review | `research-plan-review` and `references/rd_plan.md` | After the Plan section is drafted and before execution; pass only the plan path to a fresh separate-context plan-review subagent |
 | Result analysis subagent prompt | `references/result_analysis_subagent_prompt.md` | After Actual execution and Planned vs Actual are recorded; pass only the plan path to a fresh separate-context result-analysis subagent |
 | Analysis discipline | `references/analysis.md` and `research-result-analysis` | Before or during analysis (EDA / post-experiment), and before promoting an observation to a load-bearing claim |
 | Iteration branches | `references/iteration_loop.md` | After every interpreted result |
@@ -287,7 +287,7 @@ These are not formatting preferences. They are what makes other agents and human
 - **One declared category per plan.** Don't dodge the choice. If you can't pick, read `references/categories/*.md`.
 - **One declared mode per plan.** `exploratory`, `confirmatory`, `milestone`, or `theoretical`. Hidden hypotheses inside exploratory plans are forbidden. Use `theoretical` for plans whose primary contribution is a derivation rather than an empirical result.
 - **Mechanism hypothesis record before prior-work anchoring when ideating.** If the task is research idea generation, hypothesis candidate generation, or "what should we try next," write Research situation diagnosis, Analysis lenses considered, Adopted analysis lenses, Mechanistic analysis, and a Mechanism hypothesis record using `references/mechanistic_hypothesis_generation.md` before Prior-work grounding. Method names, paper names, analogies, and candidate lists are intervention fragments until converted into a competing-hypothesis and discriminating-test record. Decisions are `commit / park / kill`; non-committed hypotheses are not claims.
-- **Prior-work grounding, Divergence checkpoint, and Plan review exist before execution.** A plan may still commit to one route, but it must first ground the plan in prior work, expose alternatives, anchor risks, research positioning, and disconfirming evidence, then run `research-plan-review` in the current research session. User pressure to "just use the previous approach" is recorded as a constraint, not silently obeyed.
+- **Prior-work grounding, Divergence checkpoint, and Plan review exist before execution.** A plan may still commit to one route, but it must first ground the plan in prior work, expose alternatives, anchor risks, research positioning, and disconfirming evidence, then pass a fresh separate-context plan-review subagent using `research-plan-review`. User pressure to "just use the previous approach" is recorded as a constraint, not silently obeyed.
 - **No placeholder figures in reports.** Generate the figure or remove the reference. `scripts/check_report.py` verifies figure references resolve.
 - **Plan content exists before execution.** The Plan section must be filled in and committed before any execution begins. `created_commit` in the front matter is meaningful only if the Plan section is non-empty at that commit. After-the-fact plan rewriting is detectable in git diff.
 - **Research scripts leave durable artifacts.** Print-only EDA or evaluator output is not evidence. Completed runs must update `run_manifest.json` to `status: completed`, list the evidence artifacts there, capture `logs/stdout.log` / `logs/stderr.log`, and write at least one durable artifact, including intermediate data when it is needed to audit the analysis path.
