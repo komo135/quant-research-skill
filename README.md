@@ -27,7 +27,7 @@ Examples of work that triggers the skill:
 
 It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-## Core design (v2.6.2)
+## Core design (v2.7.0)
 
 ### R&D categories (Frascati 2015)
 
@@ -258,12 +258,25 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.6.2** — clarifies the boundary between pre-result planning commitments and post-result explanations, while keeping prior-work grounding, plan-scoped literature survey evidence, citation-use mapping, independent plan review, explanation-centered result analysis, assumption audit, theoretical mode, paper-grade reports, and statistical reporting minimums.
+**Version 2.7.0** — replaces active idea generation with mechanism hypothesis records, while keeping pre-result planning boundaries, prior-work grounding, independent plan review, explanation-centered result analysis, assumption audit, theoretical mode, paper-grade reports, and statistical reporting minimums.
 
 <details>
 <summary>Changelog</summary>
 
-### v2.6.2 (current) — pre-result planning boundary
+### v2.7.0 (current) — mechanistic hypothesis generation
+
+Replaces active research idea generation with a mechanism-first record that makes assumptions, analysis lenses, competing hypotheses, predictions, tests, evidence needs, and commit / park / kill decisions explicit before planning.
+
+**Added / changed**
+
+- Replaced the active `Idea portfolio` workflow with the `Mechanism hypothesis record` workflow.
+- Added `skills/research/references/mechanistic_hypothesis_generation.md` as the primary idea-generation reference.
+- Added `skills/research/scripts/check_mechanism_hypothesis_record.py` and removed the old idea-portfolio checker.
+- Deprecated the old ideation references as compatibility stubs that redirect to mechanistic hypothesis generation.
+- Updated the skill instructions, plan templates, and README contract to require mechanistic hypothesis generation before planning from research ideas.
+- Hardened the checker for candidate-list preambles, per-lens fields, primary/auxiliary lens counts, and blocked/commit consistency.
+
+### v2.6.2 — pre-result planning boundary
 
 Clarifies that plans and plan review contain commitments made before results exist, while Result analysis contains explanations made after evidence exists.
 
