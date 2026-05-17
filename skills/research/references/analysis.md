@@ -23,12 +23,12 @@ A complete result analysis separates:
 2. **What happened** — the observed result shape: aggregate movement, slices, seed variability, failures, anomalies, traces, and condition-specific effects.
 3. **Prediction comparison** — whether planned predictions, thresholds, support requirements, and expected conditions were met, missed, reversed, or only partly satisfied.
 4. **Candidate explanations** — candidate causes and alternative explanations, including procedure / artifact explanations such as leakage, split mismatch, broken comparators, script bugs, measurement artifacts, or missing provenance.
-5. **Failure analysis when prediction missed** — why the result fell short, separated into premise/mechanism failure, approach/intervention failure, procedure/artifact/data failure, and evaluation/power/metric failure.
+5. **Failed-prediction analysis when prediction missed** — why the result fell short, starting from the observed gap and using live candidate failure explanations. Premise/mechanism, approach/intervention, procedure/artifact/data, and evaluation/power/metric are coverage lenses, not required verdict categories.
 6. **Evidence for and against each explanation** — support and contradiction recorded separately for each candidate mechanism.
 7. **Discriminating analysis** — the ablation, slice, trace, perturbation, failure sample, or theoretical check needed to separate leading candidates.
 8. **Alternatives still live** — the candidate explanations that remain plausible after the current evidence is inspected.
 
-Mechanism claims require discriminating evidence. Association-only patterns can motivate candidates, but they do not by themselves explain why the result happened. Failed predictions require especially careful decomposition: otherwise the record cannot distinguish a wrong premise from a weak intervention, bad data, a broken procedure, or an underpowered evaluation. Result analysis does not decide promotion readiness; it supplies the decomposition that later claim writing uses.
+Mechanism claims require discriminating evidence. Association-only patterns can motivate candidates, but they do not by themselves explain why the result happened. Failed predictions require especially careful decomposition: otherwise the record cannot distinguish a wrong premise from a weak intervention, bad data, a broken procedure, or an underpowered evaluation. Those possibilities are search lenses; do not force them into final buckets when the evidence only supports a smaller set of live explanations. Result analysis does not decide promotion readiness; it supplies the decomposition that later claim writing uses.
 
 ## Research script artifact contract
 

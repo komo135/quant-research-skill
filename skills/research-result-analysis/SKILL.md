@@ -15,7 +15,7 @@ This skill does not decide what can be claimed, whether to ship, or which iterat
 
 Treat the plan as the only starting context. Do not rely on parent-agent summaries, expected conclusions, private notes, or unstated expectations. If the plan does not identify enough evidence to explain the result, report `context_missing` and narrow the analysis.
 
-Result analysis is not only a validity audit. Procedure defects, leakage, broken comparators, missing artifacts, and script bugs are candidate explanations for the observed result, not separate verdict labels. Failed predictions require failure analysis, not just a note that the threshold was missed.
+Result analysis is not only a validity audit. Procedure defects, leakage, broken comparators, missing artifacts, and script bugs are candidate explanations for the observed result, not separate verdict labels. Failed predictions require failed-prediction analysis: observed gap plus live candidate explanations, not a note that the threshold was missed and not forced category labels.
 
 This skill owns analysis only. Do not write final claims, do not choose iteration decisions, do not assess readiness for promotion, and do not draft human-facing reports.
 
@@ -39,11 +39,7 @@ Minimum evidence rule: stdout is not evidence. A completed run needs `run_manife
 4. **Decompose why**
    Generate candidate explanations for why the result happened. Include procedure / artifact explanations when relevant: leakage, split mismatch, broken comparator, script bug, measurement artifact, missing provenance, or stdout-only evidence. For each candidate explanation, record supporting evidence, contradicting evidence, and the missing discriminator.
 
-   If the observed result missed the plan's prediction, threshold, or expected effect, explicitly separate failure causes:
-   - premise / mechanism hypothesis was wrong
-   - approach / intervention was ineffective or harmful under the tested conditions
-   - procedure, artifact, data, comparator, implementation, or measurement issue distorted the result
-   - evaluation was underpowered, noisy, mis-specified, or missing the condition needed to test the hypothesis
+   If the observed result missed the plan's prediction, threshold, or expected effect, construct failed-prediction analysis. Start from the observed gap, then generate candidate explanations for why the prediction missed. Use premise / mechanism, approach / intervention, procedure / artifact / data / comparator / implementation / measurement, and evaluation / power / metric / scope as coverage lenses only. Do not force every lens into the output and do not assign a single verdict category. Record only live explanations with why they could explain the miss, evidence for and against, what would be true if they are correct, and the missing discriminator.
 
 5. **Return**
    Return a plan-ready `## Result analysis` section. Use artifact paths, numeric values, table/figure references, and missing-context entries that the parent research agent can inspect before writing claims or decisions.
@@ -66,7 +62,7 @@ For pressure-test and review scenarios, compare the output against an answer key
 
 - required observation: artifact facts that must appear for the analysis to be correct
 - candidate explanations: plausible causes for the observed result, including procedure / artifact explanations
-- failure analysis when prediction missed: separate premise failure, approach failure, procedure/artifact/data failure, and evaluation/power/metric failure
+- failed-prediction analysis when prediction missed: observed gap plus live candidate failure explanations; coverage lenses are checked but not forced into verdict categories
 - evidence for / against each explanation: supporting evidence and contradicting evidence listed separately
 - required missing context: absent artifacts, comparators, logs, scripts, controls, slices, traces, or failure samples
 - discriminating analysis: tests, ablations, slices, trace checks, perturbations, failure samples, or theoretical checks that would separate live explanations
@@ -79,7 +75,7 @@ Result analysis is not only a validity audit. After evidence is reconstructed, e
 1. **What happened**: aggregate movement, slice differences, seed variability, failures, anomalies, traces, and condition-specific effects.
 2. **Prediction comparison**: compare observed values to planned predictions, thresholds, support requirements, and expected conditions.
 3. **Candidate explanations**: at least two plausible causes when artifacts permit them. Include null, procedure, or artifact explanations when relevant.
-4. **Failure analysis when prediction missed**: explain why the result fell short by separating premise/mechanism failure, approach/intervention failure, procedure/artifact/data failure, and evaluation/power/metric failure.
+4. **Failed-prediction analysis when prediction missed**: explain why the result fell short from the observed gap through live candidate explanations. Use premise/mechanism, approach/intervention, procedure/artifact/data, and evaluation/power/metric only as coverage lenses, not required verdict categories.
 5. **Evidence for / against each explanation**: cite support and contradiction separately. Do not hide contradicting evidence in generic limitations.
 6. **Procedure / artifact explanations**: explicitly consider whether the observed result could come from research execution mistakes, evaluation defects, leakage, broken comparators, or missing evidence.
 7. **Alternatives still live**: explanations not yet excluded.
@@ -115,11 +111,16 @@ Association-only evidence can motivate an explanation candidate, but it does not
   - Evidence against: <artifact-grounded contradiction or weakness>
   - Missing discriminator: <what would separate this from alternatives>
 
-### Failure analysis
-- Premise / mechanism hypothesis: <if the result missed prediction, whether evidence suggests the premise was wrong; otherwise Not applicable with reason>
-- Approach / intervention: <whether the chosen method was ineffective or harmful under tested conditions>
-- Procedure / artifact / data: <whether execution, implementation, comparator, data, metric, or artifact problems could explain the failure>
-- Evaluation / power / scope: <whether sample size, support, variance, metric choice, or tested conditions made the prediction untestable or unstable>
+### Failed prediction analysis
+- Observed gap: <prediction, threshold, or expected condition versus observed result>
+- Candidate failure explanations:
+  - <candidate explanation for why the prediction missed>
+    - Why this could explain the miss: <mechanism connecting evidence to the missed prediction>
+    - Evidence for: <artifact-grounded support>
+    - Evidence against: <artifact-grounded contradiction or weakness>
+    - What would be true if this explanation is correct: <testable implication>
+    - Missing discriminator: <smallest analysis that would separate this explanation from alternatives>
+- Coverage check: <which lenses were considered: premise/mechanism, approach/intervention, procedure/artifact/data/comparator/implementation/measurement, evaluation/power/metric/scope. Do not force a category; record only live explanations above.>
 
 ### Procedure / artifact explanations
 - <whether leakage, split mismatch, broken comparator, script bug, measurement artifact, missing provenance, or stdout-only evidence could explain the result>
@@ -141,5 +142,5 @@ Association-only evidence can motivate an explanation candidate, but it does not
 | Choosing `NEXT_STEP`, `REFINE`, `ADJACENT`, `PARK`, or `CLOSE` | Leave iteration decisions to the parent research skill. |
 | Translating analysis into deployment action | Do not choose ship, block, or rollout actions. |
 | Stopping at "the result is valid" | Continue to what happened, candidate explanations, evidence for/against, and discriminating next analyses. |
-| Stopping at "the prediction failed" | Explain why it failed: premise wrong, approach ineffective, procedure/data issue, or evaluation/power problem. |
+| Stopping at "the prediction failed" | Explain why it failed with live candidate explanations and discriminators; use failure lenses for coverage, not as forced verdict categories. |
 | Putting all why-analysis into generic limitations | Evaluate candidate explanations explicitly; limitations are not a substitute for decomposition. |

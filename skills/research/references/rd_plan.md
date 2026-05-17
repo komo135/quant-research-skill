@@ -470,11 +470,16 @@ Record the subagent output in the plan. The analysis explains why the result hap
   - Evidence for: <...>
   - Evidence against: <...>
 
-### Failure analysis
-- Premise / mechanism hypothesis: <if the result missed prediction, whether evidence suggests the premise was wrong; otherwise Not applicable with reason>
-- Approach / intervention: <whether the chosen method was ineffective or harmful under tested conditions>
-- Procedure / artifact / data: <whether execution, implementation, comparator, data, metric, or artifact problems could explain the failure>
-- Evaluation / power / scope: <whether sample size, support, variance, metric choice, or tested conditions made the prediction untestable or unstable>
+### Failed prediction analysis
+- Observed gap: <prediction, threshold, or expected condition versus observed result>
+- Candidate failure explanations:
+  - <candidate explanation for why the prediction missed>
+    - Why this could explain the miss: <mechanism connecting evidence to the missed prediction>
+    - Evidence for: <artifact-grounded support>
+    - Evidence against: <artifact-grounded contradiction or weakness>
+    - What would be true if this explanation is correct: <testable implication>
+    - Missing discriminator: <smallest analysis that would separate this explanation from alternatives>
+- Coverage check: <which lenses were considered: premise/mechanism, approach/intervention, procedure/artifact/data/comparator/implementation/measurement, evaluation/power/metric/scope. Do not force a category; record only live explanations above.>
 
 ### Procedure / artifact explanations
 - <procedure defect, leakage path, broken comparator, missing artifact, data issue, plan deviation, or None with reason>

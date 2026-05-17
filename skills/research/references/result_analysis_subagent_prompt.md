@@ -14,7 +14,7 @@ Return a `## Result analysis` section containing:
 1. what happened, grounded in artifacts
 2. prediction comparison against planned thresholds, expected effects, and support requirements
 3. candidate explanations for why the result happened
-4. failure analysis when the prediction missed or underperformed, separating premise/mechanism failure, approach/intervention failure, procedure/artifact/data failure, and evaluation/power/metric failure
+4. failed-prediction analysis when the prediction missed or underperformed: observed gap plus live candidate failure explanations; use premise/mechanism, approach/intervention, procedure/artifact/data, and evaluation/power/metric only as coverage lenses, not required verdict categories
 5. evidence for and against each explanation
 6. procedure or artifact explanations, including execution mistakes, leakage, broken comparators, script defects, measurement artifacts, or missing evidence when relevant
 7. alternatives still live
