@@ -63,6 +63,8 @@ Plan modes are `exploratory`, `confirmatory`, `milestone`, and `theoretical`. Th
 13. If human-facing, draft a report.
 ```
 
+The timing boundary is explicit: Plan and Plan review record pre-result commitments such as predictions, measures, controls/comparators, planned discriminating test, evidence route, artifacts, and stop / branch criteria. They do not explain why an unobserved result happened. Result analysis records post-result explanations only after evidence exists.
+
 ### Prior-work grounding
 
 Every new plan records first-class prior-work grounding before the Plan section. The required depth is bounded but sufficient: enough to support the plan's question/objective, inherited assumptions, method choice, controls/comparators/evaluation protocol when applicable, and known limitations. It is not optional just because no novelty claim is made.
@@ -103,7 +105,7 @@ This keeps agents from silently accepting "just improve last time's best approac
 
 ### Plan review subagent
 
-Before execution, the plan-review handoff uses `research-plan-review` and passes only the plan path. The reviewer checks the research design before any results exist: category/mode fit, mechanism hypothesis or principle, prediction or expected output, discriminating test, controls/comparators or limiting cases, evidence route, artifact plan, scope, and constraints. It returns `execute_as_written`, `revise_before_execution`, or `block_execution`.
+Before execution, the plan-review handoff uses `research-plan-review` and passes only the plan path. The reviewer checks the research design before any results exist: category/mode fit, mechanism hypothesis or principle, prediction or expected output, planned discriminating test, controls/comparators or limiting cases, evidence route, artifact plan, scope, and constraints. It returns `execute_as_written`, `revise_before_execution`, or `block_execution`.
 
 This verdict asymmetry is intentional. Plan review happens before execution, so it may recommend whether the design is informative enough to run. Result analysis happens after evidence exists and before claims / decisions, so it explains what happened and why but does not assess claim readiness, deployment, or iteration decisions.
 
