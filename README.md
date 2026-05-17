@@ -27,7 +27,7 @@ Examples of work that triggers the skill:
 
 It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-## Core design (v2.7.1)
+## Core design (v2.7.2)
 
 ### R&D categories (Frascati 2015)
 
@@ -49,10 +49,10 @@ Plan modes are `exploratory`, `confirmatory`, `milestone`, and `theoretical`. Th
 
 ```
 1. new_plan.py creates plans/{id}_{slug}.md (mode-specific template)
-2. Write Question / Objective. If ideating, write the Mechanistic hypothesis generation Mechanism hypothesis record before prior-work grounding.
-3. For hypothesis-generation work, run research situation diagnosis, analysis lens comparison, mechanistic analysis, and `check_mechanism_hypothesis_record.py` before planning from the record.
+2. Write Question / Objective. If ideating, use `references/mechanistic_hypothesis_generation.md` to diagnose the situation and choose the hypothesis type before prior-work grounding.
+3. For mechanistic hypothesis-generation work, write the Mechanism hypothesis record and run `check_mechanism_hypothesis_record.py` before planning from the record.
 4. Run a plan-scoped literature survey, then write Prior-work grounding and the Divergence checkpoint before the Plan section.
-5. Write Plan section.
+5. Write Plan section, starting with a Plan visual so architecture, data/evaluation flow, mechanism, system boundary, variable space, decision flow, or derivation structure is inspectable.
 6. Plan review — dispatch a fresh separate-context plan-review subagent using `research-plan-review` and pass only the plan path. Repair blockers before execution.
 7. git commit. (Plan plus Plan review are time-anchored.)
 8. Execute. Save artifacts under experiments/{plan}/runs/{run_id}/, including run_manifest.json, logs, and at least one manifest-listed non-log durable artifact. Record a mid-execution literature update if an unfamiliar method, unexpected result, new comparator, contradiction with prior work, or missing-baseline signal appears.
@@ -77,17 +77,19 @@ Plans also record a citation-use map: each cited work must name how it is used i
 
 Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims. That is separate from the plan-scoped prior-work grounding every plan needs.
 
-### Mechanistic hypothesis generation
+### Hypothesis generation and typed records
 
-When a user asks for research ideas, research directions, hypothesis candidates, or "what should we try next," the `research` skill uses `references/mechanistic_hypothesis_generation.md` to create a **Mechanism hypothesis record** before prior-work grounding. The record starts with research situation diagnosis, separates available and missing material, compares analysis lenses, adopts one primary lens plus 0-2 auxiliary lenses, converts observations into mechanistic analysis, and ends with a hypothesis, competing hypothesis, discriminating prediction, minimal test, required evidence, and `commit / park / kill` decision.
+When a user asks for research ideas, research directions, hypothesis candidates, or "what should we try next," the `research` skill uses `references/mechanistic_hypothesis_generation.md` before prior-work grounding. The reference starts with research situation diagnosis, separates available and missing material, and chooses the hypothesis type: predictive / performance, mechanistic, causal / intervention, descriptive / characterization, theoretical, or mixed with a declared primary type.
 
-Information gaps normally force `park`, not a more confident idea. Method names, paper names, analogies, metric swaps, and model-size changes are intervention fragments until they become a discriminating mechanism record.
+The verification frame is hypothetico-deductive: state a grounded hypothesis, derive observable predictions or expected effects, then compare those predictions with evidence. Mechanistic hypotheses are narrower: they claim why or how a phenomenon occurs through entities, activities, process, organization, or mechanism of action. They use a Mechanism hypothesis record with mechanistic analysis, competing mechanism, discriminating prediction, minimal test, required evidence, and `commit / park / kill`.
+
+Information gaps normally force `park`, not a more confident idea. Method names, paper names, analogies, metric swaps, and model-size changes are intervention fragments until they become a grounded typed hypothesis with predictions or expected observations.
 
 ### Assumption audit and evaluator-grounded refinement
 
 v2.3.0 adds `references/assumption_audit.md` between observation discovery and hypothesis synthesis. It surfaces background assumptions of the reference model being challenged, separate from the Divergence checkpoint's anchoring audit on imported prior work. The audit records load-bearing assumptions, downstream checks, blind-spot catalog entries tied to candidate mechanisms and claim scope, reference-class forecasts, and named constraints for hypotheses that cannot currently be evaluated.
 
-Evaluator-grounded refinement now lives in `references/mechanistic_hypothesis_generation.md`. After a failed minimal test or evaluator result, the result becomes a new observation: record which mechanism explanation was ruled out, which explanations remain live, and update the Mechanism hypothesis record instead of returning to a new idea list.
+Evaluator-grounded refinement now lives in `references/mechanistic_hypothesis_generation.md`. After a failed test, evaluator, derivation, or observation result, the result becomes a new observation: record which explanation, prediction, comparator, threshold, or mechanism was ruled out, which alternatives remain live, and update the typed hypothesis-generation record instead of returning to a new idea list. Update a Mechanism hypothesis record only when the selected hypothesis type is mechanistic.
 
 Executable feedback must persist to run artifacts. A command that only prints a fitness number is not valid evaluator feedback until the run directory contains `run_manifest.json`, `logs/stdout.log`, `logs/stderr.log`, and a durable artifact such as `outputs/fitness.json`, `tables/fitness.csv`, or an `intermediate/` diagnostic.
 
@@ -258,12 +260,24 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.7.1** — keeps the v2.7 mechanistic hypothesis protocol and tightens plan review into a premise and hypothesis-validation stop gate before execution.
+**Version 2.7.2** — locks the typed hypothesis-generation contract, accepts non-mechanistic records without forcing Mechanism hypothesis fields, and makes Plan visual review first-class.
 
 <details>
 <summary>Changelog</summary>
 
-### v2.7.1 (current) — premise-gated plan review
+### v2.7.2 (current) — typed-record and plan-visual hardening
+
+Fixes review blockers in the v2.7 protocol so predictive / performance, causal / intervention, descriptive, and theoretical hypotheses stay typed records unless they explicitly make why/how mechanism claims.
+
+**Added / changed**
+
+- Updated the hypothesis-generation checker to accept valid non-mechanistic typed records and require fair comparators for predictive / performance records.
+- Aligned README, skill instructions, plan schema, templates, and `new_plan.py` around typed hypothesis-generation records instead of Mechanism-record-only wording.
+- Required `### Plan visual` as the first Plan subsection and added a `Plan visual` research-design check to plan reviews.
+- Reframed evaluator-grounded refinement as typed-record refinement after failed tests, evaluators, derivations, or observations.
+- Narrowed component-contribution classification so only why/how contribution claims are mechanistic.
+
+### v2.7.1 — premise-gated plan review
 
 Tightens `research-plan-review` so reviewers stop plans built on wrong, unsupported, or unverified premises, or on validation methods that cannot test the stated hypothesis.
 
@@ -272,18 +286,20 @@ Tightens `research-plan-review` so reviewers stop plans built on wrong, unsuppor
 - Reframed plan review as a pre-execution stop gate for broken premises and invalid hypothesis validation methods.
 - Updated plan review output templates to center `Premise check`, `Hypothesis validation method`, and `Stop decision`.
 - Preserved narrowed observation, measurement-construction, and exploratory plans when their claim scope is explicit.
+- Clarified that not every hypothesis is mechanistic. Hypothesis generation now chooses a hypothesis type before requiring a Mechanism hypothesis record, and uses hypothetico-deductive prediction/evidence structure for verification.
+- Required `Plan visual` in research plans so structured designs are not left as prose-only descriptions.
 
-### v2.7.0 — mechanistic hypothesis generation
+### v2.7.0 — typed hypothesis generation and mechanistic hypothesis records
 
-Replaces active research idea generation with a mechanism-first record that makes assumptions, analysis lenses, competing hypotheses, predictions, tests, evidence needs, and commit / park / kill decisions explicit before planning.
+Replaces active research idea generation with a typed hypothesis-generation record. Mechanistic hypotheses use a mechanism record that makes assumptions, analysis lenses, competing mechanisms, predictions, tests, evidence needs, and commit / park / kill decisions explicit before planning.
 
 **Added / changed**
 
-- Replaced the active `Idea portfolio` workflow with the `Mechanism hypothesis record` workflow.
-- Added `skills/research/references/mechanistic_hypothesis_generation.md` as the primary idea-generation reference.
+- Replaced the active `Idea portfolio` workflow with the hypothesis-generation workflow.
+- Added `skills/research/references/mechanistic_hypothesis_generation.md` as the primary idea-generation reference. The filename is historical; the reference now distinguishes predictive / performance, mechanistic, causal / intervention, descriptive / characterization, and theoretical hypotheses.
 - Added `skills/research/scripts/check_mechanism_hypothesis_record.py` and removed the old idea-portfolio checker.
 - Deprecated the old ideation references as compatibility stubs that redirect to mechanistic hypothesis generation.
-- Updated the skill instructions, plan templates, and README contract to require mechanistic hypothesis generation before planning from research ideas.
+- Updated the skill instructions, plan templates, and README contract to require hypothesis type selection before planning from research ideas, with Mechanism hypothesis records only for mechanistic hypotheses.
 - Hardened the checker for candidate-list preambles, per-lens fields, primary/auxiliary lens counts, and blocked/commit consistency.
 
 ### v2.6.2 — pre-result planning boundary
@@ -368,7 +384,7 @@ Clarifies R&D category definitions and makes hypothesis generation explicit.
 - R&D category definitions now follow OECD Frascati Manual 2015 wording while remaining scoped to agent research work, not corporate activity.
 - Added a research lifecycle from `Observation discovery` through `Decision`.
 - Added `Observation discovery pass` before hypothesis synthesis, with observation sources including empirical, literature, failure-mode, tension, baseline, and user/problem observations.
-- Split prior work into two roles: references can supply observations, then later ground mechanism records after hypothesis rationales exist.
+- Split prior work into two roles: references can supply observations, then later ground hypothesis-generation records after hypothesis rationales exist.
 - Added a hypothesis synthesis chain: source observation, mechanism conjecture, proposed intervention, predicted effect, counter-hypothesis, and minimal disconfirming test.
 - Added approach transition criteria for staying with the current approach, `REFINE`, `ADJACENT`, `PARK`, and `CLOSE`.
 
