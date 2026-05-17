@@ -51,7 +51,7 @@ Plan modes are `exploratory`, `confirmatory`, `milestone`, and `theoretical`. Th
 1. new_plan.py creates plans/{id}_{slug}.md (mode-specific template)
 2. Write Question / Objective. If ideating, write the Research ideation Idea portfolio before prior-work grounding.
 3. For ideation work, run assumption audit before hypothesis synthesis; use iterative ideation only when its executable-evaluator preconditions hold.
-4. Write Prior-work grounding and the Divergence checkpoint.
+4. Run a plan-scoped literature survey, then write Prior-work grounding and the Divergence checkpoint before the Plan section.
 5. Write Plan section.
 6. Plan review — dispatch a fresh separate-context plan-review subagent using `research-plan-review` and pass only the plan path. Repair blockers before execution.
 7. git commit. (Plan plus Plan review are time-anchored.)
@@ -66,6 +66,8 @@ Plan modes are `exploratory`, `confirmatory`, `milestone`, and `theoretical`. Th
 ### Prior-work grounding
 
 Every new plan records first-class prior-work grounding before the Plan section. The required depth is bounded but sufficient: enough to support the plan's question/objective, inherited assumptions, method choice, controls/comparators/evaluation protocol when applicable, and known limitations. It is not optional just because no novelty claim is made.
+
+Prior-work grounding starts with a plan-scoped literature survey before the Plan section. The plan records survey evidence: search date, queries or source names, selection rationale, negative findings, and any retrieval-unavailable constraint. Unknown prior work is a post-survey constraint, not a reason to skip search.
 
 Projects use `literature/{papers.md,positioning.md}`. `positioning.md` records how the work stands on prior work: grounding, inheritance, control/comparator choice when relevant, known limitations, and claim scope. Differences or novelty can be recorded there when claimed, but novelty is not the default purpose.
 

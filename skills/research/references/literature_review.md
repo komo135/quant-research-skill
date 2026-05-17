@@ -4,7 +4,7 @@
 
 Document what is already known about the research question before writing the Plan section, choosing controls/comparators, or making claims.
 
-Every plan needs prior-work grounding. It is not optional just because no novelty claim is made. The plan-scoped job is bounded but sufficient: enough to support the plan's question/objective, inherited assumptions, method choice, controls/comparators/evaluation protocol, baselines/evaluation protocol when the claim requires them, and known limitations.
+Every plan needs prior-work grounding. Every plan also needs a plan-scoped paper survey before writing the Plan section. The resulting Prior-work grounding is not optional just because no novelty claim is made. The plan-scoped job is bounded but sufficient: enough to support the plan's question/objective, inherited assumptions, method choice, controls/comparators/evaluation protocol, baselines/evaluation protocol when the claim requires them, and known limitations.
 
 The job is to:
 
@@ -12,6 +12,14 @@ The job is to:
 2. Identify assumptions inherited from prior approaches, prior data, or prior results
 3. Cite the controls, comparators, baselines when applicable, and evaluation protocols the plan relies on
 4. Record known limitations and claim scope before execution
+
+Record survey evidence in the plan:
+
+- Search date
+- Queries or source names used
+- Selection rationale for included papers and excluded near misses
+- Negative findings, such as missing baselines, failed comparator searches, or contradictions not found
+- Retrieval-unavailable constraint when tools, access, or connectivity prevent the survey
 
 ## When to do this
 
@@ -21,9 +29,9 @@ The job is to:
 - Before claiming a baseline does not exist
 - When the agent encounters an unfamiliar method during execution
 
-Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims. That is separate from the bounded but sufficient prior-work grounding every plan needs.
+Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims. That is separate from the bounded but sufficient plan-scoped paper survey and prior-work grounding every plan needs.
 
-If prior work is genuinely unknown, record the named constraint in the plan and narrow or block relevant claims until the grounding is repaired. Do not treat absence of a novelty claim as permission to skip prior work.
+If prior work is genuinely unknown after the plan-scoped paper survey, record the named constraint in the plan and narrow or block relevant claims until the grounding is repaired. Do not treat absence of a novelty claim as permission to skip prior work. If retrieval is unavailable, record a retrieval-unavailable constraint with the affected claims; do not silently replace the survey with guesses.
 
 ## Files
 
