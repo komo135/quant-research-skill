@@ -67,11 +67,11 @@ Plan modes are `exploratory`, `confirmatory`, `milestone`, and `theoretical`. Th
 
 Every new plan records first-class prior-work grounding before the Plan section. The required depth is bounded but sufficient: enough to support the plan's question/objective, inherited assumptions, method choice, controls/comparators/evaluation protocol when applicable, and known limitations. It is not optional just because no novelty claim is made.
 
-Prior-work grounding starts with a plan-scoped literature survey before the Plan section. The plan records survey evidence: search date, queries or source names, selection rationale, negative findings, and any retrieval-unavailable constraint. Unknown prior work is a post-survey constraint, not a reason to skip search.
+Prior-work grounding starts with a plan-scoped literature survey before the Plan section. The plan records survey evidence: search date, queries or source names, selection rationale, negative findings, and any retrieval-unavailable constraint. Retrieval-unavailable is not a survey bypass; it needs attempted source/tool, failure evidence, and claim-scope narrowing. Unknown prior work is a post-survey constraint, not a reason to skip search.
 
 Projects use `literature/{papers.md,positioning.md}`. `positioning.md` records how the work stands on prior work: grounding, inheritance, control/comparator choice when relevant, known limitations, and claim scope. Differences or novelty can be recorded there when claimed, but novelty is not the default purpose.
 
-Plans also record a citation-use map: each cited work must name how it is used in the plan, such as question framing, mechanism prior, baseline, comparator, metric, evaluation protocol, theoretical foundation, limitation, contradictory evidence, or claim-scope boundary.
+Plans also record a citation-use map: each cited work must name how it is used in the plan, such as question framing, mechanism prior, baseline, comparator, metric, evaluation protocol, theoretical foundation, limitation, contradictory evidence, or claim-scope boundary. The literature files keep the project-level role union; the plan's citation-use map is the plan-specific source of truth.
 
 Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims. That is separate from the plan-scoped prior-work grounding every plan needs.
 

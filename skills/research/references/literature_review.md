@@ -23,6 +23,10 @@ Record survey evidence in the plan:
 
 Also record a citation-use map. It is not enough to list papers in `literature/papers.md`; the plan must say how each cited work is used. Use citations only when they support a specific role in the plan: question framing, mechanism prior, baseline, comparator, metric, dataset, evaluation protocol, theoretical foundation, known limitation, contradictory evidence, or claim-scope boundary.
 
+Retrieval-unavailable is not a survey bypass. Use it only with a verifiable signal: attempted source/tool, query or source ID when available, failure evidence such as tool error, access denial, connectivity output, or blocked database access, and explicit claim-scope narrowing for the claims that depended on unavailable retrieval. Do not make novelty, no-baseline, comparator-completeness, or comprehensive-grounding claims from an unavailable survey.
+
+`Used in plan as` in `literature/papers.md` and `literature/positioning.md` is a project-level role union: the set of roles a source has played across project plans. The plan-specific source of truth is the plan's `Citation-use map`. If the same paper is a baseline in one plan and a mechanism prior in another, keep both roles in the literature files and disambiguate the current plan's role only in the plan.
+
 ## When to do this
 
 - At the start of any new plan, before writing the Plan section
@@ -34,7 +38,7 @@ Also record a citation-use map. It is not enough to list papers in `literature/p
 
 Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims. That is separate from the bounded but sufficient plan-scoped paper survey and prior-work grounding every plan needs.
 
-If prior work is genuinely unknown after the plan-scoped paper survey, record the named constraint in the plan and narrow or block relevant claims until the grounding is repaired. Do not treat absence of a novelty claim as permission to skip prior work. If retrieval is unavailable, record a retrieval-unavailable constraint with the affected claims; do not silently replace the survey with guesses.
+If prior work is genuinely unknown after the plan-scoped paper survey, record the named constraint in the plan and narrow or block relevant claims until the grounding is repaired. Do not treat absence of a novelty claim as permission to skip prior work. If retrieval is unavailable, record the retrieval-unavailable constraint, retrieval-unavailable evidence, and claim-scope narrowing in the plan; do not silently replace the survey with guesses.
 
 ## Files
 
@@ -49,8 +53,8 @@ If prior work is genuinely unknown after the plan-scoped paper survey, record th
 - Citation: <full bib reference or URL>
 - Method / Finding: <one-paragraph summary, in your own words>
 - Relevance: <why this matters for the current plan>
-- Used in plan as: <question framing / mechanism prior / baseline / comparator / metric / data / evaluation protocol / theoretical foundation / limitation / contradictory evidence / claim-scope boundary>
-- Used as baseline: yes / no
+- Used in plan as: <project-level role union: question framing / mechanism prior / baseline / comparator / metric / data / evaluation protocol / theoretical foundation / limitation / contradictory evidence / claim-scope boundary>
+- Used as baseline: <yes / no; convenience flag only, not the plan-specific source of truth>
 ```
 
 Two paragraphs per entry maximum. Longer summaries belong in the agent's session notes, not in the project state. The point is to make the entry scannable when a future session is checking what was considered.
@@ -62,7 +66,7 @@ Two paragraphs per entry maximum. Longer summaries belong in the agent's session
 
 ## <Prior approach A — cite papers.md entry>
 - What it establishes: <summary>
-- Used in plan as: <specific role this source plays in the current plan>
+- Used in plan as: <project-level role union; use the plan's Citation-use map for the current plan-specific role>
 - Inherited assumption: <what this plan carries forward>
 - Baseline / protocol use: <whether this informs a baseline, control, metric, or evaluation setup>
 - Known limitation: <limitation relevant to this plan>

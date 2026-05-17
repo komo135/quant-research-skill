@@ -972,6 +972,59 @@ def test_prior_work_grounding_requires_citation_use_map():
         )
 
 
+def test_retrieval_unavailable_is_verifiable_and_narrows_claim_scope():
+    literature = read("skills/research/references/literature_review.md")
+    rd_plan = read("skills/research/references/rd_plan.md")
+    plan_review = read("skills/research-plan-review/SKILL.md")
+    template_dir = ROOT / "skills" / "research" / "assets" / "plan"
+
+    for text in [literature, rd_plan, plan_review]:
+        assert_mentions(
+            text,
+            "retrieval-unavailable is not a survey bypass",
+            "verifiable signal",
+            "attempted source/tool",
+            "failure evidence",
+            "claim-scope narrowing",
+        )
+
+    for text in [rd_plan] + [p.read_text(encoding="utf-8") for p in template_dir.glob("*.template")]:
+        assert_mentions(
+            text,
+            "Retrieval-unavailable evidence",
+            "attempted source/tool",
+            "failure evidence",
+            "Claim-scope narrowing",
+        )
+
+
+def test_citation_role_fields_define_plan_source_of_truth():
+    literature = read("skills/research/references/literature_review.md")
+    rd_plan = read("skills/research/references/rd_plan.md")
+
+    for text in [literature, rd_plan]:
+        assert_mentions(
+            text,
+            "project-level role union",
+            "plan-specific source of truth",
+            "Citation-use map",
+            "papers.md",
+            "positioning.md",
+        )
+
+
+def test_plan_review_subfield_completion_is_not_grounding_sufficiency():
+    plan_review = read("skills/research-plan-review/SKILL.md")
+
+    assert_mentions(
+        plan_review,
+        "Sub-field completion is not grounding sufficiency",
+        "substantive",
+        "filled fields",
+        "block_execution",
+    )
+
+
 def test_research_docs_require_mid_execution_literature_updates():
     literature = read("skills/research/references/literature_review.md")
     rd_plan = read("skills/research/references/rd_plan.md")

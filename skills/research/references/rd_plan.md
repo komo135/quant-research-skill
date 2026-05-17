@@ -174,7 +174,9 @@ Use `literature/papers.md` for cited prior work and `literature/positioning.md` 
 
 The Citation-use map is the plan-level bridge between the bibliography and the plan body. It must state how each cited work is used; a citation that has no role in the question, mechanism, baseline, comparator, metric, dataset, evaluation protocol, theoretical foundation, limitation, contradictory evidence, or claim-scope boundary should not be cited.
 
-If prior work is genuinely unknown after the plan-scoped literature survey, the plan must record a named constraint and narrow or block relevant claims until the grounding is repaired. Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims; this is separate from the plan-scoped grounding every plan needs.
+`Used in plan as` in `literature/papers.md` and `literature/positioning.md` is a project-level role union. The plan-specific source of truth is the plan's Citation-use map, because the same paper can be a baseline in one plan and a mechanism prior, metric, or claim-scope boundary in another.
+
+Retrieval-unavailable is not a survey bypass. The plan may record retrieval as unavailable only with a verifiable signal: attempted source/tool, query or source ID when available, failure evidence such as tool error, access denial, connectivity output, or blocked database access, and explicit claim-scope narrowing. If prior work is genuinely unknown after the plan-scoped literature survey, the plan must record a named constraint and narrow or block relevant claims until the grounding is repaired. Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims; this is separate from the plan-scoped grounding every plan needs.
 
 ```markdown
 ## Prior-work grounding
@@ -185,6 +187,8 @@ If prior work is genuinely unknown after the plan-scoped literature survey, the 
 - Selection rationale: <why included papers matter and what near misses were excluded>
 - Negative findings: <missing baselines, failed comparator searches, contradictions not found, or None>
 - Retrieval-unavailable constraint: <tool/access/connectivity failure and affected grounding or claims; None if survey ran>
+- Retrieval-unavailable evidence: <attempted source/tool, query/source id when available, and failure evidence such as tool error, access denial, connectivity output, or blocked database access; None if survey ran>
+- Claim-scope narrowing: <claims narrowed or blocked because retrieval was unavailable; None if survey ran>
 
 ### Citation-use map
 - <literature/papers.md entry>:
@@ -403,7 +407,7 @@ Record the subagent output in the plan:
 - Discriminating test: <adequate / revise / block>: <reason>
 - Controls, comparators, or limiting cases: <adequate / revise / block / not applicable>: <reason>
 - Evidence route and artifact plan: <adequate / revise / block>: <reason>
-- Prior-work survey evidence: <adequate / revise / block>: <block if missing, placeholder-only, or unsupported by Survey evidence / retrieval-unavailable constraint>
+- Prior-work survey evidence: <adequate / revise / block>: <block if missing, placeholder-only, unsupported by Survey evidence, or unsupported by a verifiable retrieval-unavailable constraint with claim-scope narrowing>
 - Scope and constraints: <adequate / revise / block>: <reason>
 
 ### Category-specific concerns
@@ -434,7 +438,7 @@ Research scripts must leave evidence, not just console text. A print-only execut
 ### Mid-execution literature updates
 - <YYYY-MM-DD or None>:
   - Survey trigger: <unfamiliar method / unexpected result / new comparator / contradiction with prior work / missing-baseline signal / other>
-  - Sources checked: <queries, papers, databases, or retrieval-unavailable constraint>
+  - Sources checked: <queries, papers, databases, or retrieval-unavailable constraint with attempted source/tool and failure evidence>
   - Literature files updated: <literature/papers.md and literature/positioning.md entries, or None with reason>
   - Effect on plan: <none / update limitations / change comparator / change metric / change evaluation protocol / amend plan / open ADJACENT plan>
   - Plan review: <not needed with reason / rerun Plan review before continuing claim-bearing execution>
