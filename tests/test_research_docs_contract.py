@@ -1064,7 +1064,7 @@ def test_readme_documents_hypothesis_generation_before_prior_work_grounding():
     assert_ordered_fragments(
         readme,
         "Question / Objective",
-        "Hypothesis generation and mechanistic hypotheses",
+        "Hypothesis generation and typed records",
         "hypothesis type",
         "Mechanism hypothesis record",
         "prior-work grounding",

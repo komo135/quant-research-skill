@@ -8,8 +8,8 @@
     {
       "name": "research",
       "source": "./",
-      "description": "v2.7.1 - Agent-driven R&D protocol with premise-gated plan review, prior-work grounding, result analysis, and paper-grade reports.",
-      "version": "2.7.1"
+      "description": "v2.7.2 - Agent-driven R&D protocol with typed hypothesis generation, plan-visual review, prior-work grounding, result analysis, and paper-grade reports.",
+      "version": "2.7.2"
     }
   ]
 }

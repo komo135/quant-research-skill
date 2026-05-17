@@ -27,7 +27,7 @@ Examples of work that triggers the skill:
 
 It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-## Core design (v2.7.1)
+## Core design (v2.7.2)
 
 ### R&D categories (Frascati 2015)
 
@@ -77,7 +77,7 @@ Plans also record a citation-use map: each cited work must name how it is used i
 
 Comprehensive literature survey is required for strong external novelty, publication, `to our knowledge`, or `no baseline exists` claims. That is separate from the plan-scoped prior-work grounding every plan needs.
 
-### Hypothesis generation and mechanistic hypotheses
+### Hypothesis generation and typed records
 
 When a user asks for research ideas, research directions, hypothesis candidates, or "what should we try next," the `research` skill uses `references/mechanistic_hypothesis_generation.md` before prior-work grounding. The reference starts with research situation diagnosis, separates available and missing material, and chooses the hypothesis type: predictive / performance, mechanistic, causal / intervention, descriptive / characterization, theoretical, or mixed with a declared primary type.
 
@@ -260,12 +260,24 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.7.1** — keeps the v2.7 hypothesis-generation protocol, distinguishes mechanistic hypotheses from other hypothesis types, and tightens plan review into a premise and hypothesis-validation stop gate before execution.
+**Version 2.7.2** — locks the typed hypothesis-generation contract, accepts non-mechanistic records without forcing Mechanism hypothesis fields, and makes Plan visual review first-class.
 
 <details>
 <summary>Changelog</summary>
 
-### v2.7.1 (current) — premise-gated plan review
+### v2.7.2 (current) — typed-record and plan-visual hardening
+
+Fixes review blockers in the v2.7 protocol so predictive / performance, causal / intervention, descriptive, and theoretical hypotheses stay typed records unless they explicitly make why/how mechanism claims.
+
+**Added / changed**
+
+- Updated the hypothesis-generation checker to accept valid non-mechanistic typed records and require fair comparators for predictive / performance records.
+- Aligned README, skill instructions, plan schema, templates, and `new_plan.py` around typed hypothesis-generation records instead of Mechanism-record-only wording.
+- Required `### Plan visual` as the first Plan subsection and added a `Plan visual` research-design check to plan reviews.
+- Reframed evaluator-grounded refinement as typed-record refinement after failed tests, evaluators, derivations, or observations.
+- Narrowed component-contribution classification so only why/how contribution claims are mechanistic.
+
+### v2.7.1 — premise-gated plan review
 
 Tightens `research-plan-review` so reviewers stop plans built on wrong, unsupported, or unverified premises, or on validation methods that cannot test the stated hypothesis.
 
