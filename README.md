@@ -27,7 +27,7 @@ Examples of work that triggers the skill:
 
 It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-## Core design (v2.7.0)
+## Core design (v2.7.1)
 
 ### R&D categories (Frascati 2015)
 
@@ -258,12 +258,22 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.7.0** — replaces active idea generation with mechanism hypothesis records, while keeping pre-result planning boundaries, prior-work grounding, independent plan review, explanation-centered result analysis, assumption audit, theoretical mode, paper-grade reports, and statistical reporting minimums.
+**Version 2.7.1** — keeps the v2.7 mechanistic hypothesis protocol and tightens plan review into a premise and hypothesis-validation stop gate before execution.
 
 <details>
 <summary>Changelog</summary>
 
-### v2.7.0 (current) — mechanistic hypothesis generation
+### v2.7.1 (current) — premise-gated plan review
+
+Tightens `research-plan-review` so reviewers stop plans built on wrong, unsupported, or unverified premises, or on validation methods that cannot test the stated hypothesis.
+
+**Added / changed**
+
+- Reframed plan review as a pre-execution stop gate for broken premises and invalid hypothesis validation methods.
+- Updated plan review output templates to center `Premise check`, `Hypothesis validation method`, and `Stop decision`.
+- Preserved narrowed observation, measurement-construction, and exploratory plans when their claim scope is explicit.
+
+### v2.7.0 — mechanistic hypothesis generation
 
 Replaces active research idea generation with a mechanism-first record that makes assumptions, analysis lenses, competing hypotheses, predictions, tests, evidence needs, and commit / park / kill decisions explicit before planning.
 
