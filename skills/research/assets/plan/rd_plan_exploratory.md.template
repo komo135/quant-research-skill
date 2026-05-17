@@ -150,7 +150,7 @@ last_updated: YYYY-MM-DD
 
 ### Reviewer
 
-- Agent: <fresh separate-context plan-review subagent>
+- Agent: <current research agent>
 - Skill: research-plan-review
 - Plan reviewed: <this plan path>
 - Reviewed at: <YYYY-MM-DD>

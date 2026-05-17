@@ -524,12 +524,14 @@ def test_research_skill_orders_lifecycle_from_observation_to_decision():
     )
 
 
-def test_research_lifecycle_uses_only_plan_review_and_result_analysis_subagents():
+def test_research_lifecycle_keeps_plan_review_in_process_and_result_analysis_separate():
     skill = read("skills/research/SKILL.md")
     rd_plan = read("skills/research/references/rd_plan.md")
     readme = read("README.md")
 
-    for text in [skill, rd_plan, readme]:
+    active_readme = readme.split("<details>", 1)[0]
+
+    for text in [skill, rd_plan, active_readme]:
         assert_ordered_fragments(
             text,
             "Plan",
@@ -542,9 +544,15 @@ def test_research_lifecycle_uses_only_plan_review_and_result_analysis_subagents(
         assert_mentions(text, "research-plan-review", "research-result-analysis")
         assert_absent(
             text,
+            "fresh separate-context plan-review subagent",
+            "plan-review subagent",
             "research-review subagent",
             "main research agent must not perform result analysis itself",
         )
+    assert_mentions(skill, "Do not dispatch a subagent for Plan review")
+    assert_mentions(rd_plan, "Do not dispatch a subagent for Plan review")
+    assert_mentions(active_readme, "current research session")
+    assert_mentions(skill, "fresh separate-context result-analysis subagent")
 
 
 def test_result_analysis_subagent_prompt_uses_plan_as_only_starting_context():
@@ -589,6 +597,12 @@ def test_plan_review_and_result_analysis_skill_boundaries_are_documented():
     )
     assert_mentions(
         plan_review,
+        "current research session",
+        "Do not dispatch a subagent",
+        "extra session context is not evidence",
+    )
+    assert_mentions(
+        plan_review,
         "Do not execute",
         "Do not analyze results",
         "Do not write final claims",
@@ -610,6 +624,7 @@ def test_plan_review_and_result_analysis_skill_boundaries_are_documented():
         "`not_ready`",
         "`invalid_evidence`",
         "GO/NO-GO",
+        "fresh separate-context plan-review subagent",
     )
     assert_mentions(
         result_analysis,
@@ -674,12 +689,15 @@ def test_plan_templates_record_plan_review_and_result_analysis_without_research_
             "## Claims",
         )
         assert_mentions(text, "research-plan-review", "research-result-analysis")
+        plan_review_section = text.split("## Plan review", 1)[1].split("## Actual execution", 1)[0]
+        assert_mentions(plan_review_section, "- Agent: <current research agent>")
         assert_absent(
             text,
             "## Research review",
             "research-review subagent",
             "Claim-readiness assessment",
         )
+        assert_absent(plan_review_section, "fresh separate-context plan-review subagent")
 
 
 def test_plans_separate_pre_result_commitments_from_post_result_explanations():

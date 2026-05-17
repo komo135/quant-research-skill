@@ -16,11 +16,11 @@ hypothesis record when ideating, plan-scoped literature survey before the Plan
 section, Prior-work grounding, Divergence checkpoint, and Plan sections first.
 The plan-scoped literature survey is before the Plan section.
 For hypothesis-generation plans, run check_mechanism_hypothesis_record.py before
-planning from the record. Dispatch research-plan-review with
-the plan path only before execution. Then commit the reviewed plan; that commit
-is the time-anchor. After execution, fill Actual execution and Planned vs
-Actual, then dispatch research-result-analysis with the plan path only before
-writing Claims, a state-changing Decision, or a report.
+planning from the record. Run research-plan-review in the current research
+session with the plan path as the review scope before execution. Then commit
+the reviewed plan; that commit is the time-anchor. After execution, fill Actual
+execution and Planned vs Actual, then dispatch research-result-analysis with the
+plan path only before writing Claims, a state-changing Decision, or a report.
 """
 import argparse
 import subprocess
@@ -123,7 +123,7 @@ def main():
     )
     print("  2. If ideating, run scripts/check_mechanism_hypothesis_record.py before planning from the record")
     print(f"  3. git add plans/{plan_name}.md experiments/{plan_name}/")
-    print("  4. Dispatch research-plan-review with the plan path only and record Plan review")
+    print("  4. Run research-plan-review in the current research session and record Plan review")
     print(f"  5. git commit -m 'Plan {plan_id}: {slug}'")
     print("  6. After execution, fill Actual and Planned vs Actual, then dispatch research-result-analysis with the plan path only")
     print("  7. Write supported Claims, state-changing Decision, or report after Result analysis")
