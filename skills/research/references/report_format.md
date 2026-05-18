@@ -90,7 +90,7 @@ The hypothesis plan's Methodology subsection holds the full re-implementation-le
 
 Duplicating content between plan and report has no audit value — it just creates two places that can drift out of sync. The plan is the source of truth; the report is the human-facing communication.
 
-Do NOT include environment locks or commit hashes in this section's prose. Include material conditions that affect interpretation, such as data split dates, evaluation protocol, hardware class, or external model/API version. Seed information is a variability disclosure, not a substitute for reporting variance; for stochastic results, report seed count, dispersion, and failures rather than relying on one fixed seed. A pointer at the end of the report ("Source artifacts: `experiments/01/runs/`") is sufficient for readers who want raw provenance.
+Do NOT include environment locks or commit hashes in this section's prose. Include material conditions that affect interpretation, such as data split dates, evaluation protocol, hardware class, or external model/API version. Seed information is a variability disclosure, not a substitute for reporting variance; for stochastic results, report seed count, dispersion, and failures rather than relying on one fixed seed. A pointer at the end of the report ("Source artifacts: `propositions/Pxxx_slug/hypotheses/Hxxx_slug/experiments/runs/`") is sufficient for readers who want raw provenance.
 
 ### Results / Observations
 
@@ -236,7 +236,7 @@ A figure is not just an illustration of a number stated in prose; for many resul
 - **Axes, units, sample size, variance**: all four are required on any figure showing measured outcomes. A figure missing any of them is not a valid evidence carrier.
 - **One claim per figure**: a figure that shows three unrelated things splits the reader's attention. If multiple claims belong together, use sub-panels and label them (a), (b), (c) with each panel having its own self-standing caption fragment.
 - **Color and shape encoded for accessibility**: do not rely on color alone to distinguish groups (use line style or marker shape too). The figure must remain readable in grayscale.
-- **Source traceability**: figure caption or filename includes a pointer to the artifact that generated it (e.g., `figures/convergence_curves.png` ← `experiments/02/runs/02__003/eval_metrics.csv` via `lib/viz/plot_convergence.py`). This makes claim-to-artifact consistency checkable.
+- **Source traceability**: figure caption or filename includes a pointer to the artifact that generated it (e.g., `figures/convergence_curves.png` ← `propositions/P001_example/hypotheses/H001_example/experiments/runs/H001__003__seed0/outputs/eval_metrics.csv` via `lib/viz/plot_convergence.py`). This makes claim-to-artifact consistency checkable.
 
 When the figure is the primary evidence (not a decoration), the Results section's prose role shifts from "stating the number" to "guiding the reader through the figure" — what to look at first, what comparison to make, what magnitude is meaningful.
 
@@ -257,7 +257,7 @@ Claim-to-artifact consistency is an evidence-integrity check, not a separate rep
 - **Placeholder figures.** Generate the figure or remove the reference. A report with `![figure](figures/TODO.png)` fails the contract.
 - **Methods section that does not enable re-implementation.** "We tuned hyperparameters" — what hyperparameters, on what objective, with what resource envelope?
 - **Hidden limitations.** Caveats relegated to a final paragraph the reader skips. Move them up or call them out in Summary.
-- **Decision claimed but not labeled.** "We do not recommend X yet" without `REFINE` / `PARK` / `CLOSE`.
+- **Decision claimed but not tied to the current ledger.** "We do not recommend X yet" without a hypothesis-level `PARK` / `KILL` or proposition-level `UNDER_SPECIFY` / `CLOSE` decision recorded in the appropriate `decisions.md`.
 - **No actual numbers in Results.** Prose without measurements is not a research result.
 - **Padding the Background or Discussion to look thorough.** Length is not the contract; clarity is.
 - **Single-run claims in Results.** A single number with no variance is not characterized. Always include n and variance for performance claims.

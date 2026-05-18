@@ -16,6 +16,7 @@ Creates:
 Also appends an OPEN_PROPOSITION project decision to top-level decisions.md.
 """
 import argparse
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -23,6 +24,27 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 ASSETS = SKILL_ROOT / "assets"
+PROP_ID_RE = re.compile(r"^P\d{3}$")
+SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+
+def fail(message: str) -> None:
+    print(f"Error: {message}", file=sys.stderr)
+    sys.exit(1)
+
+
+def validate_id_and_slug(prop_id: str, slug: str) -> None:
+    if not PROP_ID_RE.fullmatch(prop_id):
+        fail("proposition id must match P###, for example P001")
+    if not SLUG_RE.fullmatch(slug):
+        fail("slug must be kebab-case using lowercase letters, numbers, and hyphens")
+
+
+def ensure_inside(path: Path, root: Path, label: str) -> None:
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError:
+        fail(f"{label} escapes expected root: {path}")
 
 
 def render_template(path: Path, replacements: dict[str, str]) -> str:
@@ -66,14 +88,17 @@ def main() -> None:
 
     project = Path(args.project).resolve()
     if not project.exists():
-        print(f"Error: project root does not exist: {project}", file=sys.stderr)
-        sys.exit(1)
+        fail(f"project root does not exist: {project}")
+    if not (project / "decisions.md").exists() or not (project / "propositions").is_dir():
+        fail("project root must be initialized by new_project.py before opening propositions")
+    validate_id_and_slug(args.id, args.slug)
 
     prop_name = f"{args.id}_{args.slug}"
-    prop_dir = project / "propositions" / prop_name
+    propositions_root = project / "propositions"
+    prop_dir = propositions_root / prop_name
+    ensure_inside(prop_dir, propositions_root, "proposition path")
     if prop_dir.exists():
-        print(f"Error: proposition already exists: {prop_dir}", file=sys.stderr)
-        sys.exit(1)
+        fail(f"proposition already exists: {prop_dir}")
 
     prop_dir.mkdir(parents=True)
     (prop_dir / "hypotheses").mkdir()
@@ -99,7 +124,12 @@ def main() -> None:
     print(f"  1. Fill observations in propositions/{prop_name}/observations.md")
     print(f"  2. Fill analyses in propositions/{prop_name}/analyses.md with generated doubt, working proposition, expected consequence, and proposition status")
     print(f"  3. Create a derived hypothesis only after proposition status warrants it:")
-    print(f"     python {SKILL_ROOT}/scripts/new_hypothesis.py {project} --proposition {prop_name} --id H001 --slug <slug> --title \"<title>\" --category <basic_research|applied_research|experimental_development> --mode <exploratory|confirmatory|milestone|theoretical> --hypothesis \"<hypothesis>\" --source-analysis A001 --status <supported|contradicted|unrealized-condition|under-specified|split-needed>")
+    print(
+        f"     python \"{SKILL_ROOT / 'scripts' / 'new_hypothesis.py'}\" \"{project}\" "
+        f"--proposition \"{prop_name}\" --id H001 --slug slug --title \"Title\" "
+        "--category applied_research --mode confirmatory --hypothesis \"Hypothesis\" "
+        "--source-analysis A001 --status supported"
+    )
 
 
 if __name__ == "__main__":

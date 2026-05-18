@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Every load-bearing claim in `propositions/Pxxx_slug/hypotheses/Hxxx_slug/plan.md` and `reports/<id>/report.md` uses an explicit, structured record. The structure does two jobs:
+Every load-bearing claim in `propositions/Pxxx_slug/hypotheses/Hxxx_slug/plan.md` and `propositions/Pxxx_slug/hypotheses/Hxxx_slug/reports/<id>_<slug>/report.md` uses an explicit, structured record. The structure does two jobs:
 
 1. **It forces the agent to articulate what the claim actually rests on and what it does not exclude** — preventing claims that read confidently but are actually thin on evidence.
 2. **It makes claims machine-checkable.** `scripts/check_claims.py` parses the structure and verifies required fields are present and non-empty where required.
@@ -44,9 +44,9 @@ Specific = states *what* improved, *by how much*, *under what conditions*, *with
 
 A pointer to the specific basis for the claim. This is an evidence-integrity anchor, not by itself a reproducibility guarantee: it lets a reviewer check that the reported value is connected to a concrete artifact, value, or citation, while the method and tested conditions still carry the reproducibility burden. Acceptable forms:
 
-- **file:line** — `experiments/01_phase_transition/runs/01__003__seed42/metrics.json:L8`
+- **file:line** — `propositions/P001_phase-transition/hypotheses/H001_probe/experiments/runs/H001__003__seed42/outputs/metrics.json:L8`
 - **Numeric value with provenance** — `mean BLEU 28.4 (SE 0.3) across 5 seeds, see Table 2 of reports/R02/report.md`
-- **Artifact path** — `experiments/01/runs/01__005/outputs/convergence.csv`
+- **Artifact path** — `propositions/P001_phase-transition/hypotheses/H001_probe/experiments/runs/H001__005__seed0/outputs/convergence.csv`
 - **Citation** — `Vaswani et al. 2017, Table 1`
 
 Do not use vague evidence like "the experiments," "the data," or "as discussed above."
@@ -62,9 +62,9 @@ A numeric `evidence` field for an empirical claim must specify at least:
 
 Examples of compliant evidence:
 
-- Quant: `IR 1.12 (95% CI [0.78, 1.46], n=240 monthly returns, walk_forward 3 folds), Δ vs benchmark IR 0.42 (p<0.01 with Bonferroni correction across 18 tested signals); see experiments/02/runs/02__005/walk_forward_results.csv`
+- Quant: `IR 1.12 (95% CI [0.78, 1.46], n=240 monthly returns, walk_forward 3 folds), Delta vs benchmark IR 0.42 (p<0.01 with Bonferroni correction across 18 tested signals); see propositions/P001_signal-quality/hypotheses/H001_walk-forward/experiments/runs/H001__005__seed0/outputs/walk_forward_results.csv`
 - ML: `BLEU 28.4 (SE 0.3, n=5 seeds), Δ vs baseline 27.3 = 1.1 (Cohen's d 2.8, paired t-test p<0.001); see reports/R02/tables/translation_results.csv`
-- Basic research: `phase transition observed at T_c = 2.27 ± 0.05 (n=12 independent runs, σ/sqrt(n) reported); see experiments/01/runs/01__012/transition_temps.csv`
+- Basic research: `phase transition observed at T_c = 2.27 +/- 0.05 (n=12 independent runs, sigma/sqrt(n) reported); see propositions/P001_phase-transition/hypotheses/H001_temperature-scan/experiments/runs/H001__012__seed0/outputs/transition_temps.csv`
 
 Examples that fail the minimum:
 

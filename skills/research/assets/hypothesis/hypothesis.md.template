@@ -11,6 +11,10 @@
 
 ## Type
 
+<hypothesis_type>
+
+## Allowed types
+
 predictive / performance | mechanistic | causal / intervention | descriptive / characterization | theoretical | mixed
 
 ## Derivation
@@ -36,6 +40,10 @@ predictive / performance | mechanistic | causal / intervention | descriptive / c
 - <evidence needed before planning or before claiming support>
 
 ## Current status
+
+candidate
+
+## Allowed statuses
 
 candidate | ready-for-plan | tested-supported | tested-contradicted | tested-partial | tested-inconclusive | parked | killed
 

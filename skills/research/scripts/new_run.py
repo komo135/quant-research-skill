@@ -12,9 +12,26 @@ Usage:
 """
 import argparse
 import json
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
+
+
+PROP_DIR_RE = re.compile(r"^P\d{3}_[a-z0-9]+(?:-[a-z0-9]+)*$")
+HYP_DIR_RE = re.compile(r"^H\d{3}_[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+
+def fail(message: str) -> None:
+    print(f"Error: {message}", file=sys.stderr)
+    sys.exit(1)
+
+
+def ensure_inside(path: Path, root: Path, label: str) -> None:
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError:
+        fail(f"{label} escapes expected root: {path}")
 
 
 def main() -> None:
@@ -26,12 +43,19 @@ def main() -> None:
     args = parser.parse_args()
 
     project = Path(args.project).resolve()
-    hyp_dir = project / "propositions" / args.proposition / "hypotheses" / args.hypothesis
+    if not PROP_DIR_RE.fullmatch(args.proposition):
+        fail("proposition must match P###_kebab-case-slug")
+    if not HYP_DIR_RE.fullmatch(args.hypothesis):
+        fail("hypothesis must match H###_kebab-case-slug")
+    propositions_root = project / "propositions"
+    hyp_root = propositions_root / args.proposition / "hypotheses"
+    hyp_dir = hyp_root / args.hypothesis
+    ensure_inside(hyp_dir, hyp_root, "hypothesis path")
     runs_dir = hyp_dir / "experiments" / "runs"
     if not hyp_dir.exists():
-        print(f"Error: hypothesis directory does not exist: {hyp_dir}", file=sys.stderr)
-        print("Run new_hypothesis.py first to create the derived hypothesis.", file=sys.stderr)
-        sys.exit(1)
+        fail(f"hypothesis directory does not exist: {hyp_dir}. Run new_hypothesis.py first.")
+    if not (hyp_dir / "plan.md").exists():
+        fail(f"hypothesis plan does not exist: {hyp_dir / 'plan.md'}")
     runs_dir.mkdir(parents=True, exist_ok=True)
 
     existing = [d for d in runs_dir.iterdir() if d.is_dir()]
@@ -41,8 +65,7 @@ def main() -> None:
     run_name = f"{hyp_id}__{n:03d}__seed{args.seed}"
     run_dir = runs_dir / run_name
     if run_dir.exists():
-        print(f"Error: run directory already exists: {run_dir}", file=sys.stderr)
-        sys.exit(1)
+        fail(f"run directory already exists: {run_dir}")
     run_dir.mkdir()
     for directory in ["logs", "intermediate", "outputs", "tables", "figures"]:
         (run_dir / directory).mkdir()
@@ -55,6 +78,7 @@ def main() -> None:
         "run_id": run_name,
         "proposition": args.proposition,
         "hypothesis": args.hypothesis,
+        "plan_path": f"propositions/{args.proposition}/hypotheses/{args.hypothesis}/plan.md",
         "seed": args.seed,
         "created_at": created_at,
         "status": "initialized",

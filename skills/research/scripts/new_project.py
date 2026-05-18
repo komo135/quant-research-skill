@@ -9,7 +9,6 @@ data versioning, or any computational-replicability infrastructure — those are
 agent's discretion.
 """
 import argparse
-import shutil
 from pathlib import Path
 
 
@@ -89,8 +88,10 @@ def main():
     print("Next steps:")
     print(f"  cd {target}")
     print("  git init && git add -A && git commit -m 'Initial project structure'")
-    print(f"  python {SKILL_ROOT}/scripts/new_proposition.py {target} \\")
-    print("    --id P001 --slug <slug> --title \"<title>\" --proposition \"<proposition>\" --expected \"<expected consequence>\"")
+    print(
+        f"  python \"{SKILL_ROOT / 'scripts' / 'new_proposition.py'}\" \"{target}\" "
+        "--id P001 --slug slug --title \"Title\" --proposition \"Proposition\" --expected \"Expected consequence\""
+    )
 
 
 if __name__ == "__main__":

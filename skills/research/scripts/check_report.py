@@ -286,6 +286,20 @@ def check_outcome_evidence_carrier(sections: dict) -> list:
     return issues
 
 
+def check_proposition_first_references(text: str) -> list:
+    issues = []
+    for line_no, line in enumerate(text.splitlines(), start=1):
+        if re.search(r"(?:^|[\s`'\"(])plans/", line):
+            issues.append(
+                f"  Line {line_no}: old top-level plan or run path; use propositions/<P>/hypotheses/<H>/plan.md"
+            )
+        if re.search(r"(?:^|[\s`'\"(])experiments/[^\s`'\"),]*/runs/?", line):
+            issues.append(
+                f"  Line {line_no}: old top-level plan or run path; use propositions/<P>/hypotheses/<H>/experiments/runs/"
+            )
+    return issues
+
+
 def main():
     parser = argparse.ArgumentParser(description="Verify report.md against skill contract.")
     parser.add_argument("path", help="Path to report.md")
@@ -323,6 +337,7 @@ def main():
 
     # Evidence carrier for outcome sections.
     all_issues.extend(check_outcome_evidence_carrier(sections))
+    all_issues.extend(check_proposition_first_references(text))
 
     # Figure existence.
     refs = find_figure_references(text)

@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 import sys
@@ -58,6 +59,58 @@ def first_subheading(section: str) -> str:
     for line in section.splitlines():
         stripped = line.strip()
         if stripped.startswith("#"):
+            return stripped
+    return ""
+
+
+def fill_analysis(
+    project: Path,
+    proposition: str,
+    *,
+    analysis_id: str = "A001",
+    status: str = "supported",
+    material_used: str = "O001 and proposition.md expected consequence.",
+    derived_hypothesis: str = "The derived hypothesis is testable from this analysis.",
+) -> None:
+    prop_dir = project / "propositions" / proposition
+    (prop_dir / "observations.md").write_text(
+        f"""# Observations for {proposition}
+
+## O001: Observed contrast
+
+- Material: concrete observation from the current project.
+- Measurement or evidence form: recorded comparison.
+- Comparator or expected reference: expected consequence from proposition.md.
+- Missing material: None for this analysis.
+""",
+        encoding="utf-8",
+    )
+    (prop_dir / "analyses.md").write_text(
+        f"""# Analyses for {proposition}
+
+## {analysis_id}: Concrete source analysis
+
+- Analysis question: Why does the observed contrast matter?
+- Material used: {material_used}
+- Contrast type: expectation-break
+- Contrast: expected consequence versus observed material.
+- Generated doubt: whether the current representation realizes the proposition's required condition.
+- Working proposition: if the required condition is realized, the expected consequence should appear.
+- Expected consequence if the working proposition is true: the planned discriminator should show the expected observation.
+- Observed match, break, or missing condition: observed material indicates the condition is testable.
+- Proposition status assessment: {status}
+- Derived hypothesis candidate: {derived_hypothesis}
+- What evidence would update this analysis: a discriminator that separates this hypothesis from a competing explanation.
+""",
+        encoding="utf-8",
+    )
+
+
+def current_status_value(text: str) -> str:
+    section = markdown_section(text, "## Current status")
+    for line in section.splitlines():
+        stripped = line.strip()
+        if stripped:
             return stripped
     return ""
 
@@ -1484,6 +1537,7 @@ def test_new_proposition_creates_state_ledgers_and_project_decision():
 
     for relative, exists in created_paths.items():
         assert exists, relative
+    assert current_status_value(proposition) == "open"
     assert_mentions(
         proposition,
         "## Current status",
@@ -1546,6 +1600,12 @@ def test_new_hypothesis_creates_hypothesis_plan_under_parent_proposition():
             capture_output=True,
         )
         assert create_prop.returncode == 0, create_prop.stderr
+        fill_analysis(
+            target,
+            "P001_identity-reachability",
+            status="unrealized-condition",
+            derived_hypothesis="Residual parameterization makes the identity-neighborhood easier to optimize.",
+        )
         result = subprocess.run(
             [
                 sys.executable,
@@ -1586,6 +1646,8 @@ def test_new_hypothesis_creates_hypothesis_plan_under_parent_proposition():
     assert result.returncode == 0, result.stderr
     for relative, exists in created_paths.items():
         assert exists, relative
+    assert current_status_value(hypothesis) == "candidate"
+    assert markdown_section(hypothesis, "## Type").strip() == "predictive / performance"
     assert_mentions(
         hypothesis,
         "Parent proposition",
@@ -1609,6 +1671,278 @@ def test_new_hypothesis_creates_hypothesis_plan_under_parent_proposition():
         "## Prior-work grounding",
         "### Plan visual",
     )
+    assert_absent(plan, "<copy the generated doubt", "<copy the working proposition", "<observable result expected")
+
+
+def test_new_hypothesis_rejects_placeholder_source_analysis_before_material_exists():
+    new_project = ROOT / "skills" / "research" / "scripts" / "new_project.py"
+    new_proposition = ROOT / "skills" / "research" / "scripts" / "new_proposition.py"
+    new_hypothesis = ROOT / "skills" / "research" / "scripts" / "new_hypothesis.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(tmp) / "project"
+        subprocess.run(
+            [sys.executable, str(new_project), str(target), "--name", "No Material"],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                str(new_proposition),
+                str(target),
+                "--id",
+                "P001",
+                "--slug",
+                "no-material",
+                "--title",
+                "No Material",
+                "--proposition",
+                "A proposition cannot produce a hypothesis without material.",
+                "--expected",
+                "A concrete analysis must exist before planning.",
+            ],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(new_hypothesis),
+                str(target),
+                "--proposition",
+                "P001_no-material",
+                "--id",
+                "H001",
+                "--slug",
+                "premature",
+                "--title",
+                "Premature",
+                "--category",
+                "applied_research",
+                "--mode",
+                "confirmatory",
+                "--hypothesis",
+                "This should be rejected.",
+                "--source-analysis",
+                "A001",
+                "--status",
+                "supported",
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "source analysis is still placeholder-only" in result.stderr
+
+
+def test_new_hypothesis_rejects_none_material_or_none_hypothesis_candidate():
+    new_project = ROOT / "skills" / "research" / "scripts" / "new_project.py"
+    new_proposition = ROOT / "skills" / "research" / "scripts" / "new_proposition.py"
+    new_hypothesis = ROOT / "skills" / "research" / "scripts" / "new_hypothesis.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(tmp) / "project"
+        subprocess.run(
+            [sys.executable, str(new_project), str(target), "--name", "None Material"],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                str(new_proposition),
+                str(target),
+                "--id",
+                "P001",
+                "--slug",
+                "none-material",
+                "--title",
+                "None Material",
+                "--proposition",
+                "None-like material markers are not evidence.",
+                "--expected",
+                "The CLI rejects none material before planning.",
+            ],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        cases = [
+            ("None", "A concrete hypothesis candidate."),
+            ("O001 and proposition.md expected consequence.", "None"),
+            ("no material yet", "A concrete hypothesis candidate."),
+            ("O001 and proposition.md expected consequence.", "None: material is too early"),
+        ]
+        results = []
+        for index, (material_used, derived_hypothesis) in enumerate(cases, start=1):
+            fill_analysis(
+                target,
+                "P001_none-material",
+                material_used=material_used,
+                derived_hypothesis=derived_hypothesis,
+            )
+            results.append(
+                subprocess.run(
+                    [
+                        sys.executable,
+                        str(new_hypothesis),
+                        str(target),
+                        "--proposition",
+                        "P001_none-material",
+                        "--id",
+                        f"H{index:03d}",
+                        "--slug",
+                        f"none-case-{index}",
+                        "--title",
+                        "None Case",
+                        "--category",
+                        "applied_research",
+                        "--mode",
+                        "confirmatory",
+                        "--hypothesis",
+                        "This should be rejected.",
+                        "--source-analysis",
+                        "A001",
+                        "--status",
+                        "supported",
+                    ],
+                    cwd=ROOT,
+                    text=True,
+                    capture_output=True,
+                )
+            )
+
+    for result in results:
+        assert result.returncode == 1
+        assert "source analysis is still placeholder-only" in result.stderr or "source analysis has no derived hypothesis candidate" in result.stderr
+
+
+def test_new_hypothesis_rejects_non_plannable_proposition_statuses():
+    new_project = ROOT / "skills" / "research" / "scripts" / "new_project.py"
+    new_proposition = ROOT / "skills" / "research" / "scripts" / "new_proposition.py"
+    new_hypothesis = ROOT / "skills" / "research" / "scripts" / "new_hypothesis.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(tmp) / "project"
+        subprocess.run(
+            [sys.executable, str(new_project), str(target), "--name", "Status Gate"],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                str(new_proposition),
+                str(target),
+                "--id",
+                "P001",
+                "--slug",
+                "status-gate",
+                "--title",
+                "Status Gate",
+                "--proposition",
+                "Only plannable proposition states may create a derived hypothesis.",
+                "--expected",
+                "The CLI rejects states that need more material or splitting.",
+            ],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+
+        results = []
+        for index, status in enumerate(["contradicted", "under-specified", "split-needed"], start=1):
+            fill_analysis(
+                target,
+                "P001_status-gate",
+                status=status,
+                derived_hypothesis="This status should not create a plan.",
+            )
+            results.append(
+                subprocess.run(
+                    [
+                        sys.executable,
+                        str(new_hypothesis),
+                        str(target),
+                        "--proposition",
+                        "P001_status-gate",
+                        "--id",
+                        f"H{index:03d}",
+                        "--slug",
+                        f"blocked-{index}",
+                        "--title",
+                        "Blocked",
+                        "--category",
+                        "applied_research",
+                        "--mode",
+                        "confirmatory",
+                        "--hypothesis",
+                        "This should be rejected.",
+                        "--source-analysis",
+                        "A001",
+                        "--status",
+                        status,
+                    ],
+                    cwd=ROOT,
+                    text=True,
+                    capture_output=True,
+                )
+            )
+
+    for result in results:
+        assert result.returncode == 1
+        assert "does not permit creating a hypothesis plan" in result.stderr
+
+
+def test_research_scripts_reject_path_traversal_components():
+    new_project = ROOT / "skills" / "research" / "scripts" / "new_project.py"
+    new_proposition = ROOT / "skills" / "research" / "scripts" / "new_proposition.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(tmp) / "project"
+        subprocess.run(
+            [sys.executable, str(new_project), str(target), "--name", "Path Safety"],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(new_proposition),
+                str(target),
+                "--id",
+                "P001",
+                "--slug",
+                "../escaped",
+                "--title",
+                "Escaped",
+                "--proposition",
+                "Path traversal must not be accepted.",
+                "--expected",
+                "No directory is created outside propositions.",
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "slug must be kebab-case" in result.stderr
 
 
 def test_standalone_new_plan_script_is_removed():
@@ -1663,6 +1997,22 @@ def test_proposition_first_docs_define_question_to_hypothesis_state_machine():
     )
 
 
+def test_current_docs_do_not_use_legacy_plan_first_iteration_labels():
+    paths = [
+        "skills/research-result-analysis/SKILL.md",
+        "skills/research/references/report_format.md",
+        "skills/research/references/assumption_audit.md",
+        "skills/research/references/categories/basic_research.md",
+        "skills/research/references/categories/applied_research.md",
+        "skills/research/references/categories/experimental_development.md",
+        "skills/research/references/analysis.md",
+    ]
+
+    for path in paths:
+        text = read(path)
+        assert not re.search(r"`(?:REFINE|ADJACENT|NEXT_STEP)`|\b(?:REFINE|ADJACENT|NEXT_STEP)\b", text), path
+
+
 def test_new_hypothesis_accepts_theoretical_mode_and_generates_theoretical_sections():
     new_project = ROOT / "skills" / "research" / "scripts" / "new_project.py"
     new_proposition = ROOT / "skills" / "research" / "scripts" / "new_proposition.py"
@@ -1698,6 +2048,12 @@ def test_new_hypothesis_accepts_theoretical_mode_and_generates_theoretical_secti
             text=True,
             capture_output=True,
         )
+        fill_analysis(
+            target,
+            "P042_closed-form-bound",
+            status="supported",
+            derived_hypothesis="The proposition admits a closed-form bound.",
+        )
         result = subprocess.run(
             [
                 sys.executable,
@@ -1717,6 +2073,8 @@ def test_new_hypothesis_accepts_theoretical_mode_and_generates_theoretical_secti
                 "theoretical",
                 "--hypothesis",
                 "The proposition admits a closed-form bound.",
+                "--type",
+                "theoretical",
                 "--source-analysis",
                 "A001",
                 "--status",
@@ -1736,8 +2094,17 @@ def test_new_hypothesis_accepts_theoretical_mode_and_generates_theoretical_secti
             / "H001_closed-form-bound"
             / "plan.md"
         ).read_text(encoding="utf-8")
+        hypothesis = (
+            target
+            / "propositions"
+            / "P042_closed-form-bound"
+            / "hypotheses"
+            / "H001_closed-form-bound"
+            / "hypothesis.md"
+        ).read_text(encoding="utf-8")
 
     assert "mode: theoretical" in plan
+    assert markdown_section(hypothesis, "## Type").strip() == "theoretical"
     assert "### Plan visual" in plan
     assert first_subheading(markdown_section(plan, "## Plan")) == "### Plan visual"
     assert "### Derivation question" in plan
@@ -1799,6 +2166,12 @@ def test_new_run_creates_durable_artifact_scaffold():
             check=True,
             text=True,
             capture_output=True,
+        )
+        fill_analysis(
+            target,
+            "P007_artifact-contract",
+            status="supported",
+            derived_hypothesis="new_run creates the durable artifact scaffold.",
         )
         subprocess.run(
             [
@@ -1870,8 +2243,38 @@ def test_new_run_creates_durable_artifact_scaffold():
             "run_manifest.json",
         ]:
             assert (run_dir / relative).exists(), relative
-        assert_mentions(manifest, "initialized", "command", "artifacts")
+        assert_mentions(
+            manifest,
+            "initialized",
+            "command",
+            "artifacts",
+            "propositions/P007_artifact-contract/hypotheses/H001_artifact-contract/plan.md",
+        )
         assert_mentions(readme, "print-only", "stdout is not evidence", "check_run_artifacts.py")
+
+        manifest_path = run_dir / "run_manifest.json"
+        manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        (run_dir / "outputs" / "metrics.json").write_text('{"n": 1}', encoding="utf-8")
+        manifest_data.update(
+            {
+                "status": "completed",
+                "command": "python experiments/code/run.py",
+                "artifacts": ["outputs/metrics.json"],
+            }
+        )
+        manifest_path.write_text(json.dumps(manifest_data, indent=2) + "\n", encoding="utf-8")
+        check_result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "skills" / "research" / "scripts" / "check_run_artifacts.py"),
+                str(run_dir),
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert check_result.returncode == 0, check_result.stdout + check_result.stderr
 
 
 def test_check_run_artifacts_rejects_print_only_run():
@@ -1883,7 +2286,7 @@ def test_check_run_artifacts_rejects_print_only_run():
         (run_dir / "logs" / "stdout.log").write_text("accuracy 0.84\n", encoding="utf-8")
         (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
         (run_dir / "run_manifest.json").write_text(
-            '{"run_id":"run","plan":"01_demo","status":"completed","command":"python eda.py"}',
+            '{"run_id":"run","proposition":"P001_demo","hypothesis":"H001_demo","plan_path":"propositions/P001_demo/hypotheses/H001_demo/plan.md","status":"completed","command":"python eda.py"}',
             encoding="utf-8",
         )
         result = subprocess.run(
@@ -1909,7 +2312,7 @@ def test_check_run_artifacts_requires_manifest_artifact_list():
         (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
         (run_dir / "outputs" / "metrics.json").write_text('{"accuracy": 0.84, "n": 128}', encoding="utf-8")
         (run_dir / "run_manifest.json").write_text(
-            '{"run_id":"run","plan":"01_demo","status":"completed","command":"python eda.py --run-dir run","artifacts":[]}',
+            '{"run_id":"run","proposition":"P001_demo","hypothesis":"H001_demo","plan_path":"propositions/P001_demo/hypotheses/H001_demo/plan.md","status":"completed","command":"python eda.py --run-dir run","artifacts":[]}',
             encoding="utf-8",
         )
         result = subprocess.run(
@@ -1935,7 +2338,7 @@ def test_check_run_artifacts_rejects_unlisted_or_non_evidence_manifest_artifact(
         (run_dir / "outputs" / "metrics.json").write_text('{"accuracy": 0.84, "n": 128}', encoding="utf-8")
         (run_dir / "README.md").write_text("not evidence\n", encoding="utf-8")
         (run_dir / "run_manifest.json").write_text(
-            '{"run_id":"run","plan":"01_demo","status":"completed","command":"python eda.py --run-dir run","artifacts":["README.md"]}',
+            '{"run_id":"run","proposition":"P001_demo","hypothesis":"H001_demo","plan_path":"propositions/P001_demo/hypotheses/H001_demo/plan.md","status":"completed","command":"python eda.py --run-dir run","artifacts":["README.md"]}',
             encoding="utf-8",
         )
         result = subprocess.run(
@@ -1961,7 +2364,7 @@ def test_check_run_artifacts_rejects_stdout_transcript_as_artifact():
         (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
         (run_dir / "outputs" / "stdout_copy.txt").write_text("accuracy 0.84\n", encoding="utf-8")
         (run_dir / "run_manifest.json").write_text(
-            '{"run_id":"run","plan":"01_demo","status":"completed","command":"python eda.py --run-dir run","artifacts":["outputs/stdout_copy.txt"]}',
+            '{"run_id":"run","proposition":"P001_demo","hypothesis":"H001_demo","plan_path":"propositions/P001_demo/hypotheses/H001_demo/plan.md","status":"completed","command":"python eda.py --run-dir run","artifacts":["outputs/stdout_copy.txt"]}',
             encoding="utf-8",
         )
         result = subprocess.run(
@@ -1987,7 +2390,7 @@ def test_check_run_artifacts_requires_completed_status():
         (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
         (run_dir / "outputs" / "metrics.json").write_text('{"accuracy": 0.84, "n": 128}', encoding="utf-8")
         (run_dir / "run_manifest.json").write_text(
-            '{"run_id":"run","plan":"01_demo","status":"failed","command":"python eda.py --run-dir run","artifacts":["outputs/metrics.json"]}',
+            '{"run_id":"run","proposition":"P001_demo","hypothesis":"H001_demo","plan_path":"propositions/P001_demo/hypotheses/H001_demo/plan.md","status":"failed","command":"python eda.py --run-dir run","artifacts":["outputs/metrics.json"]}',
             encoding="utf-8",
         )
         result = subprocess.run(
@@ -2001,6 +2404,46 @@ def test_check_run_artifacts_requires_completed_status():
     assert "run_manifest.json status must be 'completed'" in result.stdout
 
 
+def test_check_run_artifacts_requires_manifest_identity_fields_as_strings():
+    script = ROOT / "skills" / "research" / "scripts" / "check_run_artifacts.py"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        run_dir = Path(tmp) / "run"
+        (run_dir / "logs").mkdir(parents=True)
+        (run_dir / "outputs").mkdir()
+        (run_dir / "logs" / "stdout.log").write_text("wrote outputs/metrics.json\n", encoding="utf-8")
+        (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
+        (run_dir / "outputs" / "metrics.json").write_text('{"accuracy": 0.84, "n": 128}', encoding="utf-8")
+        (run_dir / "run_manifest.json").write_text(
+            json.dumps(
+                {
+                    "run_id": "",
+                    "proposition": "",
+                    "hypothesis": ["H001_demo"],
+                    "plan_path": "",
+                    "status": ["completed"],
+                    "command": ["python", "eda.py"],
+                    "artifacts": ["outputs/metrics.json"],
+                }
+            ),
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [sys.executable, str(script), str(run_dir)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "run_manifest.json run_id must be a non-empty string" in result.stdout
+    assert "run_manifest.json proposition must be a non-empty string" in result.stdout
+    assert "run_manifest.json hypothesis must be a non-empty string" in result.stdout
+    assert "run_manifest.json plan_path must be a non-empty string" in result.stdout
+    assert "run_manifest.json status must be a non-empty string" in result.stdout
+    assert "run_manifest.json command must be a non-empty string" in result.stdout
+
+
 def test_check_run_artifacts_accepts_manifest_logs_and_artifact():
     script = ROOT / "skills" / "research" / "scripts" / "check_run_artifacts.py"
 
@@ -2012,7 +2455,7 @@ def test_check_run_artifacts_accepts_manifest_logs_and_artifact():
         (run_dir / "logs" / "stderr.log").write_text("", encoding="utf-8")
         (run_dir / "outputs" / "metrics.json").write_text('{"accuracy": 0.84, "n": 128}', encoding="utf-8")
         (run_dir / "run_manifest.json").write_text(
-            '{"run_id":"run","plan":"01_demo","status":"completed","command":"python eda.py --run-dir run","artifacts":["outputs/metrics.json"]}',
+            '{"run_id":"run","proposition":"P001_demo","hypothesis":"H001_demo","plan_path":"propositions/P001_demo/hypotheses/H001_demo/plan.md","status":"completed","command":"python eda.py --run-dir run","artifacts":["outputs/metrics.json"]}',
             encoding="utf-8",
         )
         result = subprocess.run(
@@ -2721,8 +3164,8 @@ The report explains why the limiting cases matter and what interpretation remain
 The report names unevaluated assumptions and conditions not covered by the derivation.
 
 ## References
-- Plan: plans/01_theoretical.md
-- Source artifacts: experiments/01_theoretical/runs/
+- Plan: propositions/P001_theory/hypotheses/H001_theoretical/plan.md
+- Source artifacts: propositions/P001_theory/hypotheses/H001_theoretical/experiments/runs/
 - Prior work: [Foundation 1948] from literature/papers.md.
 """
 
@@ -2739,19 +3182,101 @@ The report names unevaluated assumptions and conditions not covered by the deriv
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_check_report_rejects_old_top_level_plan_references():
+    script = ROOT / "skills" / "research" / "scripts" / "check_report.py"
+
+    report = """# Theoretical Report
+
+## Summary
+This report summarizes a derivational result.
+
+## Background
+Prior formulations motivate the derivation and define the known constraints.
+
+## Related Work
+This report positions the derivation against the directly relevant foundations.
+
+## Theory / Formulation
+The formulation states the objects, assumptions, and result being derived.
+
+## Derivation context
+The derivation route and limiting cases are described for independent review.
+
+## Observations
+At k=0, the formulation reduces to the known boundary case without changing the proof state.
+No figure/table: theoretical limiting-case observation is summarized in prose; no measured artifact exists yet.
+
+## Ablation / Sensitivity
+Not applicable: no component-causality or robustness claim is made in this theoretical report.
+
+## Discussion
+The report explains why the limiting cases matter and what interpretation remains association-level or formal-only.
+
+## Limitations
+The report names unevaluated assumptions and conditions not covered by the derivation.
+
+## References
+- Plan: `plans/01_theoretical.md`
+- Source artifacts: `experiments/01_theoretical/runs/`
+- Prior work: [Foundation 1948] from literature/papers.md.
+"""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        report_path = Path(tmp) / "report.md"
+        report_path.write_text(report, encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(script), str(report_path)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    assert result.returncode == 1
+    assert "old top-level plan or run path" in result.stdout
+
+
 def test_new_project_next_steps_use_formal_categories_and_theoretical_mode():
-    script = ROOT / "skills" / "research" / "scripts" / "new_project.py"
+    new_project = ROOT / "skills" / "research" / "scripts" / "new_project.py"
+    new_proposition = ROOT / "skills" / "research" / "scripts" / "new_proposition.py"
 
     with tempfile.TemporaryDirectory() as tmp:
         target = Path(tmp) / "project"
-        result = subprocess.run(
-            [sys.executable, str(script), str(target), "--name", "Next Step Contract"],
+        project_result = subprocess.run(
+            [sys.executable, str(new_project), str(target), "--name", "Next Step Contract"],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        proposition_result = subprocess.run(
+            [
+                sys.executable,
+                str(new_proposition),
+                str(target),
+                "--id",
+                "P001",
+                "--slug",
+                "next-step-contract",
+                "--title",
+                "Next Step Contract",
+                "--proposition",
+                "Next step output should be concrete and shell-safe.",
+                "--expected",
+                "The generated command should avoid placeholders and bash continuations.",
+            ],
             cwd=ROOT,
             check=True,
             text=True,
             capture_output=True,
         )
 
-    assert "new_proposition.py" in result.stdout
-    assert "new_plan.py" not in result.stdout
-    assert "--id P001" in result.stdout
+    combined = project_result.stdout + "\n" + proposition_result.stdout
+    assert "new_proposition.py" in project_result.stdout
+    assert "new_hypothesis.py" in proposition_result.stdout
+    assert "new_plan.py" not in combined
+    assert "--id P001" in project_result.stdout
+    assert "<slug>" not in combined
+    assert not re.search(r"\\\s*$", combined, flags=re.MULTILINE)
+    assert '"Title"' in combined
+    assert '--slug slug' in combined
+    assert f'"{target}"' in combined

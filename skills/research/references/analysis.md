@@ -165,7 +165,7 @@ The transition from interpretation to claim is where the disclosure floor applie
 A diagnostic plot is not sufficient warrant for a causal/counterfactual claim. The disciplined progression: observe → ablate → make a Rung 2 claim. Counterfactual (Rung 3) claims require additional causal structure (controlled intervention isolating the alleged mechanism).
 
 In the iteration_loop, this maps to:
-- Rung 1 observations may prompt REFINE (narrow the question to test a candidate cause)
+- Rung 1 observations may mark the proposition `under-specified` and prompt a narrower derived hypothesis or material-acquisition step.
 - Rung 2 ablation results support confirmatory claims about component contribution
 - Rung 3 counterfactual claims are rarely warranted from a single experiment program; they require a controlled study
 

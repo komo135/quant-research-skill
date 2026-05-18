@@ -144,7 +144,7 @@ Association-only evidence can motivate an explanation candidate, but it does not
 | Writing final claims | Return why-analysis only; the parent research protocol records claims. |
 | Choosing proposition decisions | Result analysis does not update `proposition.md` or proposition `decisions.md`; the parent agent does that after reviewing the analysis. |
 | Choosing hypothesis decisions | Result analysis does not update `hypothesis.md` or hypothesis `decisions.md`; the parent agent does that after reviewing the analysis. |
-| Choosing `NEXT_STEP`, `REFINE`, `ADJACENT`, `PARK`, or `CLOSE` | Leave iteration decisions to the parent research skill. |
+| Choosing old plan-first branch labels | Return state-update inputs only; the parent records current proposition and hypothesis decisions in the appropriate ledger. |
 | Translating analysis into deployment action | Do not choose ship, block, or rollout actions. |
 | Stopping at "the result is valid" | Continue to what happened, candidate explanations, and evidence for/against. |
 | Stopping at "the prediction failed" | Explain why it failed with live candidate explanations; use failure lenses for coverage, not as forced verdict categories. |

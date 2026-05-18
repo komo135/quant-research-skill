@@ -8,7 +8,7 @@ Usage:
         --category basic_research|applied_research|experimental_development \
         --mode exploratory|confirmatory|milestone|theoretical \
         --hypothesis "<hypothesis>" --source-analysis A001 \
-        --status supported|contradicted|unrealized-condition|under-specified|split-needed
+        --status supported|unrealized-condition
 
 Creates:
     propositions/P001_slug/hypotheses/H001_slug/hypothesis.md
@@ -18,6 +18,7 @@ Creates:
     propositions/P001_slug/hypotheses/H001_slug/decisions.md
 """
 import argparse
+import re
 import subprocess
 import sys
 from datetime import date
@@ -26,6 +27,130 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 ASSETS = SKILL_ROOT / "assets"
+PROP_DIR_RE = re.compile(r"^P\d{3}_[a-z0-9]+(?:-[a-z0-9]+)*$")
+HYP_ID_RE = re.compile(r"^H\d{3}$")
+SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+ANALYSIS_ID_RE = re.compile(r"^A\d{3}$")
+PLANNABLE_STATUSES = {"supported", "unrealized-condition"}
+
+
+def fail(message: str) -> None:
+    print(f"Error: {message}", file=sys.stderr)
+    sys.exit(1)
+
+
+def ensure_inside(path: Path, root: Path, label: str) -> None:
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError:
+        fail(f"{label} escapes expected root: {path}")
+
+
+def validate_components(proposition: str, hyp_id: str, slug: str, source_analysis: str) -> None:
+    if not PROP_DIR_RE.fullmatch(proposition):
+        fail("proposition must match P###_kebab-case-slug")
+    if not HYP_ID_RE.fullmatch(hyp_id):
+        fail("hypothesis id must match H###, for example H001")
+    if not SLUG_RE.fullmatch(slug):
+        fail("slug must be kebab-case using lowercase letters, numbers, and hyphens")
+    if not ANALYSIS_ID_RE.fullmatch(source_analysis):
+        fail("source-analysis must match A###, for example A001")
+
+
+def parse_analysis_entry(analyses_md: Path, analysis_id: str) -> dict[str, str]:
+    lines = analyses_md.read_text(encoding="utf-8").splitlines()
+    heading_re = re.compile(rf"^##\s+{re.escape(analysis_id)}\b.*$")
+    start = None
+    for index, line in enumerate(lines):
+        if heading_re.match(line.strip()):
+            start = index + 1
+            break
+    if start is None:
+        fail(f"source analysis not found in analyses.md: {analysis_id}")
+
+    end = len(lines)
+    for index in range(start, len(lines)):
+        if re.match(r"^##\s+\S", lines[index]):
+            end = index
+            break
+    block = lines[start:end]
+
+    fields: dict[str, str] = {}
+    for line in block:
+        match = re.match(r"^-\s+([^:]+):\s*(.*)$", line.strip())
+        if match:
+            fields[match.group(1).strip()] = match.group(2).strip()
+    return fields
+
+
+def is_placeholder(value: str) -> bool:
+    stripped = value.strip()
+    if not stripped:
+        return True
+    lowered = stripped.lower()
+    none_like = {
+        "none",
+        "none.",
+        "n/a",
+        "na",
+        "not applicable",
+        "no material",
+        "no material yet",
+        "no hypothesis",
+        "no hypothesis yet",
+    }
+    return (
+        "<" in stripped
+        or ">" in stripped
+        or lowered in none_like
+        or lowered.startswith("none:")
+        or lowered.startswith("n/a:")
+        or lowered.startswith("not applicable:")
+        or lowered.startswith("no material")
+        or lowered.startswith("no hypothesis")
+        or lowered.startswith("todo")
+        or lowered.startswith("tbd")
+        or lowered.startswith("none yet")
+    )
+
+
+def require_analysis_field(fields: dict[str, str], name: str) -> str:
+    value = fields.get(name, "")
+    if is_placeholder(value):
+        fail(f"source analysis is still placeholder-only: {name}")
+    return value
+
+
+def load_source_analysis(prop_dir: Path, analysis_id: str, requested_status: str) -> dict[str, str]:
+    analyses_md = prop_dir / "analyses.md"
+    if not analyses_md.exists():
+        fail(f"analyses.md missing under: {prop_dir}")
+    fields = parse_analysis_entry(analyses_md, analysis_id)
+    required_names = [
+        "Analysis question",
+        "Material used",
+        "Contrast type",
+        "Contrast",
+        "Generated doubt",
+        "Working proposition",
+        "Expected consequence if the working proposition is true",
+        "Observed match, break, or missing condition",
+        "Proposition status assessment",
+        "Derived hypothesis candidate",
+        "What evidence would update this analysis",
+    ]
+    analysis = {name: require_analysis_field(fields, name) for name in required_names}
+    status = analysis["Proposition status assessment"]
+    if status != requested_status:
+        fail(f"source analysis status '{status}' does not match --status '{requested_status}'")
+    if status not in PLANNABLE_STATUSES:
+        fail(
+            f"proposition status '{status}' does not permit creating a hypothesis plan; "
+            "add material, revise, or split the proposition first"
+        )
+    if is_placeholder(analysis["Derived hypothesis candidate"]):
+        fail("source analysis has no derived hypothesis candidate")
+    return analysis
 
 
 def get_git_sha(project_root: Path) -> str:
@@ -79,25 +204,42 @@ def main() -> None:
         choices=["supported", "contradicted", "unrealized-condition", "under-specified", "split-needed"],
         help="Proposition status assessment that produced this hypothesis",
     )
-    parser.add_argument("--type", default="predictive / performance", help="Hypothesis type")
-    parser.add_argument("--expected", default="<what should be observed if the hypothesis is useful>")
+    parser.add_argument(
+        "--type",
+        default="predictive / performance",
+        choices=[
+            "predictive / performance",
+            "mechanistic",
+            "causal / intervention",
+            "descriptive / characterization",
+            "theoretical",
+            "mixed",
+        ],
+        help="Hypothesis type",
+    )
+    parser.add_argument("--expected", default=None, help="Prediction or expected observation")
+    parser.add_argument("--competing", default=None, help="Competing hypothesis")
+    parser.add_argument("--discriminator", default=None, help="Minimal discriminator")
+    parser.add_argument("--required-evidence", default=None, help="Required evidence before claiming support")
     args = parser.parse_args()
 
+    validate_components(args.proposition, args.id, args.slug, args.source_analysis)
     project = Path(args.project).resolve()
-    prop_dir = project / "propositions" / args.proposition
+    propositions_root = project / "propositions"
+    prop_dir = propositions_root / args.proposition
+    ensure_inside(prop_dir, propositions_root, "proposition path")
     if not prop_dir.exists():
-        print(f"Error: parent proposition does not exist: {prop_dir}", file=sys.stderr)
-        sys.exit(1)
+        fail(f"parent proposition does not exist: {prop_dir}")
     if not (prop_dir / "proposition.md").exists():
-        print(f"Error: proposition.md missing under: {prop_dir}", file=sys.stderr)
-        sys.exit(1)
+        fail(f"proposition.md missing under: {prop_dir}")
+    analysis = load_source_analysis(prop_dir, args.source_analysis, args.status)
 
     prop_id = args.proposition.split("_", 1)[0]
     hyp_name = f"{args.id}_{args.slug}"
     hyp_dir = prop_dir / "hypotheses" / hyp_name
+    ensure_inside(hyp_dir, prop_dir / "hypotheses", "hypothesis path")
     if hyp_dir.exists():
-        print(f"Error: hypothesis already exists: {hyp_dir}", file=sys.stderr)
-        sys.exit(1)
+        fail(f"hypothesis already exists: {hyp_dir}")
 
     hyp_dir.mkdir(parents=True)
     (hyp_dir / "experiments").mkdir()
@@ -108,19 +250,28 @@ def main() -> None:
     (hyp_dir / "reports" / ".gitkeep").touch()
 
     prop_title = read_title(prop_dir / "proposition.md")
+    expected_observation = args.expected or analysis["Expected consequence if the working proposition is true"]
+    competing = args.competing or (
+        "The same material is explained by a competing condition, comparator, or measurement effect rather than this hypothesis."
+    )
+    discriminator = args.discriminator or analysis["What evidence would update this analysis"]
+    required_evidence = args.required_evidence or analysis["What evidence would update this analysis"]
     replacements = {
         "<hypothesis_id>": args.id,
         "<Hypothesis title>": args.title,
         "<proposition_id>": prop_id,
         "<source_analysis>": args.source_analysis,
         "<hypothesis_statement>": args.hypothesis,
-        "<working proposition from the source analysis>": "<copy from analyses.md>",
+        "<hypothesis_type>": args.type,
+        "<working proposition from the source analysis>": analysis["Working proposition"],
         "<source_status>": args.status,
-        "<why this hypothesis preserves, revises, splits, rejects, or realizes a condition of the parent proposition>": "<explain from source analysis>",
-        "<what should be observed if the hypothesis is useful>": args.expected,
-        "<plausible alternative that could explain the same material>": "<competing hypothesis>",
-        "<smallest experiment, analysis, derivation check, or observation that separates this hypothesis from the competitor>": "<minimal discriminator>",
-        "<evidence needed before planning or before claiming support>": "<required evidence>",
+        "<why this hypothesis preserves, revises, splits, rejects, or realizes a condition of the parent proposition>": (
+            f"{analysis['Generated doubt']} Status: {args.status}."
+        ),
+        "<what should be observed if the hypothesis is useful>": expected_observation,
+        "<plausible alternative that could explain the same material>": competing,
+        "<smallest experiment, analysis, derivation check, or observation that separates this hypothesis from the competitor>": discriminator,
+        "<evidence needed before planning or before claiming support>": required_evidence,
     }
 
     hypothesis_md = render_template(ASSETS / "hypothesis" / "hypothesis.md.template", replacements)
@@ -130,8 +281,7 @@ def main() -> None:
 
     tpl_path = ASSETS / "plan" / f"rd_plan_{args.mode}.md.template"
     if not tpl_path.exists():
-        print(f"Error: template not found: {tpl_path}", file=sys.stderr)
-        sys.exit(1)
+        fail(f"template not found: {tpl_path}")
     plan_name = f"{args.id}_{args.slug}"
     sha = get_git_sha(project)
     plan = (
@@ -152,6 +302,18 @@ def main() -> None:
         .replace("<source_status>", args.status)
         .replace("<hypothesis_statement>", args.hypothesis)
         .replace("<hypothesis_type>", args.type)
+        .replace("<copy the generated doubt from the source analysis>", analysis["Generated doubt"])
+        .replace("<copy the working proposition from the source analysis>", analysis["Working proposition"])
+        .replace("<copy the expected consequence from the source analysis>", analysis["Expected consequence if the working proposition is true"])
+        .replace("<observable result expected if the hypothesis is useful>", expected_observation)
+        .replace("<source observations from observations.md>", analysis["Material used"])
+        .replace("<plausible alternative under which the predicted effect should not appear>", competing)
+        .replace("<smallest comparison, observation, derivation check, or controlled intervention>", discriminator)
+        .replace("<plausible alternative explaining the same material>", competing)
+        .replace("<smallest observation or analysis that separates them>", discriminator)
+        .replace("<smallest acceptance test or measurement that separates them>", discriminator)
+        .replace("<smallest derivation check, counterexample, limiting-case check, or model that separates them>", discriminator)
+        .replace("<observable consequence if applicable, or state no current empirical evaluator and name the assumption-audit constraint>", expected_observation)
     )
     (hyp_dir / "plan.md").write_text(plan, encoding="utf-8")
 
