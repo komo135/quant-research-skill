@@ -39,9 +39,9 @@ Minimum evidence rule: stdout is not evidence. A completed run needs `run_manife
    Separate literal observations from interpretation. Describe the result shape before explaining it: aggregate movement, slices, seed variability, failures, anomalies, traces, and condition-specific effects.
 
 4. **Decompose why**
-   Generate candidate explanations for why the result happened. Include procedure / artifact explanations when relevant: leakage, split mismatch, broken comparator, script bug, measurement artifact, missing provenance, or stdout-only evidence. For each candidate explanation, record supporting evidence, contradicting evidence, and the missing discriminator.
+   Generate candidate explanations for why the result happened. Include procedure / artifact explanations when relevant: leakage, split mismatch, broken comparator, script bug, measurement artifact, missing provenance, or stdout-only evidence. For each candidate explanation, record supporting and contradicting evidence.
 
-   If the observed result missed the plan's prediction, threshold, or expected effect, construct failed-prediction analysis. Start from the observed gap, then generate candidate explanations for why the prediction missed. Use premise / mechanism, approach / intervention, procedure / artifact / data / comparator / implementation / measurement, and evaluation / power / metric / scope as coverage lenses only. Do not force every lens into the output and do not assign a single verdict category. Record only live explanations with why they could explain the miss, evidence for and against, what would be true if they are correct, and the missing discriminator.
+   If the observed result missed the plan's prediction, threshold, or expected effect, construct failed-prediction analysis. Start from the observed gap, then generate candidate explanations for why the prediction missed. Use premise / mechanism, approach / intervention, procedure / artifact / data / comparator / implementation / measurement, and evaluation / power / metric / scope as coverage lenses only. Do not force every lens into the output and do not assign a single verdict category. Record only live explanations with why they could explain the miss and evidence for and against.
 
 5. **Return**
    Return a plan-ready `## Result analysis` section. Use artifact paths, numeric values, table/figure references, and missing-context entries that the parent research agent can inspect before writing claims or decisions.
@@ -67,7 +67,6 @@ For pressure-test and review scenarios, compare the output against an answer key
 - failed-prediction analysis when prediction missed: observed gap plus live candidate failure explanations; coverage lenses are checked but not forced into verdict categories
 - evidence for / against each explanation: supporting evidence and contradicting evidence listed separately
 - required missing context: absent artifacts, comparators, logs, scripts, controls, slices, traces, or failure samples
-- discriminating analysis: tests, ablations, slices, trace checks, perturbations, failure samples, or theoretical checks that would separate live explanations
 - forbidden conclusion: claims, promotion-readiness assessments, deployment decisions, iteration branches, or final reports
 
 ## Explanation Analysis Contract
@@ -81,7 +80,6 @@ Result analysis is not only a validity audit. After evidence is reconstructed, e
 5. **Evidence for / against each explanation**: cite support and contradiction separately. Do not hide contradicting evidence in generic limitations.
 6. **Procedure / artifact explanations**: explicitly consider whether the observed result could come from research execution mistakes, evaluation defects, leakage, broken comparators, or missing evidence.
 7. **Alternatives still live**: explanations not yet excluded.
-8. **Discriminating next analyses**: the smallest additional analysis that would separate the leading explanations.
 
 Association-only evidence can motivate an explanation candidate, but it does not establish a mechanism. Pearl ladder applies: diagnostic correlation is not enough for intervention or counterfactual explanation.
 
@@ -111,7 +109,6 @@ Association-only evidence can motivate an explanation candidate, but it does not
 - <candidate cause>
   - Evidence for: <artifact-grounded support>
   - Evidence against: <artifact-grounded contradiction or weakness>
-  - Missing discriminator: <what would separate this from alternatives>
 
 ### Failed prediction analysis
 - Observed gap: <prediction, threshold, or expected condition versus observed result>
@@ -120,8 +117,6 @@ Association-only evidence can motivate an explanation candidate, but it does not
     - Why this could explain the miss: <mechanism connecting evidence to the missed prediction>
     - Evidence for: <artifact-grounded support>
     - Evidence against: <artifact-grounded contradiction or weakness>
-    - What would be true if this explanation is correct: <testable implication>
-    - Missing discriminator: <smallest analysis that would separate this explanation from alternatives>
 - Coverage check: <which lenses were considered: premise/mechanism, approach/intervention, procedure/artifact/data/comparator/implementation/measurement, evaluation/power/metric/scope. Do not force a category; record only live explanations above.>
 
 ### Procedure / artifact explanations
@@ -130,8 +125,6 @@ Association-only evidence can motivate an explanation candidate, but it does not
 ### Alternatives still live
 - <plausible explanation, confound, missing control, untested condition, or theoretical gap not yet excluded>
 
-### Discriminating next analyses
-- <smallest analysis, ablation, slice, trace check, perturbation, failure sample, theoretical check, repair, or rerun that would separate live explanations>
 ```
 
 ## Common Mistakes
@@ -143,6 +136,6 @@ Association-only evidence can motivate an explanation candidate, but it does not
 | Writing final claims | Return why-analysis only; the parent research protocol records claims. |
 | Choosing `NEXT_STEP`, `REFINE`, `ADJACENT`, `PARK`, or `CLOSE` | Leave iteration decisions to the parent research skill. |
 | Translating analysis into deployment action | Do not choose ship, block, or rollout actions. |
-| Stopping at "the result is valid" | Continue to what happened, candidate explanations, evidence for/against, and discriminating next analyses. |
-| Stopping at "the prediction failed" | Explain why it failed with live candidate explanations and discriminators; use failure lenses for coverage, not as forced verdict categories. |
+| Stopping at "the result is valid" | Continue to what happened, candidate explanations, and evidence for/against. |
+| Stopping at "the prediction failed" | Explain why it failed with live candidate explanations; use failure lenses for coverage, not as forced verdict categories. |
 | Putting all why-analysis into generic limitations | Evaluate candidate explanations explicitly; limitations are not a substitute for decomposition. |

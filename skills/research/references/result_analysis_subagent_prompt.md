@@ -18,8 +18,7 @@ Return a `## Result analysis` section containing:
 5. evidence for and against each explanation
 6. procedure or artifact explanations, including execution mistakes, leakage, broken comparators, script defects, measurement artifacts, or missing evidence when relevant
 7. alternatives still live
-8. discriminating next analyses
-9. context_missing entries for missing or insufficient context
+8. context_missing entries for missing or insufficient context
 
 Do not assess promotion readiness. Do not write final claims, decisions, iteration branches, deployment recommendations, or human-facing reports.
 ```

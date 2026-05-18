@@ -4,7 +4,6 @@ import sys
 import tempfile
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -212,9 +211,9 @@ def test_report_format_and_templates_define_paper_grade_contract():
             "## Ablation / Sensitivity",
             "## Discussion",
             "## Limitations",
-            "## Next action",
             "## References",
         )
+        assert_absent(text, "## Next action", "## Next hypothesis", "## Next hypotheses")
         assert_mentions(
             text,
             "Not applicable:",
@@ -688,7 +687,6 @@ def test_plan_review_and_result_analysis_skill_boundaries_are_documented():
         "Candidate explanations",
         "Evidence for / against",
         "Procedure / artifact explanations",
-        "Discriminating next analyses",
         "context_missing",
         "artifact contract",
         "stdout is not evidence",
@@ -798,7 +796,6 @@ def test_plan_templates_do_not_invite_pre_result_result_analysis():
             "### Failed prediction analysis",
             "### Procedure / artifact explanations",
             "### Alternatives still live",
-            "### Discriminating next analyses",
             "<explanation 1 for why the result happened>",
             "<candidate explanation for why the prediction missed>",
         )
@@ -2126,9 +2123,6 @@ The observed result is described with enough detail to avoid placeholder text.
 
 ## Limitations
 The report leaves plausible alternatives and untested conditions explicitly open.
-
-## Next action
-NEXT_STEP: continue the same plan after the reader reviews this evidence.
 """
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -2164,9 +2158,6 @@ The observed result is described with enough detail to avoid placeholder text.
 
 ## Limitations
 The report leaves plausible alternatives and untested conditions explicitly open.
-
-## Next action
-NEXT_STEP: continue the same plan after the reader reviews this evidence.
 """
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -2193,7 +2184,7 @@ def test_check_report_rejects_numeric_results_without_statistical_reporting_mini
     report = """# Underreported Numeric Report
 
 ## Summary
-This report summarizes the numeric result and the next research action.
+This report summarizes the numeric result.
 
 ## Background
 Prior formulations motivate the comparison and define the known constraints.
@@ -2215,9 +2206,6 @@ The result is interpreted as an association-level comparison, not a causal concl
 
 ## Limitations
 The report names untested conditions and plausible alternative explanations.
-
-## Next action
-NEXT_STEP: continue the same plan with a variance-aware rerun.
 
 ## References
 - Plan: plans/01_example.md
@@ -2245,7 +2233,7 @@ def test_check_report_rejects_precision_ci_false_positive_and_sample_size_only()
     report = """# False Positive Numeric Report
 
 ## Summary
-This report summarizes the numeric result and the next research action.
+This report summarizes the numeric result.
 
 ## Background
 Prior formulations motivate the comparison and define the known constraints.
@@ -2275,9 +2263,6 @@ The result is interpreted as an association-level comparison, not a causal concl
 ## Limitations
 The report names untested conditions and plausible alternative explanations.
 
-## Next action
-NEXT_STEP: continue the same plan with a variance-aware rerun.
-
 ## References
 - Plan: plans/01_example.md
 - Source artifacts: experiments/01_example/runs/
@@ -2304,7 +2289,7 @@ def test_check_report_rejects_outcome_without_figure_table_or_reason():
     report = """# No Evidence Carrier Report
 
 ## Summary
-This report summarizes the descriptive result and the next research action.
+This report summarizes the descriptive result.
 
 ## Background
 Prior formulations motivate the comparison and define the known constraints.
@@ -2329,9 +2314,6 @@ The report explains the descriptive interpretation and avoids causal promotion.
 
 ## Limitations
 The report names untested conditions and plausible alternative explanations.
-
-## Next action
-NEXT_STEP: continue the same plan with a generated figure.
 
 ## References
 - Plan: plans/01_example.md
@@ -2359,7 +2341,7 @@ def test_check_report_rejects_combined_section_headings():
     report = """# Combined Heading Report
 
 ## Summary
-This report summarizes the numeric result and the next research action.
+This report summarizes the numeric result.
 
 ## Background
 Prior formulations motivate the comparison and define the known constraints.
@@ -2384,9 +2366,6 @@ The report explains the descriptive interpretation and avoids causal promotion.
 
 ## Limitations
 The report names untested conditions and plausible alternative explanations.
-
-## Next action
-NEXT_STEP: continue the same plan with separate bibliography entries.
 """
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -2410,7 +2389,7 @@ def test_check_report_accepts_theoretical_report_shape():
     report = """# Theoretical Report
 
 ## Summary
-This report summarizes a derivational result and the next research action.
+This report summarizes a derivational result.
 
 ## Background
 Prior formulations motivate the derivation and define the known constraints.
@@ -2436,9 +2415,6 @@ The report explains why the limiting cases matter and what interpretation remain
 
 ## Limitations
 The report names unevaluated assumptions and conditions not covered by the derivation.
-
-## Next action
-NEXT_STEP: continue the same plan with a focused counterexample search.
 
 ## References
 - Plan: plans/01_theoretical.md
