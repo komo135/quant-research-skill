@@ -241,7 +241,6 @@ def test_plans_and_reports_do_not_store_next_hypotheses_or_actions():
     assert_mentions(
         report_format,
         "do not leave next hypotheses or next actions",
-        "create or cite a separate plan",
     )
     assert_mentions(
         rd_plan,
@@ -252,22 +251,46 @@ def test_plans_and_reports_do_not_store_next_hypotheses_or_actions():
         skill,
         "Reports must not include next-action or next-hypothesis sections",
     )
-    assert_mentions(
-        result_analysis,
-        "not action items",
-        "Unresolved discriminators",
-    )
-
     for text in [skill, rd_plan, report_format, readme, project_state, result_analysis, result_prompt, *report_templates]:
         assert_absent(
             text,
             "## Next action",
             "### Discriminating next analyses",
             "discriminating next analyses",
+            "Unresolved discriminators",
+            "unresolved discriminators",
+            "Missing discriminator",
+            "missing discriminator",
+            "Current blocker",
+            "Implication for hypothesis revision",
+            "create or cite a separate plan",
+            "follow-up queue",
+            "follow-up queues",
+            "follow-up work",
             "what next action",
             "next action is recommended",
             "what the next action is",
             "**Next action**",
+        )
+
+
+def test_result_analysis_contract_does_not_keep_renamed_next_action_lists():
+    result_analysis = read("skills/research-result-analysis/SKILL.md")
+    rd_plan = read("skills/research/references/rd_plan.md")
+    prompt = read("skills/research/references/result_analysis_subagent_prompt.md")
+    readme = read("README.md")
+
+    for text in [result_analysis, rd_plan, prompt, readme]:
+        assert_absent(
+            text,
+            "Unresolved discriminators",
+            "unresolved discriminators",
+            "Missing discriminator",
+            "missing discriminator",
+            "What would be true if this explanation is correct",
+            "testable implication",
+            "not action items",
+            "not an action item",
         )
 
 
@@ -736,7 +759,6 @@ def test_plan_review_and_result_analysis_skill_boundaries_are_documented():
         "Candidate explanations",
         "Evidence for / against",
         "Procedure / artifact explanations",
-        "Unresolved discriminators",
         "context_missing",
         "artifact contract",
         "stdout is not evidence",
@@ -846,7 +868,6 @@ def test_plan_templates_do_not_invite_pre_result_result_analysis():
             "### Failed prediction analysis",
             "### Procedure / artifact explanations",
             "### Alternatives still live",
-            "### Unresolved discriminators",
             "<explanation 1 for why the result happened>",
             "<candidate explanation for why the prediction missed>",
         )

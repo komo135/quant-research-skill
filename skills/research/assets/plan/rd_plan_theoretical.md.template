@@ -266,7 +266,7 @@ Do not fill this section before execution. After evidence exists, dispatch a fre
 
 ## Decision
 
-<One of NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE — see iteration_loop.md. Decision records only the branch and evidence-backed reason. Do not store future hypotheses or next actions here; create or cite a separate plan when follow-up work is needed.>
+<One of NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE — see iteration_loop.md. Decision records only the branch and evidence-backed reason. Do not store future hypotheses or next actions here.>
 
 ## References
 

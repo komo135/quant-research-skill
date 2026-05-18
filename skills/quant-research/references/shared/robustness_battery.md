@@ -134,14 +134,11 @@ unless all required robustness checks pass and both review layers are clean.
 
 ## When a check fails
 
-Each failure suggests a state update first. Connect it to the current
+Each failure is recorded as a robustness finding tied to the current
 workstream state object: an `R&D Workstream` uses `rd_plan.md`, while a
-phenomenon / mechanism workstream updates `explanation_ledger.md`. Create the
-next discriminating test only when success and failure would change a specific
-state entry; otherwise record a robustness finding, merged variant, rejected
-direction, stale row, or parked dependency.
+phenomenon / mechanism workstream updates `explanation_ledger.md`.
 
-| Failed check | Implication for hypothesis revision |
+| Failed check | Robustness finding |
 |---|---|
 | 2D threshold has only a single peak | Strong parameter dependence — diversify the signal |
 | Break-even fee < 0.3 bp | Not viable at retail; look at futures venue or spread reduction |
@@ -150,6 +147,5 @@ direction, stale row, or parked dependency.
 | DSR < 0.95 | Too many hyperparameter trials; redesign and reduce trials |
 | Only one regime works | Adopt a conditional strategy |
 
-Log durable state transitions in `decisions.md`. Add or refine the next state
-action only when success and failure would update a distinct entry in
-`rd_plan.md`, `explanation_ledger.md`, or another declared state object.
+Log durable state transitions in `decisions.md` when the finding changes plan
+state.

@@ -14,7 +14,7 @@ Checks:
 - Figure references (![...](figures/X) or relative paths) resolve to actual files.
 - Limitations section is non-empty (not just placeholder text).
 - Next-action / next-hypothesis planning sections are rejected; reports are
-  evidence artifacts, not follow-up work queues.
+  evidence artifacts.
 - Numeric outcome sections include a statistical reporting minimum: sample size,
   variance/dispersion, CI, effect size, significance, or an explicit non-applicability reason.
 

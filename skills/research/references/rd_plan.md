@@ -55,7 +55,7 @@ last_updated: YYYY-MM-DD
 <Load-bearing claims using the schema in claim_structure.md.>
 
 ## Decision
-<One of NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE — see iteration_loop.md. Decision records only the branch and evidence-backed reason. Do not store future hypotheses or next actions here; create or cite a separate plan when follow-up work is needed.>
+<One of NEXT_STEP / REFINE / ADJACENT / PARK / CLOSE — see iteration_loop.md. Decision records only the branch and evidence-backed reason. Do not store future hypotheses or next actions here.>
 
 ## References
 - Runs: experiments/<plan_id>_<slug>/runs/...
@@ -211,7 +211,7 @@ If the plan says novel, new method, publishable, to our knowledge, or no baselin
 
 Plan sections record **pre-result commitments**: the research question or objective, mechanism conjecture or principle, prediction or expected observation, primary measure, controls/comparators, planned discriminating test, evidence route, artifact plan, plan visual, and stop / branch criteria. Do not explain why an unobserved result happened. That is not available before execution.
 
-Result analysis records **post-result explanations** after evidence exists: what happened, candidate explanations for the observed result, evidence for and against those explanations, procedure / artifact explanations, alternatives still live, and unresolved discriminators. Keep these out of the pre-execution Plan and Plan review.
+Result analysis records **post-result explanations** after evidence exists: what happened, candidate explanations for the observed result, evidence for and against those explanations, procedure / artifact explanations, and alternatives still live. Keep these out of the pre-execution Plan and Plan review.
 
 ## Plan visual section
 
@@ -523,8 +523,6 @@ Record the subagent output in the plan after evidence exists. The analysis expla
     - Why this could explain the miss: <mechanism connecting evidence to the missed prediction>
     - Evidence for: <artifact-grounded support>
     - Evidence against: <artifact-grounded contradiction or weakness>
-    - What would be true if this explanation is correct: <testable implication>
-    - Missing discriminator: <smallest analysis that would separate this explanation from alternatives>
 - Coverage check: <which lenses were considered: premise/mechanism, approach/intervention, procedure/artifact/data/comparator/implementation/measurement, evaluation/power/metric/scope. Do not force a category; record only live explanations above.>
 
 ### Procedure / artifact explanations
@@ -533,8 +531,6 @@ Record the subagent output in the plan after evidence exists. The analysis expla
 ### Alternatives still live
 - <plausible explanation, confound, comparator issue, missing control, untested condition, or theoretical gap still compatible with the evidence>
 
-### Unresolved discriminators
-- <missing evidence, analysis, check, rerun, or artifact reconstruction that would distinguish among explanations; not an action item>
 ```
 
 ## Claims section

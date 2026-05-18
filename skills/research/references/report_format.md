@@ -14,7 +14,7 @@ Two design consequences follow:
 
 - **No environment locks or commit hashes in the prose.** Reports should describe material conditions, not environment locks: data identity, evaluation protocol, major tool/model versions, hardware class, external API/model version, or collection date only when those conditions could change the interpretation. A one-line pointer to `experiments/<plan>/runs/` is enough if a reader wants to dig into raw artifacts. This is methods reproducibility, not computational replicability.
 - **No exhaustive citation lists.** Cite the directly relevant prior work (methods, resources, controls, comparators, or foundations used) — typically a handful, not dozens. The Related Work section must position the work, not pad a bibliography.
-- **No follow-up queue in reports.** Do not leave next hypotheses or next actions in report prose or sections. If the result implies additional work, create or cite a separate plan; the report records evidence, interpretation, limitations, and sources.
+- **No next-work sections in reports.** Do not leave next hypotheses or next actions in report prose or sections. The report records evidence, interpretation, limitations, and sources.
 
 ## Required structure
 
@@ -215,7 +215,7 @@ For `basic_research` plans with `mode: theoretical` (pure conceptual / derivatio
 
 **Limitations** carries any assumption-audit-derived constraint (e.g., "no decisive empirical evaluator at the present state of knowledge" recorded via `references/assumption_audit.md` constraint-naming protocol).
 
-For pure-theoretical reports, predicted observations or derivation extensions belong in Observations or Limitations only when they are part of the result boundary. Do not turn them into a follow-up queue inside the report.
+For pure-theoretical reports, predicted observations or derivation extensions belong in Observations or Limitations only when they are part of the result boundary. Do not turn them into a work queue inside the report.
 
 ## Figures and tables
 
