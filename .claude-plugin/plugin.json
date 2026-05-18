@@ -1,7 +1,7 @@
 {
   "name": "research",
-  "description": "v2.7.2 - Agent-driven R&D protocol with typed hypothesis generation, plan-visual review, prior-work grounding, result analysis, and paper-grade reports.",
-  "version": "2.7.2",
+  "description": "v2.7.3 - Agent-driven R&D protocol with typed hypothesis generation, plan-visual review, prior-work grounding, result analysis, and reports without next-action queues.",
+  "version": "2.7.3",
   "author": {
     "name": "komoootv",
     "email": "komoootv@gmail.com"

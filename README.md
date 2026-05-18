@@ -27,7 +27,7 @@ Examples of work that triggers the skill:
 
 It is NOT a backtest engine, experiment tracker, notebook framework, or env-lock manager. It is a **protocol layer** that enforces structure on the narrative — plans, claims, decisions, reports — while leaving the implementation to the agent.
 
-## Core design (v2.7.2)
+## Core design (v2.7.3)
 
 ### R&D categories (Frascati 2015)
 
@@ -260,12 +260,22 @@ When an agent runs `scripts/new_project.py` to initialize an R&D project:
 
 ## Status
 
-**Version 2.7.2** — locks the typed hypothesis-generation contract, accepts non-mechanistic records without forcing Mechanism hypothesis fields, and makes Plan visual review first-class.
+**Version 2.7.3** — removes next-action / next-hypothesis queues from plan/report-facing outputs so reports stay evidence artifacts.
 
 <details>
 <summary>Changelog</summary>
 
-### v2.7.2 (current) — typed-record and plan-visual hardening
+### v2.7.3 (current) — no report-side next-work queues
+
+Removes next-action and next-hypothesis queues from plan/report-facing outputs. Reports should preserve what was done, what was found, the interpretation, limitations, and sources; they should not carry future-work queues that pollute later hypothesis generation.
+
+**Added / changed**
+
+- Removed `Next action` from report templates and report contract documentation.
+- Removed renamed next-work queues such as unresolved discriminator/current-blocker style report output.
+- Updated metadata so the installed plugin description no longer advertises next-analysis queues.
+
+### v2.7.2 — typed-record and plan-visual hardening
 
 Fixes review blockers in the v2.7 protocol so predictive / performance, causal / intervention, descriptive, and theoretical hypotheses stay typed records unless they explicitly make why/how mechanism claims.
 
