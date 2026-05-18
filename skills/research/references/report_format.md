@@ -39,7 +39,6 @@ One or two paragraphs. A reader who reads only this section should understand:
 
 - What was investigated, built, or proposed
 - What was found (the headline finding or numbers)
-- What limitations bound the finding
 
 If the report is for a decision, the recommended decision goes here.
 

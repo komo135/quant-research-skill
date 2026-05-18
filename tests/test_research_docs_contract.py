@@ -274,6 +274,36 @@ def test_plans_and_reports_do_not_store_next_hypotheses_or_actions():
         )
 
 
+def test_report_summary_does_not_replace_next_action_with_limitations():
+    skill = read("skills/research/SKILL.md")
+    report_format = read("skills/research/references/report_format.md")
+    template_dir = ROOT / "skills" / "research" / "assets" / "report"
+    category_dir = ROOT / "skills" / "research" / "references" / "categories"
+
+    summary_contracts = [
+        markdown_section(report_format, "### Summary"),
+        *[
+            markdown_section(path.read_text(encoding="utf-8"), "## Summary")
+            for path in template_dir.glob("*.template")
+        ],
+    ]
+    reports_section = markdown_section(skill, "## Reports")
+    category_report_shapes = [
+        markdown_section(path.read_text(encoding="utf-8"), "## Report shape")
+        for path in category_dir.glob("*.md")
+    ]
+
+    for text in [reports_section, *summary_contracts, *category_report_shapes]:
+        assert_absent(
+            text,
+            "what limits the finding",
+            "limitations bound the finding",
+            "known limits",
+            "where it falls short",
+            "what limitations bound",
+        )
+
+
 def test_result_analysis_contract_does_not_keep_renamed_next_action_lists():
     result_analysis = read("skills/research-result-analysis/SKILL.md")
     rd_plan = read("skills/research/references/rd_plan.md")

@@ -63,7 +63,7 @@ Not acceptable as completion:
 
 Use `assets/report/experimental_development_report.md.template`.
 
-1. **Summary** — what was built, what it does, where it falls short
+1. **Summary** — what was built and what it does
 2. **Background** — what the artifact is for, what existed before, why this iteration
 3. **System description** — architecture, key design decisions, deployment shape, dependencies (conceptual, not env-lock)
 4. **Performance** — measured behavior under stated conditions, with figures

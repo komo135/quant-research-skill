@@ -244,7 +244,7 @@ Reports are for humans. They live under `reports/<id>_<slug>/`. Each report is a
 
 Reports are paper-grade evidence artifacts, not lightweight status notes. Required sections are defined in `references/report_format.md`; sections that do not apply still appear with a short `Not applicable:` rationale. The common required sections are:
 
-1. **Summary** — 1–2 paragraphs. A reader who reads only this should understand what was done, what was found, and what limits the finding.
+1. **Summary** — 1–2 paragraphs. A reader who reads only this should understand what was done and what was found.
 2. **Background** — what was known before, what motivated the work.
 3. **Related Work** — how the work stands on directly relevant prior work, or `Not applicable:` with a reason.
 4. **Theory / Formulation** — derivation/formulation when load-bearing, or `Not applicable:` with a reason.
