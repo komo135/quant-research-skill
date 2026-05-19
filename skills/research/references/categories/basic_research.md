@@ -54,7 +54,7 @@ Acceptable completion shapes:
 - Failure modes are cataloged
 - Theoretical claim is established with explicit conditions
 
-Not required: a yes/no answer to the original question. If the original question turned out to be ill-posed, the deliverable is the better-posed version. Use the `REFINE` iteration decision when this happens within a plan, or `CLOSE: completed` when the refinement is itself the goal.
+Not required: a yes/no answer to the original question. If the original question turned out to be ill-posed, the deliverable is the better-posed version. Record `UNDER_SPECIFY` on the parent proposition when more formulation is needed, or proposition-level `CLOSE` when the refinement is itself the resolved goal.
 
 ## Report shape
 
@@ -82,7 +82,7 @@ Example of a well-scoped basic-research claim:
 
 ```yaml
 - claim: For ρ=28, β=8/3, the Lorenz system's chaotic attractor exhibits qualitatively different lobe-switching statistics at σ < 12 versus σ > 20, with intermediate σ showing transitional regime.
-  evidence: experiments/01_lorenz/runs/01__004__seed0/metrics.json:L20 (lobe-switching rates per σ); figures/02_switching_rate_vs_sigma.png
+  evidence: propositions/P001_lorenz-regimes/hypotheses/H001_sigma-scan/experiments/runs/H001__004__seed0/outputs/metrics.json:L20 (lobe-switching rates per sigma); figures/02_switching_rate_vs_sigma.png
   alternatives_not_excluded:
     - "Coarse σ grid (Δσ=0.5) may miss intermediate periodic windows"
     - "Trajectory length T=200 may be too short to capture rare lobe-switches at low σ"

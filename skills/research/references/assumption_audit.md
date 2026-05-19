@@ -35,7 +35,7 @@ Output fields:
 
 - `Blind-spot area`: adjacent knowledge area or missing result pattern, or `None with reason`
 - `How it could break the mechanism`: the failure path if the blind spot is real
-- `Claim-scope effect`: one of `conditions_not_tested: ...`, `narrowed_claim: ...`, `PARK: ...`, `ADJACENT: ...`, or `no_change: <reason>`
+- `Claim-scope effect`: one of `conditions_not_tested: ...`, `narrowed_claim: ...`, `hypothesis_decision: PARK ...`, `project_decision: OPEN_PROPOSITION ...`, or `no_change: <reason>`
 - `Required repair`: one of `retrieval: ...`, `user_input: ...`, `evaluator_construction: ...`, `narrow_conditions: ...`, or `none_with_reason: <reason>`
 
 The catalog is structurally honest: the agent admits what it might not know. It does not pretend to fix the gap. Where applicable it can prompt the user or a separate retrieval step outside this skill to supply missing material. A blind spot has no protocol value unless it changes the mechanism record, claim scope, constraint-naming, or required repair.
@@ -61,7 +61,7 @@ When an audited assumption has no current evaluator, instrument, data, or deriva
 1. In `Prior-work grounding.Unknown prior-work constraint` or `Divergence checkpoint.Disconfirming evidence`, as a named constraint with category-specific phrasing:
    - `basic_research` with `mode: theoretical`: "no decisive empirical evaluator available at the present state of knowledge"
    - `basic_research` with `mode: exploratory` or `mode: confirmatory`: "named observation requires <instrument/dataset> that is not currently accessible"
-   - `applied_research`: "evaluator construction deferred to ADJACENT plan <id>"
+   - `applied_research`: "evaluator construction deferred to a separate derived hypothesis under the relevant proposition"
    - `experimental_development`: "acceptance test deferred to milestone <name>"
 2. In any resulting load-bearing claim, narrow `conditions_tested` to the regime actually tested and record the missing-evaluator regime as a `conditions_not_tested` entry referencing the plan-level named constraint.
 

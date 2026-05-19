@@ -2,7 +2,8 @@
 """Verify that a research run left durable evidence artifacts.
 
 Checks:
-- `run_manifest.json` exists, records a command, and has `status: completed`.
+- `run_manifest.json` exists, records proposition/hypothesis/plan_path,
+  records a command, and has `status: completed`.
 - `logs/stdout.log` and `logs/stderr.log` exist.
 - At least one manifest-listed non-empty durable artifact exists outside stdout/stderr logs.
 
@@ -55,22 +56,37 @@ def is_console_transcript(relative_path: Path) -> bool:
     return name.endswith(".log") or stem.startswith(TRANSCRIPT_PREFIXES)
 
 
+def require_nonempty_string(manifest: dict[str, Any], field: str, issues: list[str]) -> str | None:
+    value = manifest.get(field)
+    if not isinstance(value, str) or not value.strip():
+        issues.append(f"  run_manifest.json {field} must be a non-empty string")
+        return None
+    return value
+
+
 def check_manifest(run_dir: Path, manifest: dict[str, Any] | None) -> tuple[list[str], int]:
     if manifest is None:
         return [], 0
 
     issues: list[str] = []
     durable_count = 0
-    command = manifest.get("command")
-    status = str(manifest.get("status", "")).lower()
-    if not command or not str(command).strip():
-        issues.append("  run_manifest.json must record the executed command; initialized runs are not completed evidence")
-    if status != "completed":
-        issues.append("  run_manifest.json status must be 'completed' before the run can be used as evidence")
-
-    for required in ["run_id", "plan", "status"]:
+    for required in ["run_id", "proposition", "hypothesis", "plan_path", "status"]:
         if required not in manifest:
             issues.append(f"  run_manifest.json missing required field: '{required}'")
+    for field in ["run_id", "proposition", "hypothesis", "status"]:
+        if field in manifest:
+            require_nonempty_string(manifest, field, issues)
+    status = manifest.get("status")
+    if isinstance(status, str) and status.lower() != "completed":
+        issues.append("  run_manifest.json status must be 'completed' before the run can be used as evidence")
+    if "command" in manifest:
+        require_nonempty_string(manifest, "command", issues)
+    else:
+        issues.append("  run_manifest.json must record the executed command; initialized runs are not completed evidence")
+    plan_path = require_nonempty_string(manifest, "plan_path", issues) if "plan_path" in manifest else None
+    if plan_path is not None:
+        if not plan_path.startswith("propositions/") or "/hypotheses/" not in plan_path or not plan_path.endswith("/plan.md"):
+            issues.append("  run_manifest.json plan_path must point to propositions/<P>/hypotheses/<H>/plan.md")
 
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, list):
@@ -130,7 +146,7 @@ def check_run(run_dir: Path) -> list[str]:
 
 def main():
     parser = argparse.ArgumentParser(description="Verify a research run directory has durable artifacts.")
-    parser.add_argument("run_dir", help="Path to experiments/<plan>/runs/<run_id>")
+    parser.add_argument("run_dir", help="Path to propositions/<P>/hypotheses/<H>/experiments/runs/<run_id>")
     args = parser.parse_args()
 
     run_dir = Path(args.run_dir).resolve()

@@ -87,7 +87,7 @@ Example claim record:
 
 ```yaml
 - claim: Replacing the standard MHA block with the proposed sparse-attention variant reduces validation perplexity by 0.18 (relative 2.1%) on WikiText-103 at the 350M-parameter scale across 3 seeds, with stable training.
-  evidence: experiments/02_sparse_attn/runs/02__008__seed{0,1,2}/eval/wikitext103.json; figures/perplexity_vs_seed.png
+  evidence: propositions/P001_sparse-attention/hypotheses/H001_wikitext-eval/experiments/runs/H001__008__seed{0,1,2}/outputs/wikitext103.json; figures/perplexity_vs_seed.png
   alternatives_not_excluded:
     - "Improvement may come from the 1.3% increase in active FLOPs at fixed parameter count"
     - "Only 3 seeds — std 0.07; the 0.18 gap is ~2.5σ but not >3σ"
@@ -124,7 +124,7 @@ Pearl Rung 2 (intervention via ablation) is the standard warrant for "component 
 - **Single-seed comparative claims.** For stochastic comparisons, variance across seeds is part of the result. Run multiple seeds for claim-bearing comparisons.
 - **Hyperparameter asymmetry.** If your method got more hyperparameter tuning than the comparator, the comparison is biased. Report tuning effort explicitly.
 - **In-sample tuning.** Methods tuned on the test set are not tested. Use a validation split for tuning; test only at the end.
-- **Metric shopping.** If the primary success criterion was not met, do not switch to a different criterion and present it as a success. If a secondary criterion is more relevant, REFINE the plan before any claim is made.
+- **Metric shopping.** If the primary success criterion was not met, do not switch to a different criterion and present it as a success. If a secondary criterion is more relevant, update the hypothesis/proposition state and draft a new derived hypothesis before any claim is made.
 - **Compute apples-vs-oranges.** Comparing a 10× larger model to a smaller comparator tells you about scale, not about your method. Hold compute constant or report scaling curves.
 - **Ablation theater.** Single-component ablations on isolated runs do not isolate causal contribution if the components interact. Report joint ablations when interactions matter.
 - **Skipping the negative-result writeup.** A method that did not improve is still a result. Document it; the next agent should not re-run it.

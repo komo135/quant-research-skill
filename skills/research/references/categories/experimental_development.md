@@ -39,7 +39,7 @@ Milestone mode differs from confirmatory:
 - Confirmatory fixes a hypothesis/objective, evidence measure, and decision threshold
 - Milestone fixes acceptance criteria ("system handles input class A, latency under T ms, returns correct output on the regression suite under conditions C")
 
-One plan still declares one mode. A milestone plan may include benchmark thresholds as acceptance criteria, but if the benchmark comparison becomes the load-bearing evidence for a methods claim, open an `ADJACENT` applied-research plan with confirmatory mode instead of making the plan both milestone and confirmatory.
+One plan still declares one mode. A milestone plan may include benchmark thresholds as acceptance criteria, but if the benchmark comparison becomes the load-bearing evidence for a methods claim, open a separate applied-research derived hypothesis with confirmatory mode instead of making the plan both milestone and confirmatory.
 
 `exploratory` mode is sometimes appropriate for very early-stage development (figuring out what is even buildable). Switch to `milestone` once the shape of the system is clear.
 
@@ -87,7 +87,7 @@ Example claim record:
 
 ```yaml
 - claim: The implemented inference server handles 850 requests/second median throughput at p99 latency under 120 ms on a single A100 for the 7B-parameter model under the regression test load.
-  evidence: experiments/03_serve/runs/03__012__seed0/loadtest/results.json; figures/latency_distribution.png
+  evidence: propositions/P001_serving-system/hypotheses/H001_load-test/experiments/runs/H001__012__seed0/outputs/loadtest_results.json; figures/latency_distribution.png
   alternatives_not_excluded:
     - "Single hardware tested (1× A100, no NUMA effects measured)"
     - "Synthetic request distribution (constant prompt length, may not reflect real load)"
@@ -128,5 +128,5 @@ Performance claims are distribution claims. Report the distribution, not a singl
 - **Skipping edge cases.** Most production failures are edge cases. Completion criteria should include edge-case scenarios.
 - **Documentation debt.** A working artifact that nobody else can run is half-built. The System description in the report must let a non-author bring the artifact up.
 - **Promoting development to a component-causality claim without evidence.** Claiming "system S works because of component I" requires an ablation or controlled intervention. Without that evidence, the claim is "system S works under stated conditions," not "component I is the reason."
-- **Hidden infrastructure changes.** Modifying lib/ or shared infrastructure as part of development without recording it in `decisions.md` makes the change invisible to other plans.
+- **Hidden infrastructure changes.** Modifying lib/ or shared infrastructure as part of development without recording it in the relevant project, proposition, or hypothesis `decisions.md` makes the change invisible to other hypotheses.
 - **Single-run performance numbers.** Performance is a distribution. Report it as one.
