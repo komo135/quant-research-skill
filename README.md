@@ -71,50 +71,30 @@ enabled = true
 
 ## Quickstart
 
-Create a proposition-first project scaffold:
+This is an agent skill, not a human-operated command-line framework. After installing the plugin, ask your agent to use the skill and give it the research context, material, and desired project location.
 
-```bash
-python skills/research/scripts/new_project.py ./my-research --name "My Research"
+Example prompts:
+
+```text
+Use the research skill to start a proposition-first R&D project in ./my-research.
+The situation question is: why does the baseline fail when preprocessing changes?
+Use the attached observations as the initial material. Do not create a hypothesis until
+the proposition analysis has enough material.
 ```
 
-Create the first proposition from concrete material:
-
-```bash
-python skills/research/scripts/new_proposition.py ./my-research \
-  --id P001 \
-  --slug baseline-break \
-  --title "Baseline Break" \
-  --proposition "If the new representation preserves the required signal, the baseline failure should disappear." \
-  --expected "The planned discriminator should show lower failure rate than the current baseline."
+```text
+Use research-plan-review on ./my-research/propositions/P001_baseline-break/
+hypotheses/H001_discriminator-test/plan.md. Check whether the plan actually tests
+the derived hypothesis and whether premise, prior-work grounding, and Plan visual are sufficient.
 ```
 
-After recording observations and source analysis, create a derived hypothesis:
-
-```bash
-python skills/research/scripts/new_hypothesis.py ./my-research \
-  --proposition P001_baseline-break \
-  --id H001 \
-  --slug discriminator-test \
-  --title "Discriminator Test" \
-  --category applied_research \
-  --mode confirmatory \
-  --source-analysis A001 \
-  --status supported \
-  --hypothesis "The representation fails because the required signal is erased during preprocessing." \
-  --type "mechanistic" \
-  --expected "A leakage-free discriminator should recover the failure mode." \
-  --competing "The failure is caused by the downstream model rather than preprocessing." \
-  --discriminator "Compare preprocessing-preserved and preprocessing-erased variants under the same evaluator." \
-  --required-evidence "A run artifact with the discriminator result and evaluation conditions."
+```text
+Use research-result-analysis on the completed plan path. Reconstruct the run evidence,
+explain what happened and why, and return state-update inputs. Do not write final
+claims or proposition decisions.
 ```
 
-Then run the workflow:
-
-1. Fill the hypothesis `plan.md`.
-2. Ask `research-plan-review` to review the plan path before execution.
-3. Execute and store durable run artifacts with `new_run.py`.
-4. Ask `research-result-analysis` to analyze the plan path after evidence exists.
-5. Update the hypothesis and parent proposition ledgers.
+The agent may use the bundled scripts to create folders, seed ledgers, and check artifacts. Those scripts are implementation utilities for the skill workflow; the normal user interface is the agent conversation.
 
 ## Core workflow
 
@@ -141,7 +121,7 @@ A contradicted proposition is not a plannable parent. Record the contradiction, 
 
 ## Project layout
 
-`skills/research/scripts/new_project.py` creates this proposition-first structure:
+The agent creates and maintains this proposition-first structure:
 
 ```text
 {project-root}/
@@ -217,7 +197,9 @@ Mid-execution literature update is required when an unfamiliar method, unexpecte
 
 The extension includes references for validation, feature construction, model diagnostics, prediction-to-decision mapping, multiple testing, robustness, and sanity checks. It also includes utility scripts for purged k-fold, CPCV, walk-forward validation, leakage checks, multiple-testing corrections, sanity checks, and sensitivity grids.
 
-## Bundled scripts
+## Agent-facing utilities
+
+The repository includes small Python utilities that agents can use to make the workflow repeatable. They are not the primary user interface, and they should not replace the skill's judgment about material sufficiency, proposition status, plan readiness, or claim scope.
 
 `skills/research/scripts/`:
 

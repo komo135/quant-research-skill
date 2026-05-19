@@ -38,4 +38,10 @@ jobs:
         run: python -m pytest
 
       - name: Check whitespace
-        run: git diff --check "$(git hash-object -t tree /dev/null)" HEAD
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            BASE_SHA="$(git rev-parse HEAD~1)"
+          fi
+          git diff --check "$BASE_SHA" HEAD
