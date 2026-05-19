@@ -1,83 +1,147 @@
 # research-skill
 
-A Claude Code and Codex plugin providing four skills for **agent-driven R&D**:
+[![CI](https://github.com/komo135/research-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/komo135/research-skill/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
-- **`research`** — proposition-first protocol for R&D work across Frascati categories. It manages observations, analyses, Generated doubt, Working proposition, Expected consequence, Proposition status, Derived hypothesis, hypothesis plans, claims, decisions, and reports.
-- **`research-plan-review`** — independent pre-execution review. It starts from a hypothesis plan path only and checks premise, proposition trace, validation method, plan visual, prior-work grounding, and blockers.
-- **`research-result-analysis`** — independent post-execution analysis. It starts from a hypothesis plan path only, reconstructs evidence, explains what happened and why, and returns state-update inputs without writing final claims or decisions.
-- **`quant-research`** — domain extension layered on `research` for time-series and statistically rigorous quantitative R&D.
+`research-skill` is a Claude Code and Codex plugin for **agent-driven R&D**. It gives agents a proposition-first research lifecycle, independent plan review, independent result analysis, and a quantitative research extension for time-series and statistically fragile evaluations.
 
-The core rule: **research-level reproducibility is enforced; experiment-level replicability is the agent's discretion.** Reports record material conditions, not environment locks: data identity, split dates, evaluation protocol, major model/tool versions, hardware class, external API/model version, collection date, formal assumptions, and seed variability when they affect interpretation. Research scripts still need evidence: print-only output is incomplete and stdout is not evidence, so completed runs keep a manifest with `status: completed`, logs, and at least one manifest-listed durable artifact. Claim-to-artifact consistency checks are evidence-integrity checks rather than a replacement for methods reproducibility; experiment-level replicability infrastructure is not skill-enforced. Provenance or variability logs are useful but not substitutes for methods reproducibility.
+The central idea is simple: the top-level research unit is a **proposition**, not a standalone plan. Plans test one derived hypothesis traced to a live parent proposition.
 
-## Core design
+## Why this exists
 
-### Proposition-first lifecycle
+Agentic research often fails in predictable ways: it jumps from vague topics to experiments, treats missing material as permission to speculate, forgets why a hypothesis was generated, or turns a result into a claim without checking whether the original proposition survived.
+
+This plugin makes those transitions explicit:
+
+- collect material before proposing hypotheses;
+- record the generated doubt, working proposition, expected consequence, observed match or break, and proposition status;
+- derive one plan-ready hypothesis from a live proposition;
+- review the plan before execution;
+- analyze results before updating hypothesis and proposition ledgers;
+- preserve durable artifacts instead of treating stdout as evidence.
+
+## When to use it
+
+Use this plugin when an agent is doing R&D work that needs traceable reasoning, durable evidence, and disciplined claim formation.
+
+Good fits:
+
+- basic research, applied research, or experimental development work;
+- exploratory research that must not skip from topic to hypothesis;
+- experiments where prior assumptions, comparators, or evaluation method may be wrong;
+- post-result analysis where the agent must explain what happened before deciding what to claim;
+- quantitative work with time-series validation, multiple-testing risk, leakage risk, or selected-best-of-N evaluation.
+
+Poor fits:
+
+- one-off implementation tasks with no research claim;
+- purely qualitative note-taking where no hypothesis, evidence route, or claim is needed;
+- work where reproducibility and artifact discipline are intentionally out of scope.
+
+## Skills
+
+| Skill | Role |
+|---|---|
+| `research` | Proposition-first protocol for R&D work across Frascati categories. Owns observations, analyses, proposition state, derived hypotheses, plans, claims, decisions, and reports. |
+| `research-plan-review` | Independent pre-execution review. Starts from a hypothesis plan path and checks premise, proposition trace, validation method, plan visual, prior-work grounding, and blockers. |
+| `research-result-analysis` | Independent post-execution analysis. Starts from a hypothesis plan path, reconstructs evidence, explains what happened and why, and returns state-update inputs without writing final claims or decisions. |
+| `quant-research` | Domain extension layered on `research` for time-series and statistically rigorous quantitative R&D. Adds validation, leakage, multiple-testing, and robustness guidance. |
+
+## Installation
+
+### Claude Code
 
 ```text
-Situation question
-→ observation / analysis
-→ proposition P
-→ expected observation E if P is true
-→ compare observed O with E
-→ decide whether P is contradicted or whether P's required condition is unrealized
-→ if P remains live, derive hypothesis H that preserves, revises, splits from, or realizes a condition of P
-→ predict what should happen if H is true
-→ Hypothesis plan
-→ Plan review
-→ Execution
-→ Result analysis
-→ hypothesis status update
-→ proposition status update
+/plugin marketplace add https://github.com/komo135/research-skill
+/plugin install research@research-skill
 ```
 
-Question generation is not free-form ideation. It starts from material and a contrast:
+### Codex
 
-- `expectation-break`
-- `constraint-joint-fit`
-- `required-component-doubt`
-- `trace-meaning`
-- `static-to-process`
-- `analogy-transfer`
-- `search-or-evaluation-bottleneck`
-- `representation-change`
+```bash
+codex plugin marketplace add https://github.com/komo135/research-skill
+```
 
-Each analysis records the Generated doubt, Working proposition, Expected consequence, observed match/break/missing condition, Proposition status, and only then a Derived hypothesis candidate. Material absence means no proposition or hypothesis: collect observations, measurements, constraints, comparators, traces, prior-work facts, theoretical tensions, or bottleneck evidence first.
+Enable the plugin in `~/.codex/config.toml`:
 
-The material-acquisition task should name the missing observation, comparator or expected reference, measurement or evidence form, minimal reproduction or trace, and next artifact to collect.
+```toml
+[plugins."research@research-skill"]
+enabled = true
+```
 
-A contradicted proposition is not a plannable parent: record the contradiction, revise, split, or close the proposition, then derive the next hypothesis under the updated proposition.
+## Quickstart
 
-Hypothesis candidates are typed; a derived hypothesis may be predictive / performance, mechanistic, causal / intervention, descriptive / characterization, theoretical, or mixed.
+Create a proposition-first project scaffold:
 
-### Proposition status
+```bash
+python skills/research/scripts/new_project.py ./my-research --name "My Research"
+```
 
-Propositions are not claims. They are long-lived research state.
+Create the first proposition from concrete material:
 
-Statuses:
+```bash
+python skills/research/scripts/new_proposition.py ./my-research \
+  --id P001 \
+  --slug baseline-break \
+  --title "Baseline Break" \
+  --proposition "If the new representation preserves the required signal, the baseline failure should disappear." \
+  --expected "The planned discriminator should show lower failure rate than the current baseline."
+```
 
-- `open`
-- `supported`
-- `contradicted`
-- `unrealized-condition`
-- `under-specified`
-- `split-needed`
-- `split`
-- `closed`
+After recording observations and source analysis, create a derived hypothesis:
 
-Derived hypotheses use:
+```bash
+python skills/research/scripts/new_hypothesis.py ./my-research \
+  --proposition P001_baseline-break \
+  --id H001 \
+  --slug discriminator-test \
+  --title "Discriminator Test" \
+  --category applied_research \
+  --mode confirmatory \
+  --source-analysis A001 \
+  --status supported \
+  --hypothesis "The representation fails because the required signal is erased during preprocessing." \
+  --type "mechanistic" \
+  --expected "A leakage-free discriminator should recover the failure mode." \
+  --competing "The failure is caused by the downstream model rather than preprocessing." \
+  --discriminator "Compare preprocessing-preserved and preprocessing-erased variants under the same evaluator." \
+  --required-evidence "A run artifact with the discriminator result and evaluation conditions."
+```
 
-- `candidate`
-- `ready-for-plan`
-- `tested-supported`
-- `tested-contradicted`
-- `tested-partial`
-- `tested-inconclusive`
-- `parked`
-- `killed`
+Then run the workflow:
 
-## Project layout the skill produces
+1. Fill the hypothesis `plan.md`.
+2. Ask `research-plan-review` to review the plan path before execution.
+3. Execute and store durable run artifacts with `new_run.py`.
+4. Ask `research-result-analysis` to analyze the plan path after evidence exists.
+5. Update the hypothesis and parent proposition ledgers.
 
-When an agent runs `scripts/new_project.py`:
+## Core workflow
+
+```mermaid
+flowchart TD
+  A[Situation question] --> B[Observation or analysis]
+  B --> C[Working proposition]
+  C --> D[Expected consequence]
+  D --> E[Observed match, break, or missing condition]
+  E --> F[Proposition status]
+  F -->|live and plan-ready| G[Derived hypothesis]
+  F -->|missing material| M[Material acquisition task]
+  F -->|contradicted or closed| R[Revise, split, or close proposition]
+  G --> H[Hypothesis plan]
+  H --> I[Plan review]
+  I --> J[Execution with durable artifacts]
+  J --> K[Result analysis]
+  K --> L[Hypothesis and proposition ledger updates]
+```
+
+Material absence means no proposition or hypothesis. The agent should collect observations, measurements, constraints, comparators, traces, prior-work facts, theoretical tensions, or bottleneck evidence first.
+
+A contradicted proposition is not a plannable parent. Record the contradiction, revise, split, or close the proposition, then derive the next hypothesis under the updated proposition.
+
+## Project layout
+
+`skills/research/scripts/new_project.py` creates this proposition-first structure:
 
 ```text
 {project-root}/
@@ -103,84 +167,111 @@ When an agent runs `scripts/new_project.py`:
                 └── decisions.md         # hypothesis decisions
 ```
 
-`lib/`, `data/`, and `literature/` may exist when the project needs shared code, data, or project-level prior-work state, but the research lifecycle is organized by propositions and derived hypotheses.
+`lib/`, `data/`, and `literature/` may exist when the project needs shared code, data, or project-level prior-work state. The lifecycle itself remains organized by propositions and derived hypotheses.
 
-## Bundled scripts
+## Research contract
 
-`skills/research/scripts/`:
+Research-level reproducibility is enforced; experiment-level replicability infrastructure is the agent's discretion.
 
-| script | purpose |
-|---|---|
-| `new_project.py` | Initialize proposition-first project structure |
-| `new_proposition.py` | Create `propositions/Pxxx_slug/` with proposition, observations, analyses, decisions, and hypotheses directory |
-| `new_hypothesis.py` | Create `hypotheses/Hxxx_slug/` with hypothesis ledger, hypothesis plan, experiments, reports, and decisions |
-| `new_run.py` | Create durable run evidence scaffold under a derived hypothesis |
-| `check_run_artifacts.py` | Reject print-only runs and verify manifest/logs/non-log artifacts |
-| `check_mechanism_hypothesis_record.py` | Legacy checker for older mechanism-record plans; current flow uses proposition analyses and hypothesis ledgers |
-| `check_claims.py` | Verify claim record structure |
-| `check_report.py` | Verify report contract |
-| `draft_report.py` | Initialize a report under a derived hypothesis |
+Reports record material conditions rather than environment locks: data identity, split dates, evaluation protocol, major model/tool versions, hardware class, external API/model version, collection date, formal assumptions, and seed variability when they affect interpretation.
 
-There is no standalone `new_plan.py`; top-level plans are the old lifecycle.
+Research scripts still need evidence. Print-only output is incomplete, and stdout is not evidence. Completed runs keep a manifest with `status: completed`, logs, and at least one manifest-listed durable artifact. Claim-to-artifact consistency checks are evidence-integrity checks, not a replacement for methods reproducibility.
 
-## Hypothesis plan
+## Reports
+
+Reports are paper-grade standalone evidence artifacts under each derived hypothesis. They include Related Work, Theory / Formulation, Methods & Conditions, Results or Observations, Ablation / Sensitivity, Discussion, Limitations, and References.
+
+Sections that do not apply still appear with `Not applicable:` and a reason. Reports should be understandable without replaying the full agent session.
+
+## Hypothesis plans
 
 `propositions/Pxxx_slug/hypotheses/Hxxx_slug/plan.md` contains:
 
-- Proposition and hypothesis trace
-- Prior-work grounding
-- Divergence checkpoint
-- Plan visual for architecture, data/evaluation flow, mechanism, system boundary, decision flow, or derivation structure
-- Method and evidence route
-- Plan review
-- Actual execution
-- Planned vs Actual
-- Result analysis
-- Claims
-- Result feedback
+- proposition and hypothesis trace;
+- prior-work grounding;
+- divergence checkpoint;
+- plan visual for architecture, data/evaluation flow, mechanism, system boundary, decision flow, or derivation structure;
+- method and evidence route;
+- plan review;
+- actual execution;
+- planned vs actual;
+- result analysis;
+- claims;
+- result feedback.
 
 The trace must include Situation question context, Generated doubt, Working proposition, Expected consequence, Proposition status, Derived hypothesis, and Hypothesis plan link. The plan may summarize proposition history but must not rewrite it.
 
 Prior-work grounding uses `literature/{papers.md,positioning.md}` when project-level prior-work state is useful.
 
-Mid-execution literature update: if an unfamiliar method, unexpected result, new comparator, contradiction with prior work, or missing-baseline signal appears, record the update before claim-bearing execution continues.
+Mid-execution literature update is required when an unfamiliar method, unexpected result, new comparator, contradiction with prior work, or missing-baseline signal appears before claim-bearing execution continues.
 
-## Review and result gates
+## Quant research extension
 
-Before execution, `research-plan-review` checks wrong, unsupported, or unverified premise risk, the hypothesis validation method, and whether the plan actually tests the derived hypothesis produced by source analysis or drifted into a convenient different question. Broken premise or invalid validation method returns `block_execution`.
+`quant-research` adds statistical methodology for time-series and selected-best evaluations. Use it together with `research` when:
 
-After execution, `research-result-analysis` explains what happened and why from the plan path and artifacts. It does not choose proposition decisions. The parent agent then updates:
+- time order matters and random-shuffle CV would leak future information;
+- labels overlap and ordinary k-fold validation underestimates error;
+- many variants are tested and the best one is selected;
+- feature construction may use information unavailable at prediction time;
+- a result needs robustness checks across regimes, perturbations, or parameter settings.
 
-1. `hypothesis.md`
-2. hypothesis `decisions.md`
-3. parent `proposition.md`
-4. proposition `decisions.md`
+The extension includes references for validation, feature construction, model diagnostics, prediction-to-decision mapping, multiple testing, robustness, and sanity checks. It also includes utility scripts for purged k-fold, CPCV, walk-forward validation, leakage checks, multiple-testing corrections, sanity checks, and sensitivity grids.
 
-## Reports
+## Bundled scripts
 
-Reports are paper-grade standalone evidence artifacts under each derived hypothesis. They include Related Work, Theory / Formulation, Methods & Conditions, Results or Observations, Ablation / Sensitivity, Discussion, Limitations, and References. Sections that do not apply still appear with `Not applicable:` and a reason.
+`skills/research/scripts/`:
 
-## Installation
+| Script | Purpose |
+|---|---|
+| `new_project.py` | Initialize proposition-first project structure. |
+| `new_proposition.py` | Create `propositions/Pxxx_slug/` with proposition, observations, analyses, decisions, and hypotheses directory. |
+| `new_hypothesis.py` | Create `hypotheses/Hxxx_slug/` with hypothesis ledger, hypothesis plan, experiments, reports, and decisions. |
+| `new_run.py` | Create durable run evidence scaffold under a derived hypothesis. |
+| `check_run_artifacts.py` | Reject print-only runs and verify manifest/logs/non-log artifacts. |
+| `check_mechanism_hypothesis_record.py` | Legacy checker for older mechanism-record plans; current flow uses proposition analyses and hypothesis ledgers. |
+| `check_claims.py` | Verify claim record structure. |
+| `check_report.py` | Verify report contract. |
+| `draft_report.py` | Initialize a report under a derived hypothesis. |
 
-### Claude Code
+`skills/quant-research/scripts/`:
 
-```text
-/plugin marketplace add https://github.com/komo135/research-skill
-/plugin install research@research-skill
-```
+| Script | Purpose |
+|---|---|
+| `purged_kfold.py` | Purged k-fold cross-validation for time-series with overlapping labels. |
+| `cpcv.py` | Combinatorial Purged Cross-Validation. |
+| `walk_forward.py` | Walk-forward validation with expanding or rolling windows. |
+| `multiple_testing.py` | Multiple-testing corrections, including Bonferroni, Benjamini-Hochberg, and Romano-Wolf. |
+| `leakage_check.py` | Detect train/test feature leakage and look-ahead bias. |
+| `sanity_checks.py` | Standard pre-claim sanity checks. |
+| `sensitivity_grid.py` | Parameter sensitivity grid for robustness analysis. |
 
-### Codex
+There is no standalone `new_plan.py`; top-level plans are the old lifecycle.
+
+## Development
+
+Install development dependencies:
 
 ```bash
-codex plugin marketplace add https://github.com/komo135/research-skill
+python -m pip install -r requirements-dev.txt
 ```
 
-Enable in `~/.codex/config.toml`:
+Run checks:
 
-```toml
-[plugins."research@research-skill"]
-enabled = true
+```bash
+python -m pytest
+python -m json.tool .codex-plugin/plugin.json
+python -m json.tool .claude-plugin/plugin.json
+python -m json.tool .claude-plugin/marketplace.json
+git diff --check
 ```
+
+Before adding or changing tests, apply the repository's Test Admission Gate in `AGENTS.md`. For release, packaging, cache, and plugin metadata work, use verification commands and report evidence instead of adding version-number or release-state tests.
+
+## Contributing
+
+Contributions are welcome when they preserve the proposition-first lifecycle and keep public contracts explicit. Start with [CONTRIBUTING.md](./CONTRIBUTING.md), and use the issue and pull request templates in `.github/`.
+
+For security or safety-sensitive reports, see [SECURITY.md](./SECURITY.md).
 
 ## License
 

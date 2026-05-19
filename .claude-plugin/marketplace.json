@@ -8,8 +8,8 @@
     {
       "name": "research",
       "source": "./",
-      "description": "v2.7.3 - Agent-driven R&D protocol with typed hypothesis generation, plan-visual review, prior-work grounding, result analysis, and reports without next-action queues.",
-      "version": "2.7.3"
+      "description": "v3.0.0 - Proposition-first R&D protocol with observation/analysis state, derived hypothesis plans, plan review, result analysis, and proposition feedback.",
+      "version": "3.0.0"
     }
   ]
 }
