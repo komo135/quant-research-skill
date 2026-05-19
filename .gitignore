@@ -3,6 +3,7 @@ __pycache__/
 *.pyo
 .DS_Store
 .tdd/
+.superpowers/
 docs/
 skills/*/skill_tests/
 plugins/*/skills/*/skill_tests/
